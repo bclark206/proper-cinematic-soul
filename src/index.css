@@ -2,41 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Proper Cuisine Design System - Cinematic Elegance
+Colors: Gold (#BFAF87), Jet Black (#1C1C1C), Cream (#EAE3D5), White (#FFFFFF)
+Fonts: Playfair Display (headings), Inter (body)
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core Brand Colors */
+    --background: 36 25% 91%; /* Cream background */
+    --foreground: 0 0% 11%; /* Jet black text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 0 0% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 11%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Sophisticated Gold */
+    --primary: 45 25% 64%; /* #BFAF87 */
+    --primary-foreground: 0 0% 11%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Jet Black */
+    --secondary: 0 0% 11%; /* #1C1C1C */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted - Warm Cream */
+    --muted: 36 25% 91%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Luxurious Gold */
+    --accent: 45 30% 70%;
+    --accent-foreground: 0 0% 11%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 45 15% 85%;
+    --input: 45 15% 85%;
+    --ring: 45 25% 64%;
 
     --radius: 0.5rem;
+
+    /* Custom Proper Cuisine Colors */
+    --gold: 45 25% 64%; /* #BFAF87 */
+    --jet-black: 0 0% 11%; /* #1C1C1C */
+    --cream: 36 25% 91%; /* #EAE3D5 */
+    --pure-white: 0 0% 100%; /* #FFFFFF */
+    
+    /* Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)), hsl(45 30% 70%));
+    --gradient-dark: linear-gradient(135deg, hsl(var(--jet-black)), hsl(0 0% 18%));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--jet-black) / 0.9), hsl(var(--jet-black) / 0.7));
+    
+    /* Shadows */
+    --shadow-elegant: 0 20px 40px -12px hsl(var(--jet-black) / 0.25);
+    --shadow-gold: 0 8px 32px -8px hsl(var(--gold) / 0.3);
+    --shadow-subtle: 0 4px 16px -4px hsl(var(--jet-black) / 0.1);
+
+    /* Typography Scale */
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,41 +84,43 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark mode with elegant black & gold theme */
+    --background: 0 0% 11%; /* Jet Black */
+    --foreground: 36 25% 91%; /* Cream text */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 15%;
+    --card-foreground: 36 25% 91%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 36 25% 91%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 45 25% 64%; /* Gold stays primary */
+    --primary-foreground: 0 0% 11%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 36 25% 91%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 45 30% 70%;
+    --accent-foreground: 0 0% 11%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 36 25% 91%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 0 0% 20%;
+    --input: 0 0% 18%;
+    --ring: 45 25% 64%;
+    
+    --sidebar-background: 0 0% 11%;
+    --sidebar-foreground: 36 25% 91%;
+    --sidebar-primary: 45 25% 64%;
+    --sidebar-primary-foreground: 0 0% 11%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 36 25% 91%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 45 25% 64%;
   }
 }
 
@@ -100,6 +130,114 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-feature-settings: "kern" 1, "liga" 1, "swsh" 1;
+  }
+}
+
+@layer components {
+  /* Cinematic Animations */
+  .fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+  }
+  
+  .fade-in-slow {
+    animation: fade-in 1.2s ease-out forwards;
+  }
+
+  .parallax-hero {
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  /* Elegant hover effects */
+  .hover-gold {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-gold:hover {
+    color: hsl(var(--gold));
+    text-shadow: 0 0 20px hsl(var(--gold) / 0.3);
+  }
+
+  /* Menu reveal animation */
+  .menu-reveal {
+    transform: translateY(20px);
+    opacity: 0;
+    animation: menu-reveal 0.6s ease-out forwards;
+  }
+
+  /* Luxury button styles */
+  .btn-gold {
+    background: var(--gradient-gold);
+    color: hsl(var(--jet-black));
+    border: 1px solid hsl(var(--gold));
+    transition: all 0.3s ease;
+  }
+  
+  .btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-gold);
+  }
+
+  .btn-outline-gold {
+    background: transparent;
+    color: hsl(var(--gold));
+    border: 2px solid hsl(var(--gold));
+    transition: all 0.3s ease;
+  }
+  
+  .btn-outline-gold:hover {
+    background: hsl(var(--gold));
+    color: hsl(var(--jet-black));
+    transform: translateY(-2px);
+  }
+}
+
+@layer utilities {
+  .text-display {
+    font-family: var(--font-display);
+  }
+  
+  .text-body {
+    font-family: var(--font-body);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes menu-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
