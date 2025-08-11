@@ -53,21 +53,13 @@ const MenuSection = () => {
         <div className="grid lg:grid-cols-3 gap-8 mb-16">
           {menuItems.map((menu, index) => (
             <Card key={menu.title} className="bg-cream border-gold/20 overflow-hidden group hover:shadow-gold transition-all duration-500">
-              <div className="relative h-64 overflow-hidden">
-                <img 
-                  src={menu.image} 
-                  alt={menu.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-jet-black/80 to-transparent"></div>
-                <div className="absolute bottom-4 left-4 flex items-center space-x-2 text-pure-white">
+              <CardContent className="p-8">
+                <div className="flex items-center space-x-2 text-jet-black/60 mb-4">
                   <menu.icon className="w-5 h-5" />
                   <Clock className="w-4 h-4" />
                   <span className="text-sm">{menu.time}</span>
                 </div>
-              </div>
-              
-              <CardContent className="p-8">
+                
                 <h3 className="font-display text-3xl font-bold text-jet-black mb-2">
                   {menu.title}
                 </h3>
