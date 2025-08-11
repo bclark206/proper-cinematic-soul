@@ -20,7 +20,7 @@ const MenuSection = () => {
       subtitle: "Elevated classics with chef-driven finesse",
       description: "Our dinner service showcases the finest ingredients transformed through Southern tradition and modern technique.",
       icon: Utensils,
-      time: "Wed-Sun | 5PM-11PM",
+      time: "Daily | 5PM-11PM",
       image: foodImage,
       highlights: ["Bourbon Glazed Short Rib", "Blackened Red Snapper", "Heritage Pork Chop"]
     },
@@ -29,7 +29,7 @@ const MenuSection = () => {
       subtitle: "Artfully crafted, elegantly served",
       description: "Our bar program celebrates classic cocktails with a Southern twist, featuring premium spirits and house-made ingredients.",
       icon: Wine,
-      time: "Wed-Sun | 5PM-Late",
+      time: "Daily | 5PM-Late",
       image: cocktailImage,
       highlights: ["Old Fashioned Proper", "Golden Hour Martini", "Baltimore Boulevardier"]
     }
