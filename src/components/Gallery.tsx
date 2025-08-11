@@ -21,7 +21,17 @@ const Gallery = () => {
     { id: 5, image: "/lovable-uploads/b698a030-11b4-4877-89ef-151bd687a332.png", title: "Dining Room Perspective", category: "all", description: "Signature gold and marble accents throughout." },
     { id: 6, image: "/lovable-uploads/8f451f04-db68-4d54-b4d4-75574f6bd736.png", title: "Banquette View", category: "all", description: "Elegant mirrors and gold drapes frame the space." },
     { id: 7, image: "/lovable-uploads/4692a049-cf96-4742-ad15-0538a777ec33.png", title: "Table Setting Close-up", category: "all", description: "Polished glassware and black accents for contrast." },
-    { id: 8, image: "/lovable-uploads/7235fdc5-9400-478a-a585-18cce9f51f98.png", title: "Symmetry & Style", category: "all", description: "A refined, symmetrical view of the dining salon." }
+    { id: 8, image: "/lovable-uploads/7235fdc5-9400-478a-a585-18cce9f51f98.png", title: "Symmetry & Style", category: "all", description: "A refined, symmetrical view of the dining salon." },
+    { id: 9, image: "/lovable-uploads/11f3986d-83be-4818-9505-c83e10c07e57.png", title: "Grand Aisle Perspective", category: "all", description: "A sweeping aisle framed by gold curtains and seating." },
+    { id: 10, image: "/lovable-uploads/852749f7-e5b7-4543-83a1-043fa3f7a9a4.png", title: "Panoramic Dining View", category: "all", description: "A wide-angle of the chandelier and dining layout." },
+    { id: 11, image: "/lovable-uploads/4d20cfe0-2db9-4acb-938d-ba2de25ad805.png", title: "Table Setting Focus", category: "all", description: "Elegant place settings with pearl napkin rings." },
+    { id: 12, image: "/lovable-uploads/c4c831cb-afcf-4195-9078-68117ab29c7e.png", title: "Chandelier & Lounge", category: "all", description: "Crystal chandelier over gold tufted banquettes." },
+    { id: 13, image: "/lovable-uploads/2d018f20-6de6-4b87-8290-63abaca61ae8.png", title: "Salon Seating", category: "all", description: "Mirror-lined walls and intimate seating areas." },
+    { id: 14, image: "/lovable-uploads/5a10a0b7-7ec0-4933-a968-4e0c4250750f.png", title: "Dining Row View", category: "all", description: "Rows of linen-covered tables and warm lighting." },
+    { id: 15, image: "/lovable-uploads/8ce5fdc1-6c42-4270-accc-a345d87344cc.png", title: "Ceiling Details", category: "all", description: "Architectural ceiling details with ambient lighting." },
+    { id: 16, image: "/lovable-uploads/b37c9414-8a52-4e2a-85d8-7f4ed80faddc.png", title: "Curved Banquette", category: "all", description: "Curved seating with dramatic drapery and mirrors." },
+    { id: 17, image: "/lovable-uploads/e9458ccc-b712-43de-83a3-8c2a6dd33501.png", title: "Corner Lounge", category: "all", description: "Corner vantage with soft window light and decor." },
+    { id: 18, image: "/lovable-uploads/cf525d30-1e37-4624-8c51-8d10cada996e.png", title: "Chandelier Overlook", category: "all", description: "Chandelier glow over an elegant banquette line." }
   ];
 
   const filteredItems = currentCategory === "all" 
