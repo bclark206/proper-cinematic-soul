@@ -3,9 +3,8 @@ const heroImage = "/lovable-uploads/acfb37f3-0fb6-4e2a-a2ec-3630b8545589.png";
 const Hero = () => {
   return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0 bg-cover bg-center md:bg-fixed" style={{
-      backgroundImage: `url(${heroImage})`
-    }}>
+      <div className="absolute inset-0">
+        <img src={heroImage} alt="Proper Cuisine restaurant hero interior" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-hero"></div>
       </div>
       
@@ -27,8 +26,14 @@ const Hero = () => {
               ORDER ONLINE
             </a>
           </Button>
-          <Button variant="outline-gold" size="xl" className="min-w-48 text-pure-white border-pure-white hover:bg-pure-white hover:text-jet-black" asChild>
-            <a href="#menus">View Our Menus</a>
+          <Button variant="outline-gold" size="xl" className="min-w-48 text-pure-white border-pure-white hover:bg-pure-white hover:text-jet-black"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('menus')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              history.replaceState(null, '', '#menus');
+            }}
+          >
+            View Our Menus
           </Button>
         </div>
       </div>
