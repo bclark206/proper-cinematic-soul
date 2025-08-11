@@ -5,12 +5,12 @@ const Contact = () => {
   const contactInfo = [{
     icon: MapPin,
     title: "Location",
-    details: ["1234 Proper Way", "Baltimore, MD 21201"],
+    details: ["206 E Redwood St", "Baltimore, MD 21202"],
     action: "Get Directions"
   }, {
     icon: Phone,
     title: "Reservations",
-    details: ["(410) 555-0123", "Call or text anytime"],
+    details: ["(443) 432-2771", "Call or text anytime"],
     action: "Call Now"
   }, {
     icon: Mail,
@@ -20,13 +20,13 @@ const Contact = () => {
   }, {
     icon: Clock,
     title: "Hours",
-    details: ["Wed-Sun | 5PM-11PM", "Brunch: Sat-Sun 10AM-3PM"],
+    details: ["Sunday 11am-11pm", "Mon-Thu 12pm-11pm", "Fri-Sat 12pm-12am"],
     action: "View Calendar"
   }];
   const socialLinks = [{
     icon: Instagram,
-    label: "@propercuisine",
-    href: "#"
+    label: "@TheProperCuisine",
+    href: "https://instagram.com/TheProperCuisine"
   }, {
     icon: Facebook,
     label: "Proper Cuisine",
