@@ -11,7 +11,7 @@ const MenuSection = () => {
       subtitle: "Decadent bites & champagne-soaked Sundays",
       description: "Weekend indulgence meets Southern soul. Our brunch menu features elevated classics with a modern twist.",
       icon: Coffee,
-      time: "Sat-Sun | 10AM-3PM",
+      time: "Sunday | 11AM-11PM",
       image: foodImage,
       highlights: ["Shrimp & Grits Royale", "Chicken & Waffle Stack", "Proper Benedict"]
     },
