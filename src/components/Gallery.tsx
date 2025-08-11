@@ -3,63 +3,25 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import heroImage from "@/assets/hero-restaurant.jpg";
-import foodImage from "@/assets/fine-dining-plate.jpg";
-import cocktailImage from "@/assets/craft-cocktails.jpg";
+
+
 
 const Gallery = () => {
   const [currentCategory, setCurrentCategory] = useState("all");
   
   const categories = [
-    { id: "all", label: "All" },
-    { id: "interior", label: "Interior" },
-    { id: "food", label: "Food" },
-    { id: "cocktails", label: "Cocktails" },
-    { id: "events", label: "Events" }
+    { id: "all", label: "All" }
   ];
 
   const galleryItems = [
-    {
-      id: 1,
-      image: heroImage,
-      title: "Main Dining Room",
-      category: "interior",
-      description: "Gold chandeliers and velvet banquettes create an atmosphere of luxury"
-    },
-    {
-      id: 2,
-      image: foodImage,
-      title: "Signature Plating",
-      category: "food", 
-      description: "Each dish is crafted as a work of art"
-    },
-    {
-      id: 3,
-      image: cocktailImage,
-      title: "Craft Cocktails",
-      category: "cocktails",
-      description: "Artfully crafted drinks at our elegant bar"
-    },
-    {
-      id: 4,
-      image: heroImage,
-      title: "Vintage Photo Wall",
-      category: "interior",
-      description: "Celebrating culture and community through photography"
-    },
-    {
-      id: 5,
-      image: foodImage,
-      title: "Chef's Special",
-      category: "food",
-      description: "Southern soul meets modern technique"
-    },
-    {
-      id: 6,
-      image: cocktailImage,
-      title: "Golden Hour",
-      category: "cocktails",
-      description: "Our signature cocktail program"
-    }
+    { id: 1, image: "/lovable-uploads/ab3d54a6-16a6-4d65-97f6-035597e43363.png", title: "Grand Dining Room Aisle", category: "all", description: "Velvet banquettes, gold drapery, and a crystal chandelier." },
+    { id: 2, image: "/lovable-uploads/e3818c3c-f025-4cbe-b8ad-bf435168ef1b.png", title: "Dining Room Panorama", category: "all", description: "Expansive view of our elegant dining room and chandelier." },
+    { id: 3, image: "/lovable-uploads/f9018a80-bd90-4c1a-a857-e10d3898caa0.png", title: "Intimate Corner Seating", category: "all", description: "Gold tufted seating with refined table settings." },
+    { id: 4, image: "/lovable-uploads/721d9e64-7f5b-4031-9732-4f12cd3968e6.png", title: "Chandelier Detail", category: "all", description: "Opulent crystal chandelier over the main floor." },
+    { id: 5, image: "/lovable-uploads/b698a030-11b4-4877-89ef-151bd687a332.png", title: "Dining Room Perspective", category: "all", description: "Signature gold and marble accents throughout." },
+    { id: 6, image: "/lovable-uploads/8f451f04-db68-4d54-b4d4-75574f6bd736.png", title: "Banquette View", category: "all", description: "Elegant mirrors and gold drapes frame the space." },
+    { id: 7, image: "/lovable-uploads/4692a049-cf96-4742-ad15-0538a777ec33.png", title: "Table Setting Close-up", category: "all", description: "Polished glassware and black accents for contrast." },
+    { id: 8, image: "/lovable-uploads/7235fdc5-9400-478a-a585-18cce9f51f98.png", title: "Symmetry & Style", category: "all", description: "A refined, symmetrical view of the dining salon." }
   ];
 
   const filteredItems = currentCategory === "all" 
