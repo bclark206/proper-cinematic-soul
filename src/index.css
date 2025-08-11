@@ -20,7 +20,7 @@ Fonts: Playfair Display (headings), Inter (body)
     --popover-foreground: 0 0% 11%;
 
     /* Primary - Sophisticated Gold */
-    --primary: 45 25% 64%; /* #BFAF87 */
+    --primary: 43 35% 58%; /* Richer, warmer gold to match banquettes */
     --primary-foreground: 0 0% 11%;
 
     /* Secondary - Jet Black */
@@ -32,7 +32,7 @@ Fonts: Playfair Display (headings), Inter (body)
     --muted-foreground: 0 0% 45%;
 
     /* Accent - Luxurious Gold */
-    --accent: 45 30% 70%;
+    --accent: 43 40% 62%;
     --accent-foreground: 0 0% 11%;
 
     --destructive: 0 84.2% 60.2%;
@@ -45,13 +45,13 @@ Fonts: Playfair Display (headings), Inter (body)
     --radius: 0.5rem;
 
     /* Custom Proper Cuisine Colors */
-    --gold: 45 25% 64%; /* #BFAF87 */
+    --gold: 43 35% 58%; /* Richer, warmer gold to match banquettes */
     --jet-black: 0 0% 11%; /* #1C1C1C */
     --cream: 36 25% 91%; /* #EAE3D5 */
     --pure-white: 0 0% 100%; /* #FFFFFF */
     
     /* Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)), hsl(45 30% 70%));
+    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)), hsl(43 40% 62%));
     --gradient-dark: linear-gradient(135deg, hsl(var(--jet-black)), hsl(0 0% 18%));
     --gradient-hero: linear-gradient(135deg, hsl(var(--jet-black) / 0.9), hsl(var(--jet-black) / 0.7));
     
