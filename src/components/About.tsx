@@ -18,15 +18,17 @@ const About = () => {
             <div className="space-y-6 text-lg text-jet-black/80 leading-relaxed">
               <p>
                 Proper Cuisine was designed for those who crave more than just a meal. 
-                It's for the culture — for those who know flavor, respect style, and 
-                love a space where every detail matters.
+                Birthed from our sister restaurant, the world-famous Papi Cuisine—celebrated 
+                for its amazing food and one-of-a-kind spices—our menu carries forward that 
+                legacy of bold flavors and unforgettable dining experiences.
               </p>
               
               <p>
-                With roots in Southern cooking and a nod to vintage elegance, our space 
-                reflects the richness of Black excellence and the energy of Baltimore's 
-                food scene. We've created a place where tradition meets innovation, 
-                where every dish tells a story.
+                It's for the culture—for those who know flavor, respect style, and love a 
+                space where every detail matters. With roots in Southern cooking and a nod 
+                to vintage elegance, our space reflects the richness of Black excellence 
+                and the energy of Baltimore's food scene. We've created a place where 
+                tradition meets innovation, where every dish tells a story.
               </p>
               
               <p>
