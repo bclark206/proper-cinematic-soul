@@ -16,7 +16,7 @@ const Footer = () => {
             </p>
             
             <div className="flex space-x-4">
-              <a href="#" className="text-cream hover:text-gold transition-colors">
+              <a href="https://instagram.com/thepropercuisine" className="text-cream hover:text-gold transition-colors">
                 <Instagram className="w-6 h-6" />
               </a>
               <a href="#" className="text-cream hover:text-gold transition-colors">
@@ -37,14 +37,14 @@ const Footer = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 mt-0.5 text-gold" />
                 <div>
-                  <p>1234 Proper Way</p>
-                  <p>Baltimore, MD 21201</p>
+                  <p>206 E Redwood St</p>
+                  <p>Baltimore, MD 21202</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-gold" />
-                <p>(410) 555-0123</p>
+                <p>(443) 432-2771</p>
               </div>
               
               <div className="flex items-center space-x-3">
@@ -61,18 +61,18 @@ const Footer = () => {
             </h4>
             <div className="space-y-3 text-cream/80">
               <div>
-                <p className="font-medium text-pure-white">Dinner Service</p>
-                <p>Wed-Sun | 5PM-11PM</p>
+                <p className="font-medium text-pure-white">Sunday</p>
+                <p>11am-11pm</p>
               </div>
               
               <div>
-                <p className="font-medium text-pure-white">Brunch</p>
-                <p>Sat-Sun | 10AM-3PM</p>
+                <p className="font-medium text-pure-white">Monday-Thursday</p>
+                <p>12pm-11pm</p>
               </div>
               
               <div>
-                <p className="font-medium text-pure-white">Bar</p>
-                <p>Wed-Sun | 5PM-Late</p>
+                <p className="font-medium text-pure-white">Friday-Saturday</p>
+                <p>12pm-12am</p>
               </div>
             </div>
           </div>

@@ -44,7 +44,7 @@ const Navigation = () => {
             <div className="flex items-center space-x-4 text-sm text-cream">
               <div className="flex items-center space-x-1">
                 <Phone className="w-4 h-4" />
-                <span>(443-432-2771</span>
+                <span>(443) 432-2771</span>
               </div>
               <div className="flex items-center space-x-1">
                 <MapPin className="w-4 h-4" />
@@ -77,11 +77,11 @@ const Navigation = () => {
                 <div className="text-sm text-cream space-y-2">
                   <div className="flex items-center space-x-2">
                     <Phone className="w-4 h-4" />
-                    <span>(410) 555-0123</span>
+                    <span>(443) 432-2771</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <MapPin className="w-4 h-4" />
-                    <span>1234 Proper Way, Baltimore, MD</span>
+                    <span>206 E Redwood St, Baltimore, MD</span>
                   </div>
                 </div>
               </div>
