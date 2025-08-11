@@ -143,8 +143,8 @@ const Gallery = () => {
             
             <div className="relative h-96 lg:h-full">
               <img 
-                src={heroImage} 
-                alt="Interior Details"
+                src="/lovable-uploads/8f451f04-db68-4d54-b4d4-75574f6bd736.png" 
+                alt="Elegant restaurant interior showcasing attention to detail"
                 className="w-full h-full object-cover"
               />
             </div>
