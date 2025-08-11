@@ -108,7 +108,11 @@ const Contact = () => {
                   Secure your spot at Baltimore's premier dining destination.
                 </p>
                 <div className="space-y-4">
-                  <Button variant="dark-elegant" size="lg" className="w-full">Book on Resy</Button>
+                  <Button variant="dark-elegant" size="lg" className="w-full" asChild>
+                    <a href="https://resy.com/cities/baltimore-md/venues/proper-cuisine?date=2025-08-11&seats=2" target="_blank" rel="noopener noreferrer">
+                      Book on Resy
+                    </a>
+                  </Button>
                   <Button variant="outline" size="lg" className="w-full border-jet-black text-jet-black hover:bg-jet-black hover:text-gold">
                     Call for Reservations
                   </Button>
