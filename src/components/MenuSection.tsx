@@ -80,7 +80,20 @@ const MenuSection = () => {
                   </ul>
                 </div>
                 
-                <Button variant="gold" className="w-full">
+                <Button 
+                  variant="gold" 
+                  className="w-full"
+                  onClick={() => {
+                    if (menu.title === "Brunch") {
+                      window.open('/lovable-uploads/0f7faa77-73bf-4a44-836c-918842d42bea.png', '_blank');
+                    } else if (menu.title === "Dinner") {
+                      window.open('/lovable-uploads/307c5cb3-4934-4387-9d12-8744feaf9b63.png', '_blank');
+                    } else {
+                      // Placeholder for cocktail menu
+                      console.log(`${menu.title} menu not yet available`);
+                    }
+                  }}
+                >
                   View {menu.title} Menu
                 </Button>
               </CardContent>
