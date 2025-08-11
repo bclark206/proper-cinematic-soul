@@ -51,8 +51,10 @@ const Navigation = () => {
                 <span>Baltimore, MD</span>
               </div>
             </div>
-            <Button variant="gold" size="sm">
-              Reserve Now
+            <Button variant="gold" size="sm" asChild>
+              <a href="https://resy.com/cities/baltimore-md/venues/proper-cuisine?date=2025-08-11&seats=2" target="_blank" rel="noopener noreferrer">
+                Reserve Now
+              </a>
             </Button>
           </div>
 
@@ -71,8 +73,10 @@ const Navigation = () => {
                   {item.label}
                 </a>)}
               <div className="px-3 py-4 border-t border-gold/20 mt-4">
-                <Button variant="gold" size="sm" className="w-full mb-3">
-                  Reserve Now
+                <Button variant="gold" size="sm" className="w-full mb-3" asChild>
+                  <a href="https://resy.com/cities/baltimore-md/venues/proper-cuisine?date=2025-08-11&seats=2" target="_blank" rel="noopener noreferrer">
+                    Reserve Now
+                  </a>
                 </Button>
                 <div className="text-sm text-cream space-y-2">
                   <div className="flex items-center space-x-2">
