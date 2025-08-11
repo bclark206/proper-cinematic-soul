@@ -1,43 +1,42 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Twitter } from "lucide-react";
-
 const Contact = () => {
-  const contactInfo = [
-    {
-      icon: MapPin,
-      title: "Location",
-      details: ["206 E Redwood St", "Baltimore, MD 21202"],
-      action: "Get Directions"
-    },
-    {
-      icon: Phone,
-      title: "Reservations",
-      details: ["(443) 432-2771", "Call or text anytime"],
-      action: "Call Now"
-    },
-    {
-      icon: Mail,
-      title: "Email",
-      details: ["info@propercuisine.com", "We'll respond within 24hrs"],
-      action: "Send Email"
-    },
-    {
-      icon: Clock,
-      title: "Hours",
-      details: ["Sunday 11am-11pm", "Mon-Thu 12pm-11pm | Fri-Sat 12pm-12am"],
-      action: "View Calendar"
-    }
-  ];
-
-  const socialLinks = [
-    { icon: Instagram, label: "@TheProperCuisine", href: "https://instagram.com/thepropercuisine" },
-    { icon: Facebook, label: "Proper Cuisine", href: "#" },
-    { icon: Twitter, label: "@propercuisine", href: "#" }
-  ];
-
-  return (
-    <section id="contact" className="py-24 px-6 bg-jet-black">
+  const contactInfo = [{
+    icon: MapPin,
+    title: "Location",
+    details: ["1234 Proper Way", "Baltimore, MD 21201"],
+    action: "Get Directions"
+  }, {
+    icon: Phone,
+    title: "Reservations",
+    details: ["(410) 555-0123", "Call or text anytime"],
+    action: "Call Now"
+  }, {
+    icon: Mail,
+    title: "Email",
+    details: ["info@propercuisine.com", "We'll respond within 24hrs"],
+    action: "Send Email"
+  }, {
+    icon: Clock,
+    title: "Hours",
+    details: ["Wed-Sun | 5PM-11PM", "Brunch: Sat-Sun 10AM-3PM"],
+    action: "View Calendar"
+  }];
+  const socialLinks = [{
+    icon: Instagram,
+    label: "@propercuisine",
+    href: "#"
+  }, {
+    icon: Facebook,
+    label: "Proper Cuisine",
+    href: "#"
+  }, {
+    icon: Twitter,
+    label: "@propercuisine",
+    href: "#"
+  }];
+  return <section id="contact" className="py-24 px-6 bg-jet-black">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
@@ -54,8 +53,7 @@ const Contact = () => {
           {/* Contact Information */}
           <div className="lg:col-span-2 space-y-8">
             <div className="grid md:grid-cols-2 gap-6">
-              {contactInfo.map((info) => (
-                <Card key={info.title} className="bg-cream border-gold/20 hover:shadow-gold transition-all duration-300">
+              {contactInfo.map(info => <Card key={info.title} className="bg-cream border-gold/20 hover:shadow-gold transition-all duration-300">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
                       <div className="p-3 bg-gradient-gold rounded-lg">
@@ -66,11 +64,9 @@ const Contact = () => {
                           {info.title}
                         </h3>
                         <div className="space-y-1 mb-4">
-                          {info.details.map((detail, index) => (
-                            <p key={index} className="text-jet-black/70">
+                          {info.details.map((detail, index) => <p key={index} className="text-jet-black/70">
                               {detail}
-                            </p>
-                          ))}
+                            </p>)}
                         </div>
                         <Button variant="outline-gold" size="sm">
                           {info.action}
@@ -78,8 +74,7 @@ const Contact = () => {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
             </div>
 
             {/* Map Placeholder */}
@@ -113,9 +108,7 @@ const Contact = () => {
                   Secure your spot at Baltimore's premier dining destination.
                 </p>
                 <div className="space-y-4">
-                  <Button variant="dark-elegant" size="lg" className="w-full">
-                    Book on OpenTable
-                  </Button>
+                  <Button variant="dark-elegant" size="lg" className="w-full">Book on Resy</Button>
                   <Button variant="outline" size="lg" className="w-full border-jet-black text-jet-black hover:bg-jet-black hover:text-gold">
                     Call for Reservations
                   </Button>
@@ -143,18 +136,12 @@ const Contact = () => {
                 </p>
                 
                 <div className="space-y-3">
-                  {socialLinks.map((social) => (
-                    <a
-                      key={social.label}
-                      href={social.href}
-                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gold/10 transition-colors duration-300 group"
-                    >
+                  {socialLinks.map(social => <a key={social.label} href={social.href} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gold/10 transition-colors duration-300 group">
                       <social.icon className="w-5 h-5 text-gold group-hover:scale-110 transition-transform" />
                       <span className="text-jet-black group-hover:text-gold transition-colors">
                         {social.label}
                       </span>
-                    </a>
-                  ))}
+                    </a>)}
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-gold/20 text-center">
@@ -182,8 +169,6 @@ const Contact = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Contact;
