@@ -31,7 +31,14 @@ const Gallery = () => {
     { id: 15, image: "/lovable-uploads/8ce5fdc1-6c42-4270-accc-a345d87344cc.png", title: "Ceiling Details", category: "all", description: "Architectural ceiling details with ambient lighting." },
     { id: 16, image: "/lovable-uploads/b37c9414-8a52-4e2a-85d8-7f4ed80faddc.png", title: "Curved Banquette", category: "all", description: "Curved seating with dramatic drapery and mirrors." },
     { id: 17, image: "/lovable-uploads/e9458ccc-b712-43de-83a3-8c2a6dd33501.png", title: "Corner Lounge", category: "all", description: "Corner vantage with soft window light and decor." },
-    { id: 18, image: "/lovable-uploads/cf525d30-1e37-4624-8c51-8d10cada996e.png", title: "Chandelier Overlook", category: "all", description: "Chandelier glow over an elegant banquette line." }
+    { id: 18, image: "/lovable-uploads/cf525d30-1e37-4624-8c51-8d10cada996e.png", title: "Chandelier Overlook", category: "all", description: "Chandelier glow over an elegant banquette line." },
+    { id: 19, image: "/lovable-uploads/20d2b171-869a-41b6-b7e7-a0493f3b69f6.png", title: "Bar Counter & Backbar", category: "all", description: "Gold bar top with illuminated backbar and pendant lights." },
+    { id: 20, image: "/lovable-uploads/c927a3f3-cf4c-4f98-9ec2-54753cc9729b.png", title: "Backbar Panorama", category: "all", description: "Extensive spirits selection and warm lighting." },
+    { id: 21, image: "/lovable-uploads/478e3d70-9f15-4c50-9999-dbfcbc567bca.png", title: "Vintage Photo Wall", category: "all", description: "Gallery of black-and-white portraits and a piano." },
+    { id: 22, image: "/lovable-uploads/8b149fd2-dbd3-4920-b07c-b8375591b3a0.png", title: "Photo Wall & Bar", category: "all", description: "Framed photos with golden accents and cozy seating." },
+    { id: 23, image: "/lovable-uploads/bda48432-e070-4578-82dc-ed44d295eaa2.png", title: "Champagne Bowl Detail", category: "all", description: "Champagne on ice with photo wall in the background." },
+    { id: 24, image: "/lovable-uploads/73013763-e03e-4d57-b1f6-19b348af65a7.png", title: "Lounge Corner", category: "all", description: "Intimate tables by the vintage photo wall." },
+    { id: 25, image: "/lovable-uploads/cbe1b304-8ee9-42e8-9e38-c0dcf6deb0f4.png", title: "Bar & Mirror View", category: "all", description: "Bar perspective with mirror and pendant lights." }
   ];
 
   const filteredItems = currentCategory === "all" 
