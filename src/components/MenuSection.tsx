@@ -119,7 +119,12 @@ const MenuSection = () => {
               <Download className="w-5 h-5" />
               <span>View Dinner Menu</span>
             </Button>
-            <Button variant="outline" size="lg" className="border-jet-black text-jet-black hover:bg-jet-black hover:text-gold">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="border-jet-black text-jet-black hover:bg-jet-black hover:text-gold"
+              onClick={() => window.open('/lovable-uploads/8d125a7a-dff5-4467-8137-e3c92c723b45.png', '_blank')}
+            >
               View Wine List
             </Button>
           </div>
