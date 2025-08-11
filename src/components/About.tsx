@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
-
 const About = () => {
-  return (
-    <section id="about" className="py-24 px-6 bg-cream">
+  return <section id="about" className="py-24 px-6 bg-cream">
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Content */}
@@ -39,12 +37,8 @@ const About = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="gold" size="lg">
-                View Our Story
-              </Button>
-              <Button variant="outline-gold" size="lg">
-                Meet the Chef
-              </Button>
+              
+              
             </div>
           </div>
 
@@ -98,8 +92,6 @@ const About = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default About;
