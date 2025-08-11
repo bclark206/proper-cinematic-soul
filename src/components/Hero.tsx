@@ -22,7 +22,7 @@ const Hero = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center fade-in-slow">
-          <Button variant="hero" size="xl" className="min-w-48">Reserve Your Table</Button>
+          <Button variant="hero" size="xl" className="min-w-48">ORDER ONLINE</Button>
           <Button variant="outline-gold" size="xl" className="min-w-48 text-pure-white border-pure-white hover:bg-pure-white hover:text-jet-black">
             View Our Menus
           </Button>
