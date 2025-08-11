@@ -98,9 +98,14 @@ const MenuSection = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="dark-elegant" size="lg" className="flex items-center space-x-2">
+            <Button 
+              variant="dark-elegant" 
+              size="lg" 
+              className="flex items-center space-x-2"
+              onClick={() => window.open('/lovable-uploads/307c5cb3-4934-4387-9d12-8744feaf9b63.png', '_blank')}
+            >
               <Download className="w-5 h-5" />
-              <span>Download Full Menu (PDF)</span>
+              <span>View Dinner Menu</span>
             </Button>
             <Button variant="outline" size="lg" className="border-jet-black text-jet-black hover:bg-jet-black hover:text-gold">
               View Wine List
