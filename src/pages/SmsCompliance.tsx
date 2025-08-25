@@ -218,8 +218,7 @@ const SmsCompliance = () => {
           <div className="mt-8 text-center">
             <p className="text-cream/60 text-sm">
               By providing your phone number, you agree to our{" "}
-              <a href="#" className="text-gold hover:underline">Terms of Service</a> and{" "}
-              <a href="#" className="text-gold hover:underline">Privacy Policy</a>.
+              <Link to="/privacy-policy" className="text-gold hover:underline">Privacy Policy</Link>.
               You can unsubscribe at any time by texting STOP.
             </p>
           </div>
