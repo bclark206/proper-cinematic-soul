@@ -1,4 +1,5 @@
 import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -85,15 +86,15 @@ const Footer = () => {
           </p>
           
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-cream/60 hover:text-gold text-sm transition-colors">
+            <Link to="/sms-compliance" className="text-cream/60 hover:text-gold text-sm transition-colors">
+              SMS Updates
+            </Link>
+            <Link to="/privacy-policy" className="text-cream/60 hover:text-gold text-sm transition-colors">
               Privacy Policy
-            </a>
-            <a href="#" className="text-cream/60 hover:text-gold text-sm transition-colors">
-              Terms of Service
-            </a>
-            <a href="#" className="text-cream/60 hover:text-gold text-sm transition-colors">
-              Accessibility
-            </a>
+            </Link>
+            <Link to="/terms-conditions" className="text-cream/60 hover:text-gold text-sm transition-colors">
+              Terms & Conditions
+            </Link>
           </div>
         </div>
       </div>
