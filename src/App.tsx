@@ -6,6 +6,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SmsCompliance from "./pages/SmsCompliance";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/sms-compliance" element={<SmsCompliance />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-conditions" element={<TermsConditions />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
       </Routes>

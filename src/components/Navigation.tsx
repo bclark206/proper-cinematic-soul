@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navItems = [{
@@ -25,6 +26,9 @@ const Navigation = () => {
     label: "SMS Updates",
     href: "/sms-compliance"
   }, {
+    label: "Terms & Conditions",
+    href: "/terms-conditions"
+  }, {
     label: "Privacy Policy",
     href: "/privacy-policy"
   }];
@@ -40,9 +44,17 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
-            {navItems.map(item => <a key={item.label} href={item.href} className="text-pure-white hover:text-gold transition-colors duration-300 font-medium">
-                {item.label}
-              </a>)}
+            {navItems.map(item => (
+              item.href.startsWith('/') ? (
+                <Link key={item.label} to={item.href} className="text-pure-white hover:text-gold transition-colors duration-300 font-medium">
+                  {item.label}
+                </Link>
+              ) : (
+                <a key={item.label} href={item.href} className="text-pure-white hover:text-gold transition-colors duration-300 font-medium">
+                  {item.label}
+                </a>
+              )
+            ))}
           </div>
 
           {/* Contact Info & CTA */}
@@ -75,9 +87,17 @@ const Navigation = () => {
         {/* Mobile Navigation */}
         {isOpen && <div className="lg:hidden border-t border-gold/20 bg-jet-black/95">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map(item => <a key={item.label} href={item.href} className="block px-3 py-2 text-pure-white hover:text-gold transition-colors duration-300" onClick={() => setIsOpen(false)}>
-                  {item.label}
-                </a>)}
+              {navItems.map(item => (
+                item.href.startsWith('/') ? (
+                  <Link key={item.label} to={item.href} className="block px-3 py-2 text-pure-white hover:text-gold transition-colors duration-300" onClick={() => setIsOpen(false)}>
+                    {item.label}
+                  </Link>
+                ) : (
+                  <a key={item.label} href={item.href} className="block px-3 py-2 text-pure-white hover:text-gold transition-colors duration-300" onClick={() => setIsOpen(false)}>
+                    {item.label}
+                  </a>
+                )
+              ))}
               <div className="px-3 py-4 border-t border-gold/20 mt-4">
                 <Button variant="gold" size="sm" className="w-full mb-3" asChild>
                   <a href="https://resy.com/cities/baltimore-md/venues/proper-cuisine?date=2025-08-11&seats=2" target="_blank" rel="noopener noreferrer">
