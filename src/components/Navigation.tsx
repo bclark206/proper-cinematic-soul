@@ -21,6 +21,9 @@ const Navigation = () => {
   }, {
     label: "Contact",
     href: "#contact"
+  }, {
+    label: "SMS Updates",
+    href: "/sms-compliance"
   }];
   return <nav className="fixed top-0 w-full z-50 bg-jet-black/90 backdrop-blur-md border-b border-gold/20">
       <div className="max-w-7xl mx-auto px-6">
