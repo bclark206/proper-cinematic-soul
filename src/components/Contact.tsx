@@ -109,8 +109,8 @@ const Contact = () => {
                 </p>
                 <div className="space-y-4">
                   <Button variant="dark-elegant" size="lg" className="w-full" asChild>
-                    <a href="https://resy.com/cities/baltimore-md/venues/proper-cuisine?date=2025-08-11&seats=2" target="_blank" rel="noopener noreferrer">
-                      Book on Resy
+                    <a href="https://www.opentable.com/r/proper-cuisine-reservations-baltimore-1?restref=1349446&lang=en-US&ot_source=Restaurant%20website" target="_blank" rel="noopener noreferrer">
+                      Book on OpenTable
                     </a>
                   </Button>
                   <Button variant="outline" size="lg" className="w-full border-jet-black text-jet-black hover:bg-jet-black hover:text-gold">
