@@ -17,13 +17,12 @@ const Gallery = () => {
     { id: 1, image: "/lovable-uploads/ab3d54a6-16a6-4d65-97f6-035597e43363.png", title: "Grand Dining Room", category: "all", description: "Velvet banquettes, gold drapery, and a crystal chandelier." },
     { id: 2, image: "/lovable-uploads/f9018a80-bd90-4c1a-a857-e10d3898caa0.png", title: "Intimate Corner Seating", category: "all", description: "Gold tufted seating with refined table settings." },
     { id: 3, image: "/lovable-uploads/721d9e64-7f5b-4031-9732-4f12cd3968e6.png", title: "Crystal Chandelier", category: "all", description: "Opulent crystal chandelier over the main floor." },
-    { id: 4, image: "/lovable-uploads/8f451f04-db68-4d54-b4d4-75574f6bd736.png", title: "Elegant Banquettes", category: "all", description: "Elegant mirrors and gold drapes frame the space." },
-    { id: 5, image: "/lovable-uploads/4692a049-cf96-4742-ad15-0538a777ec33.png", title: "Table Setting", category: "all", description: "Polished glassware and black accents for contrast." },
-    { id: 6, image: "/lovable-uploads/2d018f20-6de6-4b87-8290-63abaca61ae8.png", title: "Salon Seating", category: "all", description: "Mirror-lined walls and intimate seating areas." },
-    { id: 7, image: "/lovable-uploads/20d2b171-869a-41b6-b7e7-a0493f3b69f6.png", title: "Bar Counter", category: "all", description: "Gold bar top with illuminated backbar and pendant lights." },
-    { id: 8, image: "/lovable-uploads/c927a3f3-cf4c-4f98-9ec2-54753cc9729b.png", title: "Premium Bar", category: "all", description: "Extensive spirits selection and warm lighting." },
-    { id: 9, image: "/lovable-uploads/478e3d70-9f15-4c50-9999-dbfcbc567bca.png", title: "Vintage Photo Wall", category: "all", description: "Gallery of black-and-white portraits and a piano." },
-    { id: 10, image: "/lovable-uploads/bda48432-e070-4578-82dc-ed44d295eaa2.png", title: "Champagne Service", category: "all", description: "Champagne on ice with photo wall in the background." }
+    { id: 4, image: "/lovable-uploads/4692a049-cf96-4742-ad15-0538a777ec33.png", title: "Table Setting", category: "all", description: "Polished glassware and black accents for contrast." },
+    { id: 5, image: "/lovable-uploads/2d018f20-6de6-4b87-8290-63abaca61ae8.png", title: "Salon Seating", category: "all", description: "Mirror-lined walls and intimate seating areas." },
+    { id: 6, image: "/lovable-uploads/20d2b171-869a-41b6-b7e7-a0493f3b69f6.png", title: "Bar Counter", category: "all", description: "Gold bar top with illuminated backbar and pendant lights." },
+    { id: 7, image: "/lovable-uploads/c927a3f3-cf4c-4f98-9ec2-54753cc9729b.png", title: "Premium Bar", category: "all", description: "Extensive spirits selection and warm lighting." },
+    { id: 8, image: "/lovable-uploads/478e3d70-9f15-4c50-9999-dbfcbc567bca.png", title: "Vintage Photo Wall", category: "all", description: "Gallery of black-and-white portraits and a piano." },
+    { id: 9, image: "/lovable-uploads/bda48432-e070-4578-82dc-ed44d295eaa2.png", title: "Champagne Service", category: "all", description: "Champagne on ice with photo wall in the background." }
   ];
 
   const filteredItems = currentCategory === "all" 
