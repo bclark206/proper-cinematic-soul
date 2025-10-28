@@ -10,7 +10,7 @@ const Hero = () => {
       
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <h1 className="font-display text-6xl md:text-8xl lg:text-9xl font-bold text-pure-white mb-6 fade-in-up">
+        <h1 className="font-display text-6xl md:text-7xl lg:text-8xl font-bold text-pure-white mb-6 fade-in-up">
           Where Soul Meets{" "}
           <span className="hover-gold text-[#9f7d2a]">Elegance</span>
         </h1>
