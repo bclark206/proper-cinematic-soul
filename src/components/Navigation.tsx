@@ -5,22 +5,32 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navItems = [{
     label: "Home",
-    href: "#home"
+    href: "#home",
+    external: false
   }, {
     label: "About",
-    href: "#about"
+    href: "#about",
+    external: false
   }, {
     label: "Menus",
-    href: "#menus"
+    href: "#menus",
+    external: false
   }, {
     label: "Gallery",
-    href: "#gallery"
+    href: "#gallery",
+    external: false
   }, {
     label: "Private Events",
-    href: "#events"
+    href: "#events",
+    external: false
+  }, {
+    label: "Reviews",
+    href: "https://dinereply.app/review/04067e0e-b39c-4705-a143-873eeb55207d",
+    external: true
   }, {
     label: "Contact",
-    href: "#contact"
+    href: "#contact",
+    external: false
   }];
   return <nav className="fixed top-0 w-full z-50 bg-jet-black/90 backdrop-blur-md border-b border-gold/20">
       <div className="max-w-7xl mx-auto px-6">
@@ -35,7 +45,13 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
             {navItems.map(item => (
-              <a key={item.label} href={item.href} className="text-pure-white hover:text-gold transition-colors duration-300 font-medium">
+              <a 
+                key={item.label} 
+                href={item.href} 
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
+                className="text-pure-white hover:text-gold transition-colors duration-300 font-medium"
+              >
                 {item.label}
               </a>
             ))}
@@ -72,7 +88,14 @@ const Navigation = () => {
         {isOpen && <div className="lg:hidden border-t border-gold/20 bg-jet-black/95">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {navItems.map(item => (
-                <a key={item.label} href={item.href} className="block px-3 py-2 text-pure-white hover:text-gold transition-colors duration-300" onClick={() => setIsOpen(false)}>
+                <a 
+                  key={item.label} 
+                  href={item.href} 
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noopener noreferrer" : undefined}
+                  className="block px-3 py-2 text-pure-white hover:text-gold transition-colors duration-300" 
+                  onClick={() => !item.external && setIsOpen(false)}
+                >
                   {item.label}
                 </a>
               ))}
