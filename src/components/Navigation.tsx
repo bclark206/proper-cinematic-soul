@@ -25,8 +25,8 @@ const Navigation = () => {
     external: false
   }, {
     label: "Reviews",
-    href: "https://dinereply.app/review/04067e0e-b39c-4705-a143-873eeb55207d",
-    external: true
+    href: "/reviews",
+    external: false
   }, {
     label: "Contact",
     href: "#contact",
