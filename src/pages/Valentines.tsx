@@ -1,6 +1,5 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Clock, MapPin, Phone, Car, Sparkles } from "lucide-react";
 
@@ -66,8 +65,8 @@ const Valentines = () => {
     },
     {
       icon: Phone,
-      title: "Reservations Recommended",
-      description: "Book ahead to secure your preferred time and ensure a seamless romantic evening."
+      title: "Fully Committed",
+      description: "We are fully booked for Valentine's Day weekend. No walk-ins will be accepted. Thank you for your incredible support!"
     }
   ];
 
@@ -100,7 +99,7 @@ const Valentines = () => {
             </h1>
 
             <p className="text-base sm:text-xl md:text-2xl text-cream/90 mb-4 max-w-3xl mx-auto leading-relaxed fade-in-slow font-light">
-              February 14-16, 2026 | An Unforgettable Dining Experience
+              February 13-16, 2026 | An Unforgettable Dining Experience
             </p>
 
             <div className="flex items-center justify-center gap-3 mb-8 sm:mb-12 fade-in-slow">
@@ -315,91 +314,60 @@ const Valentines = () => {
           </div>
         </section>
 
-        {/* Contact & Reservation CTA - Deep dark with rose glow */}
+        {/* Contact Section - Deep dark with rose glow */}
         <section className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 bg-[#0a0a0a] relative overflow-hidden">
           {/* Ambient glow behind CTA */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(350_60%_15%)_0%,_transparent_60%)] opacity-30"></div>
 
-          <div className="max-w-7xl mx-auto relative z-10">
+          <div className="max-w-4xl mx-auto relative z-10">
             <div className="text-center mb-10 sm:mb-16">
               <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-pure-white mb-4 sm:mb-6">
-                Make Your{" "}
-                <span className="text-gold">Reservation</span>
+                We're{" "}
+                <span className="text-gold">Fully Booked</span>
               </h2>
               <p className="text-base sm:text-xl text-cream/60 max-w-2xl mx-auto">
-                Secure your table for an unforgettable Valentine's Day weekend experience
+                Thank you for your incredible support! We are fully committed for Valentine's Day weekend. No walk-ins will be accepted.
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
-              {/* Contact Information */}
-              <div className="lg:col-span-2">
-                <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-                  <Card className="bg-[#141414] border-rose/10 hover:border-rose/30 hover:shadow-rose transition-all duration-300 valentine-glow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-gradient-rose-gold rounded-lg shrink-0">
-                          <MapPin className="w-6 h-6 text-[#0a0a0a]" />
-                        </div>
-                        <div>
-                          <h3 className="font-display text-xl font-bold text-pure-white mb-2">
-                            Visit Us
-                          </h3>
-                          <p className="text-cream/60 leading-relaxed">
-                            206 E Redwood St<br />
-                            Baltimore, MD 21202
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+              <Card className="bg-[#141414] border-rose/10 hover:border-rose/30 hover:shadow-rose transition-all duration-300 valentine-glow">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="p-3 bg-gradient-rose-gold rounded-lg shrink-0">
+                      <MapPin className="w-6 h-6 text-[#0a0a0a]" />
+                    </div>
+                    <div>
+                      <h3 className="font-display text-xl font-bold text-pure-white mb-2">
+                        Visit Us
+                      </h3>
+                      <p className="text-cream/60 leading-relaxed">
+                        206 E Redwood St<br />
+                        Baltimore, MD 21202
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-                  <Card className="bg-[#141414] border-rose/10 hover:border-rose/30 hover:shadow-rose transition-all duration-300 valentine-glow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-gradient-rose-gold rounded-lg shrink-0">
-                          <Phone className="w-6 h-6 text-[#0a0a0a]" />
-                        </div>
-                        <div>
-                          <h3 className="font-display text-xl font-bold text-pure-white mb-2">
-                            Questions?
-                          </h3>
-                          <p className="text-cream/60 leading-relaxed">
-                            Call us at<br />
-                            <a href="tel:4434322771" className="text-rose hover:text-rose-light transition-colors font-medium">
-                              (443) 432-2771
-                            </a>
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-
-              {/* Reservation Card */}
-              <Card className="bg-gradient-rose-gold border-none">
-                <CardContent className="p-8 text-center">
-                  <h3 className="font-display text-3xl font-bold text-[#0a0a0a] mb-4">
-                    Reserve Your Table
-                  </h3>
-                  <p className="text-[#0a0a0a]/80 mb-6">
-                    Secure your spot for Valentine's weekend.
-                  </p>
-                  <Button
-                    variant="dark-elegant"
-                    size="lg"
-                    className="w-full"
-                    asChild
-                  >
-                    <a
-                      href="https://www.opentable.com/r/proper-cuisine-reservations-baltimore-1?restref=1349446&lang=en-US&ot_source=Restaurant%20website"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Reserve Now
-                    </a>
-                  </Button>
+              <Card className="bg-[#141414] border-rose/10 hover:border-rose/30 hover:shadow-rose transition-all duration-300 valentine-glow">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="p-3 bg-gradient-rose-gold rounded-lg shrink-0">
+                      <Phone className="w-6 h-6 text-[#0a0a0a]" />
+                    </div>
+                    <div>
+                      <h3 className="font-display text-xl font-bold text-pure-white mb-2">
+                        Questions?
+                      </h3>
+                      <p className="text-cream/60 leading-relaxed">
+                        Call us at<br />
+                        <a href="tel:4434322771" className="text-rose hover:text-rose-light transition-colors font-medium">
+                          (443) 432-2771
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
