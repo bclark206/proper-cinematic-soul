@@ -34,27 +34,28 @@ Create a new `/valentines` page for Proper Cuisine's website (propercuisine.com)
 Display these items elegantly (maybe in a card grid or elegant list):
 
 **Starters:**
-- Crab Balls
-- Devil Eggs
-- Caesar Salad
-- Strawberry Salad
+- Crab Cake Egg Roll — Crabmeat, House Aioli
+- Cheese Steak Egg Roll — Wagyu, House Aioli
+
+**Salads:**
+- Caesar Salad — Croutons, House Caesar
+- Spinach Strawberry Salad — Balsamic Vinaigrette
 
 **Entrées:**
-- Snapper
-- Honey Jerk Lamb
-- Salmon Pasta
-- Crab Cake
-- Oxtail
+- Red Snapper Étouffée — Fried Red Snapper, White Rice, Seafood Sauce
+- Crab Cake — 8oz Jumbo Lump Crabmeat
+- Creamy Salmon Pasta — Creamy Pasta, Salmon Filet, Bacon, Spinach
+- Honey Jerk Lamb Chops — Signature Jerk Rub, Honey Glazed Lamb Chops
 
-**Desserts:**
-- Apple Turnover
-- Chocolate Lava Cake
+**Dessert:**
+- Bread Pudding
 
 ### Parking Information
-Display 3 nearby parking garages:
-1. **Baltimore City Parking - Redwood Garage** - 112 E Redwood St (1 min walk)
-2. **SP+ Parking - Commerce Place Garage** - 1 South St (2 min walk)  
-3. **LAZ Parking - Hopkins Place Garage** - 110 Hopkins Place (3 min walk)
+Display nearby parking options:
+1. **Water Street Garage** - 208 Water Street
+2. **One Light Street** - 1 Light Street
+3. **Parkway** - 215 E Fayette St
+4. **Valet Parking** - Hampton Inn, 131 E Redwood Street (if you're planning to stay there)
 
 Note: "Street parking is also available. We recommend arriving 10-15 minutes early to find parking."
 

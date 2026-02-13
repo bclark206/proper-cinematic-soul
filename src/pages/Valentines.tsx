@@ -7,21 +7,21 @@ import { Heart, Clock, MapPin, Phone, Car, Sparkles } from "lucide-react";
 const Valentines = () => {
   const menuItems = {
     starters: [
-      "Crab Balls",
-      "Devil Eggs",
-      "Caesar Salad",
-      "Strawberry Salad"
+      { name: "Crab Cake Egg Roll", desc: "Crabmeat, House Aioli" },
+      { name: "Cheese Steak Egg Roll", desc: "Wagyu, House Aioli" },
+    ],
+    salads: [
+      { name: "Caesar Salad", desc: "Croutons, House Caesar" },
+      { name: "Spinach Strawberry Salad", desc: "Balsamic Vinaigrette" },
     ],
     entrees: [
-      "Snapper",
-      "Honey Jerk Lamb",
-      "Salmon Pasta",
-      "Crab Cake",
-      "Oxtail"
+      { name: "Red Snapper Étouffée", desc: "Fried Red Snapper, White Rice, Seafood Sauce" },
+      { name: "Crab Cake", desc: "8oz Jumbo Lump Crabmeat" },
+      { name: "Creamy Salmon Pasta", desc: "Creamy Pasta, Salmon Filet, Bacon, Spinach" },
+      { name: "Honey Jerk Lamb Chops", desc: "Signature Jerk Rub, Honey Glazed Lamb Chops" },
     ],
     desserts: [
-      "Apple Turnover",
-      "Chocolate Lava Cake"
+      { name: "Bread Pudding", desc: "" },
     ]
   };
 
@@ -178,7 +178,7 @@ const Valentines = () => {
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               {/* Starters */}
               <Card className="bg-[#141414] border-gold/15 overflow-hidden group hover:border-gold/40 hover:shadow-gold transition-all duration-500">
                 <CardContent className="p-5 sm:p-8">
@@ -186,11 +186,35 @@ const Valentines = () => {
                     Starters
                   </h3>
                   <p className="text-rose font-medium mb-6">Begin your evening</p>
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {menuItems.starters.map((item, idx) => (
-                      <li key={idx} className="text-cream/70 text-sm flex items-center">
-                        <span className="w-1.5 h-1.5 bg-rose rounded-full mr-3 shrink-0"></span>
-                        {item}
+                      <li key={idx} className="text-cream/70 text-sm">
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-rose rounded-full mr-3 shrink-0"></span>
+                          <span className="text-pure-white font-medium">{item.name}</span>
+                        </span>
+                        {item.desc && <span className="ml-[18px] text-cream/50 text-xs">{item.desc}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Salads */}
+              <Card className="bg-[#141414] border-gold/15 overflow-hidden group hover:border-gold/40 hover:shadow-gold transition-all duration-500">
+                <CardContent className="p-5 sm:p-8">
+                  <h3 className="font-display text-2xl sm:text-3xl font-bold text-pure-white mb-2">
+                    Salads
+                  </h3>
+                  <p className="text-rose font-medium mb-6">Fresh & crisp</p>
+                  <ul className="space-y-4">
+                    {menuItems.salads.map((item, idx) => (
+                      <li key={idx} className="text-cream/70 text-sm">
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-rose rounded-full mr-3 shrink-0"></span>
+                          <span className="text-pure-white font-medium">{item.name}</span>
+                        </span>
+                        {item.desc && <span className="ml-[18px] text-cream/50 text-xs">{item.desc}</span>}
                       </li>
                     ))}
                   </ul>
@@ -204,29 +228,35 @@ const Valentines = () => {
                     Entrées
                   </h3>
                   <p className="text-rose font-medium mb-6">The main course</p>
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {menuItems.entrees.map((item, idx) => (
-                      <li key={idx} className="text-cream/70 text-sm flex items-center">
-                        <span className="w-1.5 h-1.5 bg-rose rounded-full mr-3 shrink-0"></span>
-                        {item}
+                      <li key={idx} className="text-cream/70 text-sm">
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-rose rounded-full mr-3 shrink-0"></span>
+                          <span className="text-pure-white font-medium">{item.name}</span>
+                        </span>
+                        {item.desc && <span className="ml-[18px] text-cream/50 text-xs">{item.desc}</span>}
                       </li>
                     ))}
                   </ul>
                 </CardContent>
               </Card>
 
-              {/* Desserts */}
+              {/* Dessert */}
               <Card className="bg-[#141414] border-gold/15 overflow-hidden group hover:border-gold/40 hover:shadow-gold transition-all duration-500">
                 <CardContent className="p-5 sm:p-8">
                   <h3 className="font-display text-2xl sm:text-3xl font-bold text-pure-white mb-2">
-                    Desserts
+                    Dessert
                   </h3>
                   <p className="text-rose font-medium mb-6">A sweet finish</p>
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {menuItems.desserts.map((item, idx) => (
-                      <li key={idx} className="text-cream/70 text-sm flex items-center">
-                        <span className="w-1.5 h-1.5 bg-rose rounded-full mr-3 shrink-0"></span>
-                        {item}
+                      <li key={idx} className="text-cream/70 text-sm">
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-rose rounded-full mr-3 shrink-0"></span>
+                          <span className="text-pure-white font-medium">{item.name}</span>
+                        </span>
+                        {item.desc && <span className="ml-[18px] text-cream/50 text-xs">{item.desc}</span>}
                       </li>
                     ))}
                   </ul>
