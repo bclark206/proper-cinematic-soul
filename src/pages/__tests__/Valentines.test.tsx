@@ -79,11 +79,16 @@ describe('Valentines Page', () => {
     expect(opentableLink).toBeDefined();
   });
 
-  it('uses alternating light and dark section backgrounds', () => {
+  it('has five content sections', () => {
     const { container } = renderValentines();
     const sections = container.querySelectorAll('main > section');
-    // Hero (dark), What to Expect (cream/light), Menu (dark), Parking (cream/light), Reservation (dark)
     expect(sections.length).toBe(5);
+  });
+
+  it('uses dark background theme throughout', () => {
+    const { container } = renderValentines();
+    const wrapper = container.firstElementChild;
+    expect(wrapper?.className).toContain('bg-[#0a0a0a]');
   });
 
   it('displays scroll indicator in hero', () => {
@@ -94,5 +99,23 @@ describe('Valentines Page', () => {
   it('displays Reserve Your Table card', () => {
     renderValentines();
     expect(screen.getByRole('heading', { name: /Reserve Your Table/i })).toBeInTheDocument();
+  });
+
+  it('uses rose-gold gradient on reservation card', () => {
+    const { container } = renderValentines();
+    const roseGoldElements = container.querySelectorAll('.bg-gradient-rose-gold');
+    expect(roseGoldElements.length).toBeGreaterThan(0);
+  });
+
+  it('displays heartbeat animated heart icon in hero', () => {
+    const { container } = renderValentines();
+    const heartbeatElement = container.querySelector('.heartbeat');
+    expect(heartbeatElement).toBeInTheDocument();
+  });
+
+  it('uses valentine-glow effect on cards', () => {
+    const { container } = renderValentines();
+    const glowElements = container.querySelectorAll('.valentine-glow');
+    expect(glowElements.length).toBeGreaterThan(0);
   });
 });

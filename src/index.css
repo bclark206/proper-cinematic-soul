@@ -49,16 +49,22 @@ Fonts: Playfair Display (headings), Inter (body)
     --jet-black: 0 0% 11%; /* #1C1C1C */
     --cream: 36 25% 91%; /* #EAE3D5 */
     --pure-white: 0 0% 100%; /* #FFFFFF */
-    
+    --rose: 350 80% 65%; /* #E05A72 - romantic rose */
+    --rose-light: 350 70% 75%; /* Lighter rose for accents */
+    --deep-burgundy: 345 60% 20%; /* Deep burgundy for card backgrounds */
+
     /* Gradients */
     --gradient-gold: linear-gradient(135deg, hsl(var(--gold)), hsl(43 40% 62%));
     --gradient-dark: linear-gradient(135deg, hsl(var(--jet-black)), hsl(0 0% 18%));
     --gradient-hero: linear-gradient(135deg, hsl(var(--jet-black) / 0.9), hsl(var(--jet-black) / 0.7));
-    
+    --gradient-rose-gold: linear-gradient(135deg, hsl(var(--rose)), hsl(var(--gold)));
+    --gradient-valentine: linear-gradient(180deg, hsl(0 0% 8%), hsl(345 40% 10%), hsl(0 0% 8%));
+
     /* Shadows */
     --shadow-elegant: 0 20px 40px -12px hsl(var(--jet-black) / 0.25);
     --shadow-gold: 0 8px 32px -8px hsl(var(--gold) / 0.3);
     --shadow-subtle: 0 4px 16px -4px hsl(var(--jet-black) / 0.1);
+    --shadow-rose: 0 8px 32px -8px hsl(var(--rose) / 0.25);
 
     /* Typography Scale */
     --font-display: 'Playfair Display', serif;
@@ -174,6 +180,33 @@ Fonts: Playfair Display (headings), Inter (body)
     animation: menu-reveal 0.6s ease-out forwards;
   }
 
+  /* Valentine's romantic glow effect */
+  .valentine-glow {
+    position: relative;
+  }
+  .valentine-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-rose-gold);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+  }
+  .valentine-glow:hover::before {
+    opacity: 1;
+  }
+
+  /* Heartbeat pulse animation */
+  .heartbeat {
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+
   /* Luxury button styles */
   .btn-gold {
     background: var(--gradient-gold);
@@ -239,5 +272,23 @@ Fonts: Playfair Display (headings), Inter (body)
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.15);
+  }
+  30% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.1);
+  }
+  60% {
+    transform: scale(1);
   }
 }

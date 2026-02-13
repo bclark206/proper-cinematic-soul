@@ -70,17 +70,23 @@ export default {
 				gold: 'hsl(var(--gold))',
 				'jet-black': 'hsl(var(--jet-black))',
 				cream: 'hsl(var(--cream))',
-				'pure-white': 'hsl(var(--pure-white))'
+				'pure-white': 'hsl(var(--pure-white))',
+				rose: 'hsl(var(--rose))',
+				'rose-light': 'hsl(var(--rose-light))',
+				'deep-burgundy': 'hsl(var(--deep-burgundy))'
 			},
 			backgroundImage: {
 				'gradient-gold': 'var(--gradient-gold)',
 				'gradient-dark': 'var(--gradient-dark)',
 				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-rose-gold': 'var(--gradient-rose-gold)',
+				'gradient-valentine': 'var(--gradient-valentine)',
 			},
 			boxShadow: {
 				'elegant': 'var(--shadow-elegant)',
 				'gold': 'var(--shadow-gold)',
 				'subtle': 'var(--shadow-subtle)',
+				'rose': 'var(--shadow-rose)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

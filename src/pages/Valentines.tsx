@@ -2,7 +2,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Clock, MapPin, Phone, Car } from "lucide-react";
+import { Heart, Clock, MapPin, Phone, Car, Sparkles } from "lucide-react";
 
 const Valentines = () => {
   const menuItems = {
@@ -67,73 +67,85 @@ const Valentines = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#0a0a0a]">
       <Navigation />
 
       <main>
-        {/* Hero Section */}
+        {/* Hero Section - Deep dark with rose/gold accents */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-jet-black">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#9f7d2a_1px,_transparent_1px)] bg-[size:24px_24px] opacity-10"></div>
-            <div className="absolute inset-0 bg-gradient-hero"></div>
+          <div className="absolute inset-0 bg-[#0a0a0a]">
+            {/* Subtle radial glow from center */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(345_40%_12%)_0%,_transparent_70%)] opacity-60"></div>
+            {/* Dot pattern with rose tint */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_hsl(350_80%_65%)_0.5px,_transparent_0.5px)] bg-[size:32px_32px] opacity-[0.07]"></div>
           </div>
 
+          {/* Decorative rose-gold corner flourishes */}
+          <div className="absolute top-0 left-0 w-64 h-64 bg-[radial-gradient(ellipse_at_top_left,_hsl(350_80%_65%_/_0.1),_transparent_70%)]"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-[radial-gradient(ellipse_at_bottom_right,_hsl(43_35%_58%_/_0.1),_transparent_70%)]"></div>
+
           <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-            <div className="inline-block mb-6 animate-pulse">
-              <Heart className="w-16 h-16 text-rose-400 fill-rose-400" />
+            <div className="inline-block mb-8">
+              <Heart className="w-16 h-16 text-rose fill-rose heartbeat" />
             </div>
 
             <h1 className="font-display text-6xl md:text-7xl lg:text-8xl font-bold text-pure-white mb-6 fade-in-up">
               Valentine's Day Weekend at{" "}
-              <span className="hover-gold text-[#9f7d2a]">Proper Cuisine</span>
+              <span className="text-rose">Proper Cuisine</span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-cream/90 mb-12 max-w-3xl mx-auto leading-relaxed fade-in-slow font-light">
+            <p className="text-xl md:text-2xl text-cream/90 mb-4 max-w-3xl mx-auto leading-relaxed fade-in-slow font-light">
               February 14-16, 2026 | An Unforgettable Dining Experience
             </p>
 
-            <p className="text-lg text-cream/80 max-w-2xl mx-auto leading-relaxed fade-in-slow">
+            <div className="flex items-center justify-center gap-3 mb-12 fade-in-slow">
+              <div className="w-12 h-px bg-gradient-to-r from-transparent to-rose/60"></div>
+              <Sparkles className="w-4 h-4 text-gold" />
+              <div className="w-12 h-px bg-gradient-to-l from-transparent to-gold/60"></div>
+            </div>
+
+            <p className="text-lg text-cream/70 max-w-2xl mx-auto leading-relaxed fade-in-slow">
               Join us for a romantic weekend celebration where love meets culinary excellence.
               Indulge in an intimate atmosphere designed for unforgettable moments together.
             </p>
           </div>
 
           {/* Scroll Indicator */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-pure-white/70 animate-bounce">
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-cream/50 animate-bounce">
             <div className="flex flex-col items-center">
               <span className="text-sm mb-2 font-light">Scroll to explore</span>
-              <div className="w-px h-8 bg-gradient-to-b from-pure-white/70 to-transparent"></div>
+              <div className="w-px h-8 bg-gradient-to-b from-rose/50 to-transparent"></div>
             </div>
           </div>
         </section>
 
-        {/* What to Expect Section - Light (matches About pattern) */}
-        <section className="py-24 px-6 bg-cream">
+        {/* What to Expect Section - Dark with rose accent */}
+        <section className="py-24 px-6 bg-[#0d0d0d]">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="font-display text-5xl lg:text-6xl font-bold text-jet-black mb-6">
+              <h2 className="font-display text-5xl lg:text-6xl font-bold text-pure-white mb-6">
                 What to{" "}
                 <span className="text-gold">Expect</span>
               </h2>
-              <div className="w-24 h-1 bg-gradient-gold rounded-full mx-auto mb-6"></div>
-              <p className="text-xl text-jet-black/70 max-w-2xl mx-auto">
+              <div className="w-24 h-1 bg-gradient-rose-gold rounded-full mx-auto mb-6"></div>
+              <p className="text-xl text-cream/60 max-w-2xl mx-auto">
                 Everything you need to know for the perfect Valentine's evening.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
               {expectations.map((item) => (
-                <Card key={item.title} className="bg-pure-white border-gold/20 hover:shadow-gold transition-all duration-500">
+                <Card key={item.title} className="bg-[#141414] border-rose/10 hover:border-rose/30 hover:shadow-rose transition-all duration-500 valentine-glow">
                   <CardContent className="p-8">
                     <div className="flex items-start space-x-4">
-                      <div className="p-3 bg-gradient-gold rounded-lg">
-                        <item.icon className="w-6 h-6 text-jet-black" />
+                      <div className="p-3 bg-gradient-rose-gold rounded-lg shrink-0">
+                        <item.icon className="w-6 h-6 text-[#0a0a0a]" />
                       </div>
                       <div>
-                        <h3 className="font-display text-xl font-bold text-jet-black mb-2">
+                        <h3 className="font-display text-xl font-bold text-pure-white mb-2">
                           {item.title}
                         </h3>
-                        <p className="text-jet-black/70 leading-relaxed">
+                        <p className="text-cream/60 leading-relaxed">
                           {item.description}
                         </p>
                       </div>
@@ -145,31 +157,34 @@ const Valentines = () => {
           </div>
         </section>
 
-        {/* Limited Valentine's Menu - Dark (matches MenuSection pattern) */}
-        <section className="py-24 px-6 bg-jet-black">
-          <div className="max-w-7xl mx-auto">
+        {/* Limited Valentine's Menu - Dark with gold/rose highlights */}
+        <section className="py-24 px-6 bg-[#0a0a0a] relative overflow-hidden">
+          {/* Subtle background ambiance */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_hsl(345_40%_10%)_0%,_transparent_60%)] opacity-40"></div>
+
+          <div className="max-w-7xl mx-auto relative z-10">
             <div className="text-center mb-16">
               <h2 className="font-display text-5xl lg:text-6xl font-bold text-pure-white mb-6">
                 Limited Valentine's{" "}
                 <span className="text-gold">Menu</span>
               </h2>
-              <p className="text-xl text-cream/80 max-w-2xl mx-auto">
+              <p className="text-xl text-cream/60 max-w-2xl mx-auto">
                 Curated selections for a romantic evening
               </p>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Starters */}
-              <Card className="bg-cream border-gold/20 overflow-hidden group hover:shadow-gold transition-all duration-500">
+              <Card className="bg-[#141414] border-gold/15 overflow-hidden group hover:border-gold/40 hover:shadow-gold transition-all duration-500">
                 <CardContent className="p-8">
-                  <h3 className="font-display text-3xl font-bold text-jet-black mb-2">
+                  <h3 className="font-display text-3xl font-bold text-pure-white mb-2">
                     Starters
                   </h3>
-                  <p className="text-gold font-medium mb-6">Begin your evening</p>
+                  <p className="text-rose font-medium mb-6">Begin your evening</p>
                   <ul className="space-y-3">
                     {menuItems.starters.map((item, idx) => (
-                      <li key={idx} className="text-jet-black/70 text-sm flex items-center">
-                        <span className="w-1.5 h-1.5 bg-gold rounded-full mr-3"></span>
+                      <li key={idx} className="text-cream/70 text-sm flex items-center">
+                        <span className="w-1.5 h-1.5 bg-rose rounded-full mr-3 shrink-0"></span>
                         {item}
                       </li>
                     ))}
@@ -178,16 +193,16 @@ const Valentines = () => {
               </Card>
 
               {/* Entrées */}
-              <Card className="bg-cream border-gold/20 overflow-hidden group hover:shadow-gold transition-all duration-500">
+              <Card className="bg-[#141414] border-gold/15 overflow-hidden group hover:border-gold/40 hover:shadow-gold transition-all duration-500">
                 <CardContent className="p-8">
-                  <h3 className="font-display text-3xl font-bold text-jet-black mb-2">
+                  <h3 className="font-display text-3xl font-bold text-pure-white mb-2">
                     Entrées
                   </h3>
-                  <p className="text-gold font-medium mb-6">The main course</p>
+                  <p className="text-rose font-medium mb-6">The main course</p>
                   <ul className="space-y-3">
                     {menuItems.entrees.map((item, idx) => (
-                      <li key={idx} className="text-jet-black/70 text-sm flex items-center">
-                        <span className="w-1.5 h-1.5 bg-gold rounded-full mr-3"></span>
+                      <li key={idx} className="text-cream/70 text-sm flex items-center">
+                        <span className="w-1.5 h-1.5 bg-rose rounded-full mr-3 shrink-0"></span>
                         {item}
                       </li>
                     ))}
@@ -196,16 +211,16 @@ const Valentines = () => {
               </Card>
 
               {/* Desserts */}
-              <Card className="bg-cream border-gold/20 overflow-hidden group hover:shadow-gold transition-all duration-500">
+              <Card className="bg-[#141414] border-gold/15 overflow-hidden group hover:border-gold/40 hover:shadow-gold transition-all duration-500">
                 <CardContent className="p-8">
-                  <h3 className="font-display text-3xl font-bold text-jet-black mb-2">
+                  <h3 className="font-display text-3xl font-bold text-pure-white mb-2">
                     Desserts
                   </h3>
-                  <p className="text-gold font-medium mb-6">A sweet finish</p>
+                  <p className="text-rose font-medium mb-6">A sweet finish</p>
                   <ul className="space-y-3">
                     {menuItems.desserts.map((item, idx) => (
-                      <li key={idx} className="text-jet-black/70 text-sm flex items-center">
-                        <span className="w-1.5 h-1.5 bg-gold rounded-full mr-3"></span>
+                      <li key={idx} className="text-cream/70 text-sm flex items-center">
+                        <span className="w-1.5 h-1.5 bg-rose rounded-full mr-3 shrink-0"></span>
                         {item}
                       </li>
                     ))}
@@ -216,16 +231,16 @@ const Valentines = () => {
           </div>
         </section>
 
-        {/* Parking Information - Light (matches Gallery pattern) */}
-        <section className="py-24 px-6 bg-cream">
+        {/* Parking Information - Dark with subtle variation */}
+        <section className="py-24 px-6 bg-[#0d0d0d]">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="font-display text-5xl lg:text-6xl font-bold text-jet-black mb-6">
+              <h2 className="font-display text-5xl lg:text-6xl font-bold text-pure-white mb-6">
                 Parking{" "}
                 <span className="text-gold">Information</span>
               </h2>
-              <div className="w-24 h-1 bg-gradient-gold rounded-full mx-auto mb-6"></div>
-              <p className="text-xl text-jet-black/70">
+              <div className="w-24 h-1 bg-gradient-rose-gold rounded-full mx-auto mb-6"></div>
+              <p className="text-xl text-cream/60">
                 Convenient parking options near our restaurant
               </p>
             </div>
@@ -234,19 +249,19 @@ const Valentines = () => {
               {parkingLocations.map((location, idx) => (
                 <Card
                   key={idx}
-                  className="bg-pure-white border-gold/20 hover:shadow-gold transition-all duration-300"
+                  className="bg-[#141414] border-gold/10 hover:border-gold/30 hover:shadow-gold transition-all duration-300"
                 >
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-display text-xl font-bold text-jet-black mb-2">
+                        <h3 className="font-display text-xl font-bold text-pure-white mb-2">
                           {location.name}
                         </h3>
-                        <p className="text-jet-black/70 mb-1">{location.address}</p>
-                        <p className="text-gold text-sm font-medium">{location.walkTime}</p>
+                        <p className="text-cream/60 mb-1">{location.address}</p>
+                        <p className="text-rose text-sm font-medium">{location.walkTime}</p>
                       </div>
-                      <div className="p-3 bg-gradient-gold rounded-lg">
-                        <Car className="w-5 h-5 text-jet-black" />
+                      <div className="p-3 bg-gradient-rose-gold rounded-lg shrink-0">
+                        <Car className="w-5 h-5 text-[#0a0a0a]" />
                       </div>
                     </div>
                   </CardContent>
@@ -254,10 +269,10 @@ const Valentines = () => {
               ))}
             </div>
 
-            <Card className="bg-pure-white border-gold/20">
+            <Card className="bg-[#141414] border-gold/10">
               <CardContent className="p-6 text-center">
-                <p className="text-jet-black/80 text-lg">
-                  <span className="font-semibold text-jet-black">Note:</span> Street parking is also available.
+                <p className="text-cream/70 text-lg">
+                  <span className="font-semibold text-pure-white">Note:</span> Street parking is also available.
                   We recommend arriving 10-15 minutes early to find parking.
                 </p>
               </CardContent>
@@ -265,15 +280,18 @@ const Valentines = () => {
           </div>
         </section>
 
-        {/* Contact & Reservation CTA - Dark (matches Contact pattern) */}
-        <section className="py-24 px-6 bg-jet-black">
-          <div className="max-w-7xl mx-auto">
+        {/* Contact & Reservation CTA - Deep dark with rose glow */}
+        <section className="py-24 px-6 bg-[#0a0a0a] relative overflow-hidden">
+          {/* Ambient glow behind CTA */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(350_60%_15%)_0%,_transparent_60%)] opacity-30"></div>
+
+          <div className="max-w-7xl mx-auto relative z-10">
             <div className="text-center mb-16">
               <h2 className="font-display text-5xl lg:text-6xl font-bold text-pure-white mb-6">
                 Make Your{" "}
                 <span className="text-gold">Reservation</span>
               </h2>
-              <p className="text-xl text-cream/80 max-w-2xl mx-auto">
+              <p className="text-xl text-cream/60 max-w-2xl mx-auto">
                 Secure your table for an unforgettable Valentine's Day weekend experience
               </p>
             </div>
@@ -282,17 +300,17 @@ const Valentines = () => {
               {/* Contact Information */}
               <div className="lg:col-span-2">
                 <div className="grid md:grid-cols-2 gap-6">
-                  <Card className="bg-cream border-gold/20 hover:shadow-gold transition-all duration-300">
+                  <Card className="bg-[#141414] border-rose/10 hover:border-rose/30 hover:shadow-rose transition-all duration-300 valentine-glow">
                     <CardContent className="p-6">
                       <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-gradient-gold rounded-lg">
-                          <MapPin className="w-6 h-6 text-jet-black" />
+                        <div className="p-3 bg-gradient-rose-gold rounded-lg shrink-0">
+                          <MapPin className="w-6 h-6 text-[#0a0a0a]" />
                         </div>
                         <div>
-                          <h3 className="font-display text-xl font-bold text-jet-black mb-2">
+                          <h3 className="font-display text-xl font-bold text-pure-white mb-2">
                             Visit Us
                           </h3>
-                          <p className="text-jet-black/70 leading-relaxed">
+                          <p className="text-cream/60 leading-relaxed">
                             206 E Redwood St<br />
                             Baltimore, MD 21202
                           </p>
@@ -301,19 +319,19 @@ const Valentines = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-cream border-gold/20 hover:shadow-gold transition-all duration-300">
+                  <Card className="bg-[#141414] border-rose/10 hover:border-rose/30 hover:shadow-rose transition-all duration-300 valentine-glow">
                     <CardContent className="p-6">
                       <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-gradient-gold rounded-lg">
-                          <Phone className="w-6 h-6 text-jet-black" />
+                        <div className="p-3 bg-gradient-rose-gold rounded-lg shrink-0">
+                          <Phone className="w-6 h-6 text-[#0a0a0a]" />
                         </div>
                         <div>
-                          <h3 className="font-display text-xl font-bold text-jet-black mb-2">
+                          <h3 className="font-display text-xl font-bold text-pure-white mb-2">
                             Questions?
                           </h3>
-                          <p className="text-jet-black/70 leading-relaxed">
+                          <p className="text-cream/60 leading-relaxed">
                             Call us at<br />
-                            <a href="tel:4434322771" className="text-gold hover:text-gold/80 transition-colors font-medium">
+                            <a href="tel:4434322771" className="text-rose hover:text-rose-light transition-colors font-medium">
                               (443) 432-2771
                             </a>
                           </p>
@@ -325,12 +343,12 @@ const Valentines = () => {
               </div>
 
               {/* Reservation Card */}
-              <Card className="bg-gradient-gold border-none">
+              <Card className="bg-gradient-rose-gold border-none">
                 <CardContent className="p-8 text-center">
-                  <h3 className="font-display text-3xl font-bold text-jet-black mb-4">
+                  <h3 className="font-display text-3xl font-bold text-[#0a0a0a] mb-4">
                     Reserve Your Table
                   </h3>
-                  <p className="text-jet-black/80 mb-6">
+                  <p className="text-[#0a0a0a]/80 mb-6">
                     Secure your spot for Valentine's weekend.
                   </p>
                   <Button
