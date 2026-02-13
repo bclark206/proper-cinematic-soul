@@ -27,19 +27,24 @@ const Valentines = () => {
 
   const parkingLocations = [
     {
-      name: "Baltimore City Parking - Redwood Garage",
-      address: "112 E Redwood St",
-      walkTime: "1 min walk"
-    },
-    {
-      name: "SP+ Parking - Commerce Place Garage",
-      address: "1 South St",
+      name: "Water Street Garage",
+      address: "208 Water Street",
       walkTime: "2 min walk"
     },
     {
-      name: "LAZ Parking - Hopkins Place Garage",
-      address: "110 Hopkins Place",
+      name: "One Light Street Garage",
+      address: "1 Light Street",
       walkTime: "3 min walk"
+    },
+    {
+      name: "Parkway Garage",
+      address: "215 E Fayette Street",
+      walkTime: "3 min walk"
+    },
+    {
+      name: "Hampton Inn Valet Parking",
+      address: "131 E Redwood Street",
+      walkTime: "Next door — great if you're staying overnight!"
     }
   ];
 
