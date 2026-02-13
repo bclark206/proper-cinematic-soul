@@ -8,6 +8,7 @@ import SmsCompliance from "./pages/SmsCompliance";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import Reviews from "./pages/Reviews";
+import Valentines from "./pages/Valentines";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/reviews" element={<Reviews />} />
+          <Route path="/valentines" element={<Valentines />} />
           <Route path="/sms-compliance" element={<SmsCompliance />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
