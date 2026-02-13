@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-jet-black border-t border-gold/20 py-16 px-6">
+    <footer className="bg-jet-black border-t border-gold/20 py-10 sm:py-16 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-4 gap-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12">
           {/* Brand */}
-          <div className="lg:col-span-2">
-            <h3 className="font-display text-3xl font-bold text-gold mb-4">
+          <div className="sm:col-span-2 lg:col-span-2">
+            <h3 className="font-display text-2xl sm:text-3xl font-bold text-gold mb-4">
               Proper Cuisine
             </h3>
             <p className="text-cream/80 text-lg mb-6 max-w-md">
@@ -85,7 +85,7 @@ const Footer = () => {
             © 2024 Proper Cuisine. All rights reserved.
           </p>
           
-          <div className="flex space-x-6 mt-4 md:mt-0">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4 md:mt-0">
             <Link to="/sms-compliance" className="text-cream/60 hover:text-gold text-sm transition-colors">
               SMS Updates
             </Link>

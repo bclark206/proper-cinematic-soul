@@ -36,11 +36,11 @@ const MenuSection = () => {
   ];
 
   return (
-    <section id="menus" className="py-24 px-6 bg-jet-black">
+    <section id="menus" className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 bg-jet-black">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="font-display text-5xl lg:text-6xl font-bold text-pure-white mb-6">
+        <div className="text-center mb-10 sm:mb-16">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-pure-white mb-4 sm:mb-6">
             Choose Your{" "}
             <span className="text-gold">Proper</span> Moment
           </h2>
@@ -50,10 +50,10 @@ const MenuSection = () => {
         </div>
 
         {/* Menu Cards */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-10 sm:mb-16">
           {menuItems.map((menu, index) => (
             <Card key={menu.title} className="bg-cream border-gold/20 overflow-hidden group hover:shadow-gold transition-all duration-500">
-              <CardContent className="p-8">
+              <CardContent className="p-5 sm:p-8">
                 <div className="flex items-center space-x-2 text-jet-black/60 mb-4">
                   <menu.icon className="w-5 h-5" />
                   <Clock className="w-4 h-4" />
@@ -101,8 +101,8 @@ const MenuSection = () => {
         </div>
 
         {/* Download Section */}
-        <div className="bg-gradient-gold rounded-3xl p-12 text-center">
-          <h3 className="font-display text-3xl font-bold text-jet-black mb-4">
+        <div className="bg-gradient-gold rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center">
+          <h3 className="font-display text-2xl sm:text-3xl font-bold text-jet-black mb-4">
             Take Our Menus With You
           </h3>
           <p className="text-jet-black/80 mb-8 max-w-2xl mx-auto">

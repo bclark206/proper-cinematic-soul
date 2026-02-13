@@ -10,23 +10,23 @@ const Hero = () => {
       
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <h1 className="font-display text-6xl md:text-7xl lg:text-8xl font-bold text-pure-white mb-6 fade-in-up">
+        <h1 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-pure-white mb-6 fade-in-up">
           Where Soul Meets{" "}
           <span className="hover-gold text-[#9f7d2a]">Elegance</span>
         </h1>
-        
-        <p className="text-xl md:text-2xl text-cream/90 mb-12 max-w-3xl mx-auto leading-relaxed fade-in-slow font-light">
+
+        <p className="text-lg sm:text-xl md:text-2xl text-cream/90 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed fade-in-slow font-light">
           Proper Cuisine is a modern tribute to timeless hospitality — luxe interiors, 
           soulful flavors, and elevated vibes in the heart of Baltimore.
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center fade-in-slow">
-          <Button variant="hero" size="xl" className="min-w-48" asChild>
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center fade-in-slow">
+          <Button variant="hero" size="xl" className="w-full sm:w-auto sm:min-w-48" asChild>
             <a href="https://order.toasttab.com/online/prim-proper-cocktail-wine-bar-206-e-redwood-st" target="_blank" rel="noopener noreferrer">
               ORDER ONLINE
             </a>
           </Button>
-          <Button variant="outline-gold" size="xl" className="min-w-48 text-pure-white border-pure-white hover:bg-pure-white hover:text-jet-black"
+          <Button variant="outline-gold" size="xl" className="w-full sm:w-auto sm:min-w-48 text-pure-white border-pure-white hover:bg-pure-white hover:text-jet-black"
             onClick={(e) => {
               e.preventDefault();
               document.getElementById('menus')?.scrollIntoView({ behavior: 'smooth', block: 'start' });

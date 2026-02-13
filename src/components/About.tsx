@@ -1,19 +1,19 @@
 import { Button } from "@/components/ui/button";
 const About = () => {
-  return <section id="about" className="py-24 px-6 bg-cream">
+  return <section id="about" className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 bg-cream">
       <div className="max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
           {/* Content */}
           <div className="space-y-8">
             <div className="space-y-4">
-              <h2 className="font-display text-5xl lg:text-6xl font-bold text-jet-black leading-tight">
+              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-jet-black leading-tight">
                 Designed for{" "}
                 <span className="text-gold">the Culture</span>
               </h2>
               <div className="w-24 h-1 bg-gradient-gold rounded-full"></div>
             </div>
             
-            <div className="space-y-6 text-lg text-jet-black/80 leading-relaxed">
+            <div className="space-y-4 sm:space-y-6 text-base sm:text-lg text-jet-black/80 leading-relaxed">
               <p>
                 Proper Cuisine was designed for those who crave more than just a meal. 
                 Birthed from our sister restaurant, the world-famous Papi Cuisine—celebrated 
@@ -44,10 +44,10 @@ const About = () => {
 
           {/* Visual Elements */}
           <div className="relative">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-6">
-                <div className="bg-gold/20 rounded-2xl p-8 text-center">
-                  <div className="text-4xl font-display font-bold text-jet-black mb-2">
+            <div className="grid grid-cols-2 gap-3 sm:gap-6">
+              <div className="space-y-3 sm:space-y-6">
+                <div className="bg-gold/20 rounded-2xl p-4 sm:p-8 text-center">
+                  <div className="text-2xl sm:text-4xl font-display font-bold text-jet-black mb-2">
                     2019
                   </div>
                   <div className="text-sm text-jet-black/70">
@@ -55,8 +55,8 @@ const About = () => {
                   </div>
                 </div>
                 
-                <div className="bg-jet-black rounded-2xl p-8 text-center">
-                  <div className="text-4xl font-display font-bold text-gold mb-2">
+                <div className="bg-jet-black rounded-2xl p-4 sm:p-8 text-center">
+                  <div className="text-2xl sm:text-4xl font-display font-bold text-gold mb-2">
                     50+
                   </div>
                   <div className="text-sm text-cream">
@@ -65,9 +65,9 @@ const About = () => {
                 </div>
               </div>
               
-              <div className="space-y-6 mt-12">
-                <div className="bg-gradient-gold rounded-2xl p-8 text-center">
-                  <div className="text-4xl font-display font-bold text-jet-black mb-2">
+              <div className="space-y-3 sm:space-y-6 mt-6 sm:mt-12">
+                <div className="bg-gradient-gold rounded-2xl p-4 sm:p-8 text-center">
+                  <div className="text-2xl sm:text-4xl font-display font-bold text-jet-black mb-2">
                     Chef
                   </div>
                   <div className="text-sm text-jet-black/70">
@@ -75,8 +75,8 @@ const About = () => {
                   </div>
                 </div>
                 
-                <div className="bg-cream border-2 border-gold rounded-2xl p-8 text-center shadow-elegant">
-                  <div className="text-4xl font-display font-bold text-jet-black mb-2">
+                <div className="bg-cream border-2 border-gold rounded-2xl p-4 sm:p-8 text-center shadow-elegant">
+                  <div className="text-2xl sm:text-4xl font-display font-bold text-jet-black mb-2">
                     5★
                   </div>
                   <div className="text-sm text-jet-black/70">

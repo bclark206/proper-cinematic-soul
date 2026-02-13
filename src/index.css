@@ -138,6 +138,8 @@ Fonts: Playfair Display (headings), Inter (body)
   body {
     @apply bg-background text-foreground font-body;
     font-feature-settings: "kern" 1, "liga" 1;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -157,10 +159,16 @@ Fonts: Playfair Display (headings), Inter (body)
   }
 
   .parallax-hero {
-    background-attachment: fixed;
+    background-attachment: scroll;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+  }
+
+  @media (min-width: 768px) {
+    .parallax-hero {
+      background-attachment: fixed;
+    }
   }
 
   /* Elegant hover effects */

@@ -30,11 +30,11 @@ const Gallery = () => {
     : galleryItems.filter(item => item.category === currentCategory);
 
   return (
-    <section id="gallery" className="py-24 px-6 bg-cream">
+    <section id="gallery" className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 bg-cream">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="font-display text-5xl lg:text-6xl font-bold text-jet-black mb-6">
+        <div className="text-center mb-10 sm:mb-16">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-jet-black mb-4 sm:mb-6">
             Experience the{" "}
             <span className="text-gold">Atmosphere</span>
           </h2>
@@ -58,7 +58,7 @@ const Gallery = () => {
         </div>
 
         {/* Gallery Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-8">
           {filteredItems.map((item, index) => (
             <Card 
               key={item.id} 
@@ -93,10 +93,10 @@ const Gallery = () => {
         </div>
 
         {/* Featured Highlight */}
-        <div className="mt-16 bg-gradient-gold rounded-3xl overflow-hidden">
+        <div className="mt-10 sm:mt-16 bg-gradient-gold rounded-2xl sm:rounded-3xl overflow-hidden">
           <div className="grid lg:grid-cols-2 items-center">
-            <div className="p-12 lg:p-16">
-              <h3 className="font-display text-4xl font-bold text-jet-black mb-6">
+            <div className="p-6 sm:p-8 md:p-12 lg:p-16">
+              <h3 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-jet-black mb-4 sm:mb-6">
                 Every Detail Matters
               </h3>
               <p className="text-jet-black/80 text-lg leading-relaxed mb-8">
@@ -125,7 +125,7 @@ const Gallery = () => {
               </Button>
             </div>
             
-            <div className="relative h-96 lg:h-full">
+            <div className="relative h-64 sm:h-80 md:h-96 lg:h-full">
               <img 
                 src="/lovable-uploads/8f451f04-db68-4d54-b4d4-75574f6bd736.png" 
                 alt="Elegant restaurant interior showcasing attention to detail"

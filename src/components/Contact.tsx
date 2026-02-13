@@ -36,11 +36,11 @@ const Contact = () => {
     label: "@propercuisine",
     href: "#"
   }];
-  return <section id="contact" className="py-24 px-6 bg-jet-black">
+  return <section id="contact" className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 bg-jet-black">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="font-display text-5xl lg:text-6xl font-bold text-pure-white mb-6">
+        <div className="text-center mb-10 sm:mb-16">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-pure-white mb-4 sm:mb-6">
             Visit{" "}
             <span className="text-gold">Proper Cuisine</span>
           </h2>
@@ -49,10 +49,10 @@ const Contact = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-12">
+        <div className="grid lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
           {/* Contact Information */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="grid md:grid-cols-2 gap-6">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
               {contactInfo.map(info => <Card key={info.title} className="bg-cream border-gold/20 hover:shadow-gold transition-all duration-300">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
@@ -162,8 +162,8 @@ const Contact = () => {
         </div>
 
         {/* Bottom Banner */}
-        <div className="mt-16 text-center">
-          <div className="inline-block bg-gradient-gold rounded-2xl px-8 py-6">
+        <div className="mt-10 sm:mt-16 text-center">
+          <div className="inline-block bg-gradient-gold rounded-2xl px-6 sm:px-8 py-4 sm:py-6">
             <p className="text-jet-black font-display text-lg">
               "Proper Cuisine is what Baltimore has been waiting for."
             </p>
