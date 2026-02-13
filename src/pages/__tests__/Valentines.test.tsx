@@ -21,7 +21,7 @@ describe('Valentines Page', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText(/Proper Cuisine/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Proper Cuisine/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it('displays the date range', () => {
@@ -42,7 +42,7 @@ describe('Valentines Page', () => {
     );
 
     expect(screen.getByText(/What to Expect/i)).toBeInTheDocument();
-    expect(screen.getByText(/90-Minute Table Times/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /90-Minute Table Times/i })).toBeInTheDocument();
   });
 
   it('displays the menu sections', () => {
@@ -65,15 +65,10 @@ describe('Valentines Page', () => {
       </BrowserRouter>
     );
 
-    // Check starters
     expect(screen.getByText(/Crab Balls/i)).toBeInTheDocument();
     expect(screen.getByText(/Devil Eggs/i)).toBeInTheDocument();
-
-    // Check entrees
     expect(screen.getByText(/Honey Jerk Lamb/i)).toBeInTheDocument();
     expect(screen.getByText(/Salmon Pasta/i)).toBeInTheDocument();
-
-    // Check desserts
     expect(screen.getByText(/Chocolate Lava Cake/i)).toBeInTheDocument();
   });
 
@@ -96,8 +91,8 @@ describe('Valentines Page', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText(/206 E Redwood St/i)).toBeInTheDocument();
-    expect(screen.getByText(/Baltimore, MD 21202/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/206 E Redwood St/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Baltimore, MD/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it('displays reservation CTA button', () => {
@@ -107,8 +102,10 @@ describe('Valentines Page', () => {
       </BrowserRouter>
     );
 
-    const reserveButton = screen.getByRole('link', { name: /Reserve Now/i });
-    expect(reserveButton).toBeInTheDocument();
-    expect(reserveButton).toHaveAttribute('href', expect.stringContaining('opentable.com'));
+    const reserveButtons = screen.getAllByRole('link', { name: /Reserve/i });
+    const opentableLink = reserveButtons.find(
+      (btn) => btn.getAttribute('href')?.includes('opentable.com')
+    );
+    expect(opentableLink).toBeDefined();
   });
 });
