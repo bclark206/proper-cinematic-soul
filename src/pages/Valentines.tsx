@@ -18,6 +18,7 @@ const Valentines = () => {
       { name: "Crab Cake", desc: "8oz Jumbo Lump Crabmeat" },
       { name: "Creamy Salmon Pasta", desc: "Creamy Pasta, Salmon Filet, Bacon, Spinach" },
       { name: "Honey Jerk Lamb Chops", desc: "Signature Jerk Rub, Honey Glazed Lamb Chops" },
+      { name: "Salmon Filet", desc: "Pan-Seared Salmon Filet" },
     ],
     desserts: [
       { name: "Bread Pudding", desc: "" },
