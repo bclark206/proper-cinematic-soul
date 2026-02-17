@@ -1,0 +1,286 @@
+[
+  {
+    "id": "C43X3WPKYDK3ONUKHUIUTKQ2",
+    "name": "Temperature",
+    "modifiers": [
+      {
+        "id": "4KVAJHFDSJ4PFKWORWJPFN6Z",
+        "name": "Rare",
+        "price": null
+      },
+      {
+        "id": "7ZDVD4WDUNRIYOSJBMZVSR6S",
+        "name": "Medium Rare",
+        "price": null
+      },
+      {
+        "id": "FSKSAYOH46G5CY57NCMYH5L5",
+        "name": "Medium",
+        "price": null
+      },
+      {
+        "id": "P5AGHGCZNHBHB7WMGA44EZZJ",
+        "name": "Well Done",
+        "price": null
+      }
+    ]
+  },
+  {
+    "id": "R36X2UV64QOYY4K2H7OHLA4K",
+    "name": "Two Choice Sides",
+    "modifiers": [
+      {
+        "id": "6JFBBZ5ZZLYVIUCUMWE4ZSGF",
+        "name": "Cream Spinach",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "TWEFAQAMTNXS5RWRZDCIZRQR",
+        "name": "Double Side",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "7XHMUDUMPK3EOHHOFIWARASP",
+        "name": "Fries",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "VPSUPUGFRR3JZXYA6RNIVVBG",
+        "name": "Kale",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "KVIRM5SLFEUWWUSC76QDVSZL",
+        "name": "Mac and Cheese",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "SHPWYF7P35QPPFGOSZNAQP7G",
+        "name": "Mash Potatoes",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "SFRBPOSXJPGYJTXDF3FQ6PWV",
+        "name": "Rice",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "AJEY3W2G4VU7HLK746B6Z2XS",
+        "name": "Roasted Asparagus",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "J5FOY2ZDNKEKKAIZEKRKFBZ4",
+        "name": "Roasted Broccolini",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "3RBO73NVWFQX5IE6XHR7H4AL",
+        "name": "Roasted Brussels",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "BLFND4DDW2KLRC2TG7DBCKHQ",
+        "name": "Side Salad",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "SJEYVDZNSJ6KJMFGHKTGQRQ7",
+        "name": "Sweet and Spicy Brussels",
+        "price": {
+          "amount": 500,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "ILQX4KOHGALJWRY5HKMGZEKV",
+        "name": "Sweet Potatoe Casserole",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "H7CQX6Y6P66LGLNFP6DMNKVY",
+        "name": "Veggie Medley",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "ZGDWO4LRUGP6KKYGMP6S4UTY",
+        "name": "Yams",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      }
+    ]
+  },
+  {
+    "id": "62XKTXVAIMBUVS4BJPLZJE7J",
+    "name": "Meat Temp",
+    "modifiers": [
+      {
+        "id": "RMRKYSSDTV6JBAHY5DUFOKWN",
+        "name": "Med",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "XX6P4RW7SVGAX34U3IET2GA7",
+        "name": "Med Rare",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "S5CRNGKJKDLMUADATCD4KUQ6",
+        "name": "Med Well",
+        "price": {
+          "amount": 0,
+          "currency": "USD"
+        }
+      }
+    ]
+  },
+  {
+    "id": "EAOE3UPUWX5JQE67P4RVBI3L",
+    "name": "Protein",
+    "modifiers": [
+      {
+        "id": "IAFRIFRNUBFJI67F4G5JNF4U",
+        "name": "Bbq Jerk Lamb",
+        "price": {
+          "amount": 3000,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "RS63FHCBTFKLYWPVB3Q776VG",
+        "name": "Chicken Breast",
+        "price": {
+          "amount": 1200,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "P6ZQNL3KFFUIY6MQ2Y4UIJ7S",
+        "name": "Crab Cake",
+        "price": {
+          "amount": 3000,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "263VHPGP3L6I35BCFXREUWJU",
+        "name": "Fried Catfish",
+        "price": {
+          "amount": 1500,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "IHG3647V63ZHZA2CYEN5PCIM",
+        "name": "Fried Lobster",
+        "price": {
+          "amount": 2500,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "CGADYWJB6XKFRPTSV4E27WSM",
+        "name": "Fried Shrimp",
+        "price": {
+          "amount": 1400,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "34ARGCMJ4Z2ACQI2K55Q2WJH",
+        "name": "Grilled Lobster",
+        "price": {
+          "amount": 2000,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "AXVBPRA4WOU7WTRW2IIMH7UV",
+        "name": "Honey Jerk Lamb",
+        "price": {
+          "amount": 3000,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "YUHE557F4FFFK6URTVZQWZQS",
+        "name": "Salmon Filet",
+        "price": {
+          "amount": 2500,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "N6GC5I77WPVA3GSRFSSXXEPA",
+        "name": "Shrimp",
+        "price": {
+          "amount": 1300,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "P74KNNHY3HTT3SWDUDFZNS6H",
+        "name": "Stuffed Lobster",
+        "price": {
+          "amount": 4500,
+          "currency": "USD"
+        }
+      },
+      {
+        "id": "ZTKW6TD7AUVJHER63F46KBFV",
+        "name": "Stuffed Salmon",
+        "price": {
+          "amount": 4500,
+          "currency": "USD"
+        }
+      }
+    ]
+  }
+]

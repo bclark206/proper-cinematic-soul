@@ -28,6 +28,10 @@ const Navigation = () => {
     href: "/reviews",
     external: false
   }, {
+    label: "Order Online",
+    href: "/order",
+    external: false
+  }, {
     label: "Contact",
     href: "#contact",
     external: false
