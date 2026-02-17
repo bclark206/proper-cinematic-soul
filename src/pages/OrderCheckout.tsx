@@ -32,15 +32,15 @@ const TIP_OPTIONS = [
   { label: "25%", value: 0.25 },
 ];
 
-// Store hours from Square: Mon-Fri 5PM-12AM, Sat-Sun 12PM-12AM
+// Store hours: Mon-Fri 3PM-11PM, Sat-Sun 12PM-11PM
 const STORE_HOURS: Record<number, [number, number]> = {
-  0: [12, 24], // Sunday
-  1: [17, 24], // Monday
-  2: [17, 24], // Tuesday
-  3: [17, 24], // Wednesday
-  4: [17, 24], // Thursday
-  5: [17, 24], // Friday
-  6: [12, 24], // Saturday
+  0: [12, 23], // Sunday
+  1: [15, 23], // Monday
+  2: [15, 23], // Tuesday
+  3: [15, 23], // Wednesday
+  4: [15, 23], // Thursday
+  5: [15, 23], // Friday
+  6: [12, 23], // Saturday
 };
 
 function isStoreOpen(): boolean {
