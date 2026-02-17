@@ -87,7 +87,7 @@
         }
       ],
       "modifierListIds": [],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/60c49dcec579f040824c376451c336233b502d13/original.png",
       "price": 4000
     },
     {
@@ -395,7 +395,7 @@
         }
       ],
       "modifierListIds": [],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/45d76f0465f1b336f9e1970b9bfb0ae61eecc7df/original.jpeg",
       "price": 1200
     },
     {
@@ -411,7 +411,7 @@
         }
       ],
       "modifierListIds": [],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/44f40a8bd1cfdba977dc13a54b34c6889a0fb51a/original.jpeg",
       "price": 1200
     },
     {
@@ -543,7 +543,7 @@
       "modifierListIds": [
         "EAOE3UPUWX5JQE67P4RVBI3L"
       ],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/1cd5fc61d25bcced5709d9b82799796553c853b4/original.jpeg",
       "price": 1800
     },
     {
@@ -607,7 +607,7 @@
         }
       ],
       "modifierListIds": [],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/a14c7e7f487606bdb5429761983ff04b8404dc16/original.png",
       "price": 1700
     },
     {
@@ -630,7 +630,7 @@
       "modifierListIds": [
         "R36X2UV64QOYY4K2H7OHLA4K"
       ],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/2eb3c07a8c9e774e17b7f8ae975d13363b96c357/original.png",
       "price": 3000
     },
     {
@@ -662,7 +662,7 @@
         }
       ],
       "modifierListIds": [],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/5acd9ac1ab3e5d394350c53de8164b4fd01122d8/original.png",
       "price": 700
     },
     {
@@ -678,7 +678,7 @@
         }
       ],
       "modifierListIds": [],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/b6646ff38f3f97cdb8882de90bbf39cd949182c6/original.png",
       "price": 1300
     },
     {
@@ -712,7 +712,7 @@
       "modifierListIds": [
         "R36X2UV64QOYY4K2H7OHLA4K"
       ],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/2db5511efee9a40e17aff7821e26bfa2463a6fc7/original.png",
       "price": 3000
     },
     {
@@ -764,7 +764,7 @@
       "modifierListIds": [
         "R36X2UV64QOYY4K2H7OHLA4K"
       ],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/b11f22b78e9944bb7c66bfe53b0d71aa956e933b/original.png",
       "price": 4500
     },
     {
@@ -814,7 +814,7 @@
       "modifierListIds": [
         "R36X2UV64QOYY4K2H7OHLA4K"
       ],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/9462024edfe36a4bc2378a2c8a6a94a3f4aba833/original.png",
       "price": 4000
     },
     {
@@ -974,7 +974,7 @@
         }
       ],
       "modifierListIds": [],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/05bad1e1f47d3059e219257286a8beab647c0914/original.png",
       "price": 5500
     },
     {
@@ -1008,7 +1008,7 @@
       "modifierListIds": [
         "R36X2UV64QOYY4K2H7OHLA4K"
       ],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/e5ea8067d31f40bbae345824305a483245879c7c/original.png",
       "price": 8000
     },
     {
@@ -1076,7 +1076,7 @@
       "modifierListIds": [
         "R36X2UV64QOYY4K2H7OHLA4K"
       ],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/d4a6ad48350693f204f1628e7f6a3a26b0c6f73d/original.png",
       "price": 3000
     },
     {
@@ -1092,7 +1092,7 @@
         }
       ],
       "modifierListIds": [],
-      "imageUrl": null,
+      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/0661781d2bab38babdf9d8f12b50b92c771ca8ae/original.jpeg",
       "price": 4000
     }
   ],
@@ -1292,5 +1292,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-17T17:03:39.269639Z"
+  "fetchedAt": "2026-02-17T17:17:46.310099Z"
 }
