@@ -18,6 +18,8 @@ import {
   ShoppingBag,
   Shield,
   Heart,
+  Check,
+  Apple,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -60,10 +62,15 @@ const OrderCheckout = () => {
   const [customTip, setCustomTip] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cardReady, setCardReady] = useState(false);
-  const [squareError, setSquareError] = useState<string | null>(null);
+  const [applePayAvailable, setApplePayAvailable] = useState(false);
+  const [googlePayAvailable, setGooglePayAvailable] = useState(false);
+  const [cashAppPayAvailable, setCashAppPayAvailable] = useState(false);
 
   const cardRef = useRef<any>(null);
   const paymentsRef = useRef<any>(null);
+  const applePayRef = useRef<any>(null);
+  const googlePayRef = useRef<any>(null);
+  const cashAppPayRef = useRef<any>(null);
 
   const pickupTimes = useMemo(() => generatePickupTimes(), []);
 
@@ -80,74 +87,79 @@ const OrderCheckout = () => {
   // Load Square Web Payments SDK
   const initSquare = useCallback(async () => {
     try {
-      if (!(window as any).Square) {
-        setSquareError("Square payments is loading...");
-        return;
-      }
+      if (!(window as any).Square) return;
 
       const payments = (window as any).Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
       paymentsRef.current = payments;
 
+      // Initialize Card
       const card = await payments.card();
       await card.attach("#square-card-container");
       cardRef.current = card;
       setCardReady(true);
-      setSquareError(null);
 
       // Initialize Apple Pay
       try {
         const applePayRequest = payments.paymentRequest({
-          countryCode: 'US',
-          currencyCode: 'USD',
-          total: { amount: (orderTotal / 100).toFixed(2), label: 'Proper Cuisine' },
+          countryCode: "US",
+          currencyCode: "USD",
+          total: { amount: (orderTotal / 100).toFixed(2), label: "Proper Cuisine" },
         });
         const applePay = await payments.applePay(applePayRequest);
         if (applePay) {
-          const applePayBtn = document.getElementById('apple-pay-container');
-          if (applePayBtn) applePayBtn.style.display = 'block';
-          (window as any).__applePay = applePay;
+          applePayRef.current = applePay;
+          setApplePayAvailable(true);
         }
-      } catch (e) { console.log('Apple Pay not available:', e); }
+      } catch {
+        // Apple Pay not available on this device/browser
+      }
 
       // Initialize Google Pay
       try {
         const googlePayRequest = payments.paymentRequest({
-          countryCode: 'US',
-          currencyCode: 'USD',
-          total: { amount: (orderTotal / 100).toFixed(2), label: 'Proper Cuisine' },
+          countryCode: "US",
+          currencyCode: "USD",
+          total: { amount: (orderTotal / 100).toFixed(2), label: "Proper Cuisine" },
         });
         const googlePay = await payments.googlePay(googlePayRequest);
         if (googlePay) {
-          await googlePay.attach('#google-pay-container');
+          await googlePay.attach("#google-pay-container");
+          googlePayRef.current = googlePay;
+          setGooglePayAvailable(true);
         }
-      } catch (e) { console.log('Google Pay not available:', e); }
+      } catch {
+        // Google Pay not available
+      }
 
       // Initialize Cash App Pay
       try {
         const cashAppRequest = payments.paymentRequest({
-          countryCode: 'US',
-          currencyCode: 'USD',
-          total: { amount: (orderTotal / 100).toFixed(2), label: 'Proper Cuisine' },
+          countryCode: "US",
+          currencyCode: "USD",
+          total: { amount: (orderTotal / 100).toFixed(2), label: "Proper Cuisine" },
         });
         const cashAppPay = await payments.cashAppPay(cashAppRequest, {
-          redirectURL: window.location.origin + '/order/confirmation',
-          referenceId: 'proper-' + Date.now(),
+          redirectURL: window.location.origin + "/order/confirmation",
+          referenceId: "proper-" + Date.now(),
         });
         if (cashAppPay) {
-          await cashAppPay.attach('#cashapp-pay-container');
+          await cashAppPay.attach("#cashapp-pay-container");
+          cashAppPayRef.current = cashAppPay;
+          setCashAppPayAvailable(true);
         }
-      } catch (e) { console.log('Cash App Pay not available:', e); }
+      } catch {
+        // Cash App Pay not available
+      }
     } catch (err: any) {
       console.error("Square init error:", err);
-      setSquareError("Could not load payment form. Please refresh and try again.");
     }
   }, []);
 
   useEffect(() => {
-    // Load Square JS SDK script
-    const existingScript = document.querySelector('script[src="https://web.squarecdn.com/v1/square.js"]');
+    const existingScript = document.querySelector(
+      'script[src="https://web.squarecdn.com/v1/square.js"]'
+    );
     if (existingScript) {
-      // Script already loaded, init directly
       if ((window as any).Square) {
         initSquare();
       } else {
@@ -160,12 +172,13 @@ const OrderCheckout = () => {
     script.src = "https://web.squarecdn.com/v1/square.js";
     script.async = true;
     script.onload = () => initSquare();
-    script.onerror = () => setSquareError("Failed to load payment system. Please refresh.");
     document.head.appendChild(script);
 
     return () => {
       if (cardRef.current) {
-        try { cardRef.current.destroy(); } catch {}
+        try {
+          cardRef.current.destroy();
+        } catch {}
       }
     };
   }, [initSquare]);
@@ -190,7 +203,23 @@ const OrderCheckout = () => {
     );
   }
 
-  const handleSubmit = async () => {
+  const handleApplePay = async () => {
+    if (!applePayRef.current) return;
+    try {
+      const result = await applePayRef.current.tokenize();
+      if (result.status === "OK") {
+        await processOrder(result.token);
+      }
+    } catch {
+      toast({
+        title: "Apple Pay Error",
+        description: "Could not complete Apple Pay. Please try another method.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const processOrder = async (nonce: string | null) => {
     if (!name.trim() || !phone.trim() || !email.trim()) {
       toast({
         title: "Missing Information",
@@ -203,26 +232,7 @@ const OrderCheckout = () => {
     setIsSubmitting(true);
 
     try {
-      let nonce: string | null = null;
-
-      // Tokenize card if ready
-      if (cardRef.current && cardReady) {
-        const result = await cardRef.current.tokenize();
-        if (result.status === "OK") {
-          nonce = result.token;
-        } else {
-          toast({
-            title: "Payment Error",
-            description: result.errors?.[0]?.message || "Could not process card. Please check your details.",
-            variant: "destructive",
-          });
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
       // In production, send nonce + order to /api/create-order
-      // For now, simulate order creation
       await new Promise((r) => setTimeout(r, 2000));
 
       const confirmationNumber = `PC-${Date.now().toString(36).toUpperCase()}`;
@@ -235,7 +245,10 @@ const OrderCheckout = () => {
         tip: tipAmount,
         total: orderTotal,
         customer: { name, phone, email },
-        pickupTime: pickupTime === "asap" ? "ASAP (20–30 min)" : pickupTimes.find(t => t.value === pickupTime)?.label || "ASAP",
+        pickupTime:
+          pickupTime === "asap"
+            ? "ASAP (20–30 min)"
+            : pickupTimes.find((t) => t.value === pickupTime)?.label || "ASAP",
         createdAt: new Date().toISOString(),
         paymentNonce: nonce,
       };
@@ -254,12 +267,60 @@ const OrderCheckout = () => {
     }
   };
 
+  const handleSubmit = async () => {
+    if (!name.trim() || !phone.trim() || !email.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill out your name, phone, and email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      let nonce: string | null = null;
+
+      if (cardRef.current && cardReady) {
+        const result = await cardRef.current.tokenize();
+        if (result.status === "OK") {
+          nonce = result.token;
+        } else {
+          toast({
+            title: "Payment Error",
+            description:
+              result.errors?.[0]?.message || "Could not process card. Please check your details.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      await processOrder(nonce);
+    } catch {
+      toast({
+        title: "Order Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+    }
+  };
+
+  const sectionNumber = (n: number) => (
+    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-gold/15 text-gold text-xs font-semibold shrink-0">
+      {n}
+    </span>
+  );
+
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       <Navigation />
 
-      <main className="pt-28 pb-16 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto">
+      <main className="pt-28 pb-40 px-4 sm:px-6">
+        <div className="max-w-2xl mx-auto">
           {/* Back link */}
           <Link
             to="/order"
@@ -272,307 +333,341 @@ const OrderCheckout = () => {
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-pure-white mb-2">
             Checkout
           </h1>
-          <div className="w-12 h-[2px] bg-gradient-to-r from-gold to-transparent rounded-full mb-10" />
+          <div className="w-12 h-[2px] bg-gradient-to-r from-gold to-transparent rounded-full mb-8" />
 
-          <div className="grid lg:grid-cols-5 gap-8">
-            {/* Left Column — Form */}
-            <div className="lg:col-span-3 space-y-6">
-              {/* Customer Info */}
-              <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-9 h-9 rounded-xl bg-gold/10 flex items-center justify-center">
-                    <User className="w-4.5 h-4.5 text-gold" />
-                  </div>
-                  <h2 className="font-display text-lg text-pure-white font-medium">
-                    Your Information
-                  </h2>
+          <div className="space-y-5">
+            {/* ─── SECTION 1: Customer Info ─── */}
+            <section className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-5 sm:p-6">
+              <div className="flex items-center gap-3 mb-5">
+                {sectionNumber(1)}
+                <div className="w-8 h-8 rounded-xl bg-gold/10 flex items-center justify-center">
+                  <User className="w-4 h-4 text-gold" />
                 </div>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="name" className="text-cream/50 text-sm mb-1.5 block">
-                      Full Name
-                    </Label>
-                    <Input
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="John Doe"
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-cream placeholder:text-cream/20 focus:border-gold/40 rounded-xl h-11"
-                    />
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="phone" className="text-cream/50 text-sm mb-1.5 block">
-                        Phone Number
-                      </Label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25" />
-                        <Input
-                          id="phone"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="(443) 555-0123"
-                          className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-cream placeholder:text-cream/20 focus:border-gold/40 rounded-xl h-11"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="email" className="text-cream/50 text-sm mb-1.5 block">
-                        Email
-                      </Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25" />
-                        <Input
-                          id="email"
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="john@email.com"
-                          className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-cream placeholder:text-cream/20 focus:border-gold/40 rounded-xl h-11"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <h2 className="font-display text-lg text-pure-white font-medium">
+                  Your Information
+                </h2>
               </div>
-
-              {/* Pickup Time */}
-              <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-9 h-9 rounded-xl bg-gold/10 flex items-center justify-center">
-                    <Clock className="w-4.5 h-4.5 text-gold" />
-                  </div>
-                  <h2 className="font-display text-lg text-pure-white font-medium">
-                    Pickup Time
-                  </h2>
+              <div className="space-y-3.5">
+                <div>
+                  <Label htmlFor="name" className="text-cream/50 text-sm mb-1.5 block">
+                    Full Name
+                  </Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="John Doe"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-cream placeholder:text-cream/20 focus:border-gold/40 rounded-xl h-12"
+                  />
                 </div>
-                <RadioGroup
-                  value={pickupTime}
-                  onValueChange={setPickupTime}
-                  className="space-y-2"
-                >
-                  <div className="flex items-center space-x-3 p-3.5 rounded-xl border border-[#2a2a2a] hover:border-gold/20 transition-colors bg-[#141414]">
-                    <RadioGroupItem value="asap" id="asap" className="border-gold/40 text-gold" />
-                    <Label htmlFor="asap" className="text-cream cursor-pointer flex-1">
-                      ASAP <span className="text-cream/30 text-sm">(20–30 minutes)</span>
+                <div className="grid sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <Label htmlFor="phone" className="text-cream/50 text-sm mb-1.5 block">
+                      Phone Number
                     </Label>
-                  </div>
-                  {pickupTimes.map((t) => (
-                    <div
-                      key={t.value}
-                      className="flex items-center space-x-3 p-3.5 rounded-xl border border-[#2a2a2a] hover:border-gold/20 transition-colors bg-[#141414]"
-                    >
-                      <RadioGroupItem
-                        value={t.value}
-                        id={t.value}
-                        className="border-gold/40 text-gold"
+                    <div className="relative">
+                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25" />
+                      <Input
+                        id="phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="(443) 555-0123"
+                        className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-cream placeholder:text-cream/20 focus:border-gold/40 rounded-xl h-12"
                       />
-                      <Label htmlFor={t.value} className="text-cream cursor-pointer flex-1">
-                        {t.label}
-                      </Label>
                     </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              {/* Tip */}
-              <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-9 h-9 rounded-xl bg-gold/10 flex items-center justify-center">
-                    <Heart className="w-4.5 h-4.5 text-gold" />
                   </div>
                   <div>
-                    <h2 className="font-display text-lg text-pure-white font-medium">
-                      Add a Tip
-                    </h2>
-                    <p className="text-cream/30 text-xs mt-0.5">Show your appreciation for our team</p>
+                    <Label htmlFor="email" className="text-cream/50 text-sm mb-1.5 block">
+                      Email
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25" />
+                      <Input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="john@email.com"
+                        className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-cream placeholder:text-cream/20 focus:border-gold/40 rounded-xl h-12"
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-4 gap-2 mb-4">
-                  {TIP_OPTIONS.map((opt) => (
+
+                {/* Pickup Time inline */}
+                <div className="pt-2">
+                  <Label className="text-cream/50 text-sm mb-2 flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-gold/60" />
+                    Pickup Time
+                  </Label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setPickupTime("asap")}
+                      className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border ${
+                        pickupTime === "asap"
+                          ? "border-gold bg-gold/10 text-gold"
+                          : "border-[#2a2a2a] bg-[#141414] text-cream/50 hover:border-gold/25"
+                      }`}
+                    >
+                      ASAP
+                      <span className="text-[11px] ml-1 opacity-60">20–30 min</span>
+                    </button>
+                    {pickupTimes.slice(0, 5).map((t) => (
+                      <button
+                        key={t.value}
+                        onClick={() => setPickupTime(t.value)}
+                        className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border ${
+                          pickupTime === t.value
+                            ? "border-gold bg-gold/10 text-gold"
+                            : "border-[#2a2a2a] bg-[#141414] text-cream/50 hover:border-gold/25"
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ─── SECTION 2: Order Summary ─── */}
+            <section className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-5 sm:p-6">
+              <div className="flex items-center gap-3 mb-5">
+                {sectionNumber(2)}
+                <div className="w-8 h-8 rounded-xl bg-gold/10 flex items-center justify-center">
+                  <ShoppingBag className="w-4 h-4 text-gold" />
+                </div>
+                <h2 className="font-display text-lg text-pure-white font-medium">
+                  Order Summary
+                </h2>
+                <span className="ml-auto text-cream/30 text-sm">
+                  {cart.items.reduce((s, i) => s + i.quantity, 0)} items
+                </span>
+              </div>
+
+              <div className="space-y-3 mb-5">
+                {cart.items.map((item) => {
+                  const modTotal = item.modifiers.reduce((s, m) => s + m.price, 0);
+                  const lineTotal = (item.basePrice + modTotal) * item.quantity;
+                  return (
+                    <div
+                      key={item.cartItemId}
+                      className="flex items-start justify-between gap-3 py-3 border-b border-[#1a1a1a] last:border-0"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-gold/60 text-sm font-medium">{item.quantity}x</span>
+                          <p className="text-cream text-sm font-medium">{item.name}</p>
+                        </div>
+                        {item.modifiers.length > 0 && (
+                          <div className="ml-7 mt-0.5">
+                            {item.modifiers.map((m) => (
+                              <p key={m.modifierId} className="text-cream/25 text-xs">
+                                + {m.modifierName}
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-cream/60 text-sm font-medium whitespace-nowrap">
+                        {formatPrice(lineTotal)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Totals */}
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between text-cream/40">
+                  <span>Subtotal</span>
+                  <span className="text-cream/60">{formatPrice(cart.subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-cream/40">
+                  <span>Tax</span>
+                  <span className="text-cream/60">{formatPrice(cart.tax)}</span>
+                </div>
+                {tipAmount > 0 && (
+                  <div className="flex justify-between text-cream/40">
+                    <span>Tip</span>
+                    <span className="text-cream/60">{formatPrice(tipAmount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center pt-3 mt-1 border-t border-[#1e1e1e]">
+                  <span className="text-pure-white font-semibold text-base">Total</span>
+                  <span className="text-gold font-display font-bold text-xl">
+                    {formatPrice(orderTotal)}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            {/* ─── SECTION 3: Tip ─── */}
+            <section className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-5 sm:p-6">
+              <div className="flex items-center gap-3 mb-4">
+                {sectionNumber(3)}
+                <div className="w-8 h-8 rounded-xl bg-gold/10 flex items-center justify-center">
+                  <Heart className="w-4 h-4 text-gold" />
+                </div>
+                <div>
+                  <h2 className="font-display text-lg text-pure-white font-medium">Add a Tip</h2>
+                  <p className="text-cream/30 text-xs">Show appreciation for our team</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {TIP_OPTIONS.map((opt) => {
+                  const isActive = tipPercent === opt.value;
+                  return (
                     <button
                       key={opt.label}
                       onClick={() => {
                         setTipPercent(opt.value);
                         setCustomTip("");
                       }}
-                      className={`py-3 rounded-xl text-sm font-medium transition-all duration-200 border ${
-                        tipPercent === opt.value
-                          ? "border-gold bg-gold/10 text-gold shadow-[0_0_12px_rgba(197,168,106,0.1)]"
+                      className={`relative py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 border ${
+                        isActive
+                          ? "border-gold bg-gold/10 text-gold shadow-[0_0_16px_rgba(197,168,106,0.1)]"
                           : "border-[#2a2a2a] bg-[#141414] text-cream/50 hover:border-gold/25 hover:text-cream"
                       }`}
                     >
                       {opt.label}
+                      <span className="block text-[10px] font-normal mt-0.5 opacity-50">
+                        {formatPrice(Math.round(cart.subtotal * opt.value))}
+                      </span>
+                      {isActive && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gold flex items-center justify-center">
+                          <Check className="w-2.5 h-2.5 text-jet-black" />
+                        </div>
+                      )}
                     </button>
-                  ))}
-                  <button
-                    onClick={() => setTipPercent(null)}
-                    className={`py-3 rounded-xl text-sm font-medium transition-all duration-200 border ${
-                      tipPercent === null
-                        ? "border-gold bg-gold/10 text-gold shadow-[0_0_12px_rgba(197,168,106,0.1)]"
-                        : "border-[#2a2a2a] bg-[#141414] text-cream/50 hover:border-gold/25 hover:text-cream"
-                    }`}
-                  >
-                    Custom
-                  </button>
+                  );
+                })}
+                <button
+                  onClick={() => setTipPercent(null)}
+                  className={`py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 border ${
+                    tipPercent === null
+                      ? "border-gold bg-gold/10 text-gold shadow-[0_0_16px_rgba(197,168,106,0.1)]"
+                      : "border-[#2a2a2a] bg-[#141414] text-cream/50 hover:border-gold/25 hover:text-cream"
+                  }`}
+                >
+                  Custom
+                </button>
+              </div>
+              {tipPercent === null && (
+                <div className="relative mt-3">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cream/25 font-medium">
+                    $
+                  </span>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={customTip}
+                    onChange={(e) => setCustomTip(e.target.value)}
+                    placeholder="0.00"
+                    className="pl-7 bg-[#1a1a1a] border-[#2a2a2a] text-cream placeholder:text-cream/20 focus:border-gold/40 rounded-xl h-12"
+                  />
                 </div>
-                {tipPercent === null && (
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-cream/25 font-medium">$</span>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={customTip}
-                      onChange={(e) => setCustomTip(e.target.value)}
-                      placeholder="0.00"
-                      className="pl-7 bg-[#1a1a1a] border-[#2a2a2a] text-cream placeholder:text-cream/20 focus:border-gold/40 rounded-xl h-11"
-                    />
-                  </div>
-                )}
-                <p className="text-cream/25 text-xs mt-3">
-                  Tip: {formatPrice(tipAmount)}
-                </p>
+              )}
+            </section>
+
+            {/* ─── SECTION 4: Payment ─── */}
+            <section className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-5 sm:p-6">
+              <div className="flex items-center gap-3 mb-5">
+                {sectionNumber(4)}
+                <div className="w-8 h-8 rounded-xl bg-gold/10 flex items-center justify-center">
+                  <CreditCard className="w-4 h-4 text-gold" />
+                </div>
+                <h2 className="font-display text-lg text-pure-white font-medium">Payment</h2>
+                <div className="ml-auto flex items-center gap-1.5 text-cream/25 text-xs">
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>Secured by Square</span>
+                </div>
               </div>
 
-              {/* Payment — Square Web Payments SDK */}
-              <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-9 h-9 rounded-xl bg-gold/10 flex items-center justify-center">
-                    <CreditCard className="w-4.5 h-4.5 text-gold" />
-                  </div>
-                  <div className="flex-1">
-                    <h2 className="font-display text-lg text-pure-white font-medium">
-                      Payment
-                    </h2>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-cream/25 text-xs">
-                    <Shield className="w-3.5 h-3.5" />
-                    <span>Secured by Square</span>
-                  </div>
-                </div>
+              {/* Digital Wallets — show first for faster checkout */}
+              <div className="space-y-2.5 mb-5">
+                {/* Apple Pay — custom styled fallback button */}
+                <button
+                  onClick={handleApplePay}
+                  className="w-full h-12 bg-white text-black rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all duration-200 hover:bg-white/90 active:scale-[0.98]"
+                  style={{ display: applePayAvailable ? "flex" : "none" }}
+                >
+                  <Apple className="w-5 h-5" />
+                  Pay
+                </button>
 
-                {/* Square Card Container */}
+                {/* Google Pay */}
                 <div
-                  id="square-card-container"
-                  className="min-h-[100px] rounded-xl overflow-hidden"
-                  style={{ colorScheme: "dark" }}
+                  id="google-pay-container"
+                  className="w-full rounded-xl overflow-hidden [&>div]:!w-full [&>div>button]:!w-full [&>div>button]:!border-0 [&>div>button]:!rounded-xl"
+                  style={{
+                    minHeight: googlePayAvailable ? "48px" : "0",
+                    display: googlePayAvailable ? "block" : "none",
+                  }}
                 />
 
-                {squareError && (
-                  <p className="text-amber-400/60 text-xs mt-3 text-center">
-                    {squareError}
-                  </p>
-                )}
-
-                {/* Digital Wallet Options */}
-                <div className="mt-4 space-y-3">
-                  <div className="flex items-center gap-3 my-3">
-                    <div className="flex-1 h-px bg-cream/10" />
-                    <span className="text-cream/30 text-xs uppercase tracking-wider">or pay with</span>
-                    <div className="flex-1 h-px bg-cream/10" />
-                  </div>
-                  <div id="apple-pay-container" style={{ display: 'none' }} className="min-h-[48px]" />
-                  <div id="google-pay-container" className="min-h-[48px]" />
-                  <div id="cashapp-pay-container" className="min-h-[48px]" />
-                </div>
+                {/* Cash App Pay */}
+                <div
+                  id="cashapp-pay-container"
+                  className="w-full rounded-xl overflow-hidden [&>div]:!w-full [&>div>button]:!w-full [&>div>button]:!border-0 [&>div>button]:!rounded-xl"
+                  style={{
+                    minHeight: cashAppPayAvailable ? "48px" : "0",
+                    display: cashAppPayAvailable ? "block" : "none",
+                  }}
+                />
               </div>
-            </div>
 
-            {/* Right Column — Order Summary */}
-            <div className="lg:col-span-2">
-              <div className="sticky top-28">
-                <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl overflow-hidden">
-                  <div className="p-6">
-                    <h2 className="font-display text-lg text-pure-white font-medium mb-6">
-                      Order Summary
-                    </h2>
-
-                    <div className="space-y-3 mb-6 max-h-[40vh] overflow-y-auto pr-1">
-                      {cart.items.map((item) => {
-                        const modTotal = item.modifiers.reduce(
-                          (s, m) => s + m.price,
-                          0
-                        );
-                        const lineTotal =
-                          (item.basePrice + modTotal) * item.quantity;
-                        return (
-                          <div
-                            key={item.cartItemId}
-                            className="flex justify-between gap-3 pb-3 border-b border-[#1e1e1e]"
-                          >
-                            <div className="min-w-0">
-                              <p className="text-cream text-sm font-medium">
-                                {item.quantity}x {item.name}
-                              </p>
-                              {item.modifiers.map((m) => (
-                                <p
-                                  key={m.modifierId}
-                                  className="text-cream/25 text-xs"
-                                >
-                                  + {m.modifierName}
-                                </p>
-                              ))}
-                            </div>
-                            <span className="text-cream/60 text-sm whitespace-nowrap">
-                              {formatPrice(lineTotal)}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    <div className="space-y-2.5 text-sm">
-                      <div className="flex justify-between text-cream/40">
-                        <span>Subtotal</span>
-                        <span className="text-cream/60">{formatPrice(cart.subtotal)}</span>
-                      </div>
-                      <div className="flex justify-between text-cream/40">
-                        <span>Tax (6%)</span>
-                        <span className="text-cream/60">{formatPrice(cart.tax)}</span>
-                      </div>
-                      <div className="flex justify-between text-cream/40">
-                        <span>Tip</span>
-                        <span className="text-cream/60">{formatPrice(tipAmount)}</span>
-                      </div>
-                      <div className="flex justify-between text-pure-white font-semibold text-lg border-t border-[#1e1e1e] pt-3 mt-1">
-                        <span>Total</span>
-                        <span className="text-gold font-display">
-                          {formatPrice(orderTotal)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Place Order Button */}
-                  <div className="px-6 pb-6">
-                    <Button
-                      variant="gold"
-                      size="lg"
-                      className="w-full text-base font-semibold rounded-xl h-14 text-lg"
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center gap-2.5">
-                          <span className="w-5 h-5 border-2 border-jet-black/30 border-t-jet-black rounded-full animate-spin" />
-                          Processing...
-                        </span>
-                      ) : (
-                        `Place Order — ${formatPrice(orderTotal)}`
-                      )}
-                    </Button>
-
-                    <p className="text-cream/15 text-[11px] text-center mt-4">
-                      206 E Redwood St, Baltimore, MD 21202
-                    </p>
-                  </div>
+              {/* Divider */}
+              {(applePayAvailable || googlePayAvailable || cashAppPayAvailable) && (
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="flex-1 h-px bg-[#1e1e1e]" />
+                  <span className="text-cream/20 text-xs uppercase tracking-wider">
+                    or pay with card
+                  </span>
+                  <div className="flex-1 h-px bg-[#1e1e1e]" />
                 </div>
-              </div>
-            </div>
+              )}
+
+              {/* Square Card Input */}
+              <div
+                id="square-card-container"
+                className="min-h-[100px] rounded-xl overflow-hidden"
+                style={{ colorScheme: "dark" }}
+              />
+            </section>
           </div>
         </div>
       </main>
+
+      {/* ─── STICKY PLACE ORDER BAR ─── */}
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        <div className="bg-[#0a0a0a]/80 backdrop-blur-xl border-t border-[#1e1e1e]">
+          <div className="max-w-2xl mx-auto px-4 py-4">
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="w-full h-14 rounded-2xl font-semibold text-base transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-[#C5A86A] to-[#D4BC7C] text-[#1C1C1C] border border-[#C5A86A]/50 hover:shadow-[0_8px_32px_-8px_rgba(197,168,106,0.4)] hover:-translate-y-0.5 active:scale-[0.99]"
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center gap-2.5">
+                  <span className="w-5 h-5 border-2 border-[#1C1C1C]/30 border-t-[#1C1C1C] rounded-full animate-spin" />
+                  Processing...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  Place Order
+                  <span className="opacity-60">—</span>
+                  <span className="font-bold">{formatPrice(orderTotal)}</span>
+                </span>
+              )}
+            </button>
+            <p className="text-cream/15 text-[10px] text-center mt-2">
+              Pickup at 206 E Redwood St, Baltimore
+            </p>
+          </div>
+        </div>
+      </div>
 
       <Footer />
     </div>
