@@ -1,13 +1,14 @@
 import { useRef, useEffect } from "react";
-import { CATEGORIES, type CategorySlug } from "@/data/menu";
+import type { Category } from "@/data/menu";
 import { cn } from "@/lib/utils";
 
 interface CategoryNavProps {
-  activeCategory: CategorySlug;
-  onSelect: (slug: CategorySlug) => void;
+  categories: Category[];
+  activeCategory: string;
+  onSelect: (slug: string) => void;
 }
 
-const CategoryNav = ({ activeCategory, onSelect }: CategoryNavProps) => {
+const CategoryNav = ({ categories, activeCategory, onSelect }: CategoryNavProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
@@ -32,7 +33,7 @@ const CategoryNav = ({ activeCategory, onSelect }: CategoryNavProps) => {
           className="flex overflow-x-auto scrollbar-hide gap-1 px-4 py-3 sm:px-6 sm:justify-center"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat.slug}
               ref={(el) => { buttonRefs.current[cat.slug] = el; }}

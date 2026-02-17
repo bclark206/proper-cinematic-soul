@@ -68,19 +68,10 @@ export const MODIFIER_LISTS: ModifierList[] = [
   },
 ];
 
-export type CategorySlug =
-  | "small-plates"
-  | "salads"
-  | "entrees-land"
-  | "entrees-sea"
-  | "pasta"
-  | "sandwiches"
-  | "sides"
-  | "desserts"
-  | "drinks";
+export type CategorySlug = string;
 
 export interface Category {
-  slug: CategorySlug;
+  slug: string;
   name: string;
 }
 

@@ -13,8 +13,6 @@ import {
   type MenuItem,
   type ModifierList,
   formatPrice,
-  getModifierList,
-  getItemImageUrl,
 } from "@/data/menu";
 import type { CartItem, SelectedModifier } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
@@ -24,16 +22,18 @@ interface ItemModalProps {
   open: boolean;
   onClose: () => void;
   onAddToCart: (item: Omit<CartItem, "cartItemId">) => void;
+  getModifierList: (id: string) => ModifierList | undefined;
+  getItemImageUrl: (imageId: string | null) => string | null;
 }
 
-const ItemModal = ({ item, open, onClose, onAddToCart }: ItemModalProps) => {
+const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemImageUrl }: ItemModalProps) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedModifiers, setSelectedModifiers] = useState<SelectedModifier[]>([]);
   const [specialInstructions, setSpecialInstructions] = useState("");
 
   if (!item) return null;
 
-  const imageUrl = getItemImageUrl(item.imageId);
+  const imageUrl = (item as any).imageUrl || getItemImageUrl(item.imageId);
 
   const modifierLists: ModifierList[] = item.modifierListIds
     .map((id) => getModifierList(id))

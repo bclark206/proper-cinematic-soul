@@ -7,27 +7,39 @@ import ItemModal from "@/components/order/ItemModal";
 import CartDrawer from "@/components/order/CartDrawer";
 import FloatingCart from "@/components/order/FloatingCart";
 import { useCart } from "@/hooks/useCart";
-import {
-  CATEGORIES,
-  type CategorySlug,
-  type MenuItem,
-  getMenuItemsByCategory,
-} from "@/data/menu";
-import { Clock, MapPin, Phone } from "lucide-react";
+import { useMenu } from "@/hooks/useMenu";
+import type { MenuItem } from "@/data/menu";
+import { Clock, MapPin, Phone, Loader2, AlertCircle } from "lucide-react";
 
 const Order = () => {
   const cart = useCart();
-  const [activeCategory, setActiveCategory] = useState<CategorySlug>("small-plates");
+  const {
+    categories,
+    loading,
+    error,
+    getMenuItemsByCategory,
+    getModifierList,
+    getItemImageUrl,
+  } = useMenu();
+
+  const [activeCategory, setActiveCategory] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Set initial active category when categories load
+  useEffect(() => {
+    if (categories.length > 0 && !activeCategory) {
+      setActiveCategory(categories[0].slug);
+    }
+  }, [categories, activeCategory]);
 
   const handleItemClick = (item: MenuItem) => {
     setSelectedItem(item);
     setModalOpen(true);
   };
 
-  const handleCategorySelect = (slug: CategorySlug) => {
+  const handleCategorySelect = (slug: string) => {
     setActiveCategory(slug);
     const el = sectionRefs.current[slug];
     if (el) {
@@ -38,9 +50,10 @@ const Order = () => {
   };
 
   useEffect(() => {
+    if (categories.length === 0) return;
     const handleScroll = () => {
       const offset = 200;
-      for (const cat of [...CATEGORIES].reverse()) {
+      for (const cat of [...categories].reverse()) {
         const el = sectionRefs.current[cat.slug];
         if (el) {
           const rect = el.getBoundingClientRect();
@@ -53,7 +66,7 @@ const Order = () => {
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [categories]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -95,11 +108,40 @@ const Order = () => {
       </section>
 
       {/* Category Navigation */}
-      <CategoryNav activeCategory={activeCategory} onSelect={handleCategorySelect} />
+      {categories.length > 0 && (
+        <CategoryNav
+          categories={categories}
+          activeCategory={activeCategory}
+          onSelect={handleCategorySelect}
+        />
+      )}
 
       {/* Menu Sections */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-        {CATEGORIES.map((cat) => {
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <Loader2 className="w-8 h-8 text-gold animate-spin" />
+            <p className="text-cream/50 text-sm">Loading menu...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <AlertCircle className="w-8 h-8 text-red-400" />
+            <p className="text-cream/50 text-sm">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="text-gold text-sm underline hover:text-gold/80 transition-colors"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {/* Menu Content */}
+        {!loading && !error && categories.map((cat) => {
           const items = getMenuItemsByCategory(cat.slug);
           if (items.length === 0) return null;
 
@@ -118,7 +160,12 @@ const Order = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
                 {items.map((item) => (
-                  <MenuCard key={item.id} item={item} onClick={handleItemClick} />
+                  <MenuCard
+                    key={item.id}
+                    item={item}
+                    onClick={handleItemClick}
+                    getItemImageUrl={getItemImageUrl}
+                  />
                 ))}
               </div>
             </section>
@@ -132,6 +179,8 @@ const Order = () => {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onAddToCart={cart.addItem}
+        getModifierList={getModifierList}
+        getItemImageUrl={getItemImageUrl}
       />
 
       {/* Cart Drawer */}

@@ -1,13 +1,15 @@
-import { type MenuItem, formatPrice, getItemImageUrl } from "@/data/menu";
+import { type MenuItem, formatPrice } from "@/data/menu";
 import { Plus, UtensilsCrossed } from "lucide-react";
 
 interface MenuCardProps {
   item: MenuItem;
   onClick: (item: MenuItem) => void;
+  getItemImageUrl: (imageId: string | null) => string | null;
 }
 
-const MenuCard = ({ item, onClick }: MenuCardProps) => {
-  const imageUrl = getItemImageUrl(item.imageId);
+const MenuCard = ({ item, onClick, getItemImageUrl }: MenuCardProps) => {
+  // Support both imageUrl from API response and imageId lookup
+  const imageUrl = (item as any).imageUrl || getItemImageUrl(item.imageId);
 
   return (
     <button
