@@ -22,7 +22,7 @@ const Hero = () => {
         
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center fade-in-slow">
           <Button variant="hero" size="xl" className="w-full sm:w-auto sm:min-w-48" asChild>
-            <a href="https://order.toasttab.com/online/prim-proper-cocktail-wine-bar-206-e-redwood-st" target="_blank" rel="noopener noreferrer">
+            <a href="/order">
               ORDER ONLINE
             </a>
           </Button>
