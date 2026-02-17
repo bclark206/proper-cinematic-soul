@@ -121,6 +121,22 @@ const OrderCheckout = () => {
           await googlePay.attach('#google-pay-container');
         }
       } catch (e) { console.log('Google Pay not available:', e); }
+
+      // Initialize Cash App Pay
+      try {
+        const cashAppRequest = payments.paymentRequest({
+          countryCode: 'US',
+          currencyCode: 'USD',
+          total: { amount: (orderTotal / 100).toFixed(2), label: 'Proper Cuisine' },
+        });
+        const cashAppPay = await payments.cashAppPay(cashAppRequest, {
+          redirectURL: window.location.origin + '/order/confirmation',
+          referenceId: 'proper-' + Date.now(),
+        });
+        if (cashAppPay) {
+          await cashAppPay.attach('#cashapp-pay-container');
+        }
+      } catch (e) { console.log('Cash App Pay not available:', e); }
     } catch (err: any) {
       console.error("Square init error:", err);
       setSquareError("Could not load payment form. Please refresh and try again.");
@@ -458,6 +474,7 @@ const OrderCheckout = () => {
                   </div>
                   <div id="apple-pay-container" style={{ display: 'none' }} className="min-h-[48px]" />
                   <div id="google-pay-container" className="min-h-[48px]" />
+                  <div id="cashapp-pay-container" className="min-h-[48px]" />
                 </div>
               </div>
             </div>
