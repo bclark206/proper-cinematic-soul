@@ -1,0 +1,1296 @@
+{
+  "categories": [
+    {
+      "slug": "small-plates",
+      "name": "Small Plates & Apps"
+    },
+    {
+      "slug": "salads",
+      "name": "Salads"
+    },
+    {
+      "slug": "entrees-land",
+      "name": "Entrees \u2014 Land"
+    },
+    {
+      "slug": "entrees-sea",
+      "name": "Entrees \u2014 Sea"
+    },
+    {
+      "slug": "pasta",
+      "name": "Pasta"
+    },
+    {
+      "slug": "brunch",
+      "name": "Brunch"
+    },
+    {
+      "slug": "sandwiches",
+      "name": "Sandwiches"
+    },
+    {
+      "slug": "protein",
+      "name": "Proteins & Add-Ons"
+    },
+    {
+      "slug": "sides",
+      "name": "Sides"
+    },
+    {
+      "slug": "desserts",
+      "name": "Desserts"
+    }
+  ],
+  "menuItems": [
+    {
+      "id": "OEHZS56QJTFZZ42SE2XBHHDP",
+      "name": "Chicken And Waffles",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "IR24GVMQC2IWG7AMTGCPWJLV",
+          "name": "Regular",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
+      "id": "RGPE2HUW4EJA2YBSIPFOAYS6",
+      "name": "Shrimp And Grits",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "ZFAIB7QSGLJ2HLIVPKGYHAVE",
+          "name": "Regular",
+          "price": 3000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 3000
+    },
+    {
+      "id": "5XEQ6FV62RZ7VECDKR2KH67B",
+      "name": "Surf And Turf Fries",
+      "description": "",
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "4V6CO3QLLYKYZLZDZYSH2BRR",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 4000
+    },
+    {
+      "id": "Y3LLJKKPMN7OQUJT2UZENUJJ",
+      "name": "Broccolini",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "RYEVHFVQ46RNO3TWH6B67OSW",
+          "name": "Regular",
+          "price": 700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 700
+    },
+    {
+      "id": "R5YSXCSSOEWABLO7VJUFTUB2",
+      "name": "Bottomless Brunch (1 Salmon 5 Wings Bacon Eggs French Toast)",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "PIYCUEPW2MEKKORZZ72EUNSH",
+          "name": "Regular",
+          "price": 6000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 6000
+    },
+    {
+      "id": "RYP4VHNLLYGJ7Z346YQ3PH5V",
+      "name": "Roasted Potatoes",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "EF3VUI54ZKLBP6YUNDG3GNT5",
+          "name": "Regular",
+          "price": 0
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 0
+    },
+    {
+      "id": "DFJEDKVVRSPYYYUM7R554W2H",
+      "name": "Crab Cake Sandwich",
+      "description": null,
+      "category": "sandwiches",
+      "variations": [
+        {
+          "id": "A73JXOYC32NDB2QYCY75WM47",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 4000
+    },
+    {
+      "id": "JKHIPL232KVCLZPRHBCFD5OU",
+      "name": "Fried Salmon Bites",
+      "description": "",
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "TJ7B6CNYRGPYW5FRKOBLAFPO",
+          "name": "Regular",
+          "price": 1200
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1200
+    },
+    {
+      "id": "N7J77HTMTAGYCPSYE6UHFKOJ",
+      "name": "Bbq Jerk Lamp Chops",
+      "description": "",
+      "category": "entrees-land",
+      "variations": [
+        {
+          "id": "LGPD4WIOL4M2A6CTHMYZU5VJ",
+          "name": "Regular",
+          "price": 3500
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 3500
+    },
+    {
+      "id": "RDEEWJDZVP4KRNCLYNZFUQTU",
+      "name": "Shrimp",
+      "description": null,
+      "category": "protein",
+      "variations": [
+        {
+          "id": "RDONOO7WOPVFQH3H5MUH7BNB",
+          "name": "Regular",
+          "price": 1500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1500
+    },
+    {
+      "id": "OGRJG7SRTUQKGKCGR5VJPLLR",
+      "name": "Fried Lobster",
+      "description": null,
+      "category": "protein",
+      "variations": [
+        {
+          "id": "DONOKNZDABVKI5D5I2QG4OB2",
+          "name": "Regular",
+          "price": 2500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2500
+    },
+    {
+      "id": "KUJFFTNBRXCILLMZFYBMWQ23",
+      "name": "Apple Turnover With Ice Cream",
+      "description": null,
+      "category": "desserts",
+      "variations": [
+        {
+          "id": "XJ54QAZ6QWSIIQNYV25GUO4M",
+          "name": "Regular",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
+      "id": "7SN3B36B6VICMRW5LREXEM46",
+      "name": "Gouda Cheddar Grits",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "UGDPGGYFZCAJTM6Q2IFWU4IC",
+          "name": "Regular",
+          "price": 1000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1000
+    },
+    {
+      "id": "7TRPHJTNV6PVSY557RP5H52I",
+      "name": "Creamy Salmon Pasta",
+      "description": null,
+      "category": "pasta",
+      "variations": [
+        {
+          "id": "JBLY5YKVPR3VMLUGGHAYZSBN",
+          "name": "Regular",
+          "price": 3500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 3500
+    },
+    {
+      "id": "4N6KXJ22SXLKSF2ZDOSZZ346",
+      "name": "Crab + Bbq Jerk Lamb Chops",
+      "description": null,
+      "category": "entrees-land",
+      "variations": [
+        {
+          "id": "4DBFH57FPT73MLQWXGADD6KQ",
+          "name": "Regular",
+          "price": 7000
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 7000
+    },
+    {
+      "id": "56FKWG5XYNS62HZ6IEUSXYRO",
+      "name": "Lava Cake With Ice Cream",
+      "description": null,
+      "category": "desserts",
+      "variations": [
+        {
+          "id": "GDOK3OTMCSTE35PQNW6HE7Q6",
+          "name": "Regular",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
+      "id": "V6TOWYINJHJMBILSHV4RML6M",
+      "name": "Cheesesteak Egg Rolls",
+      "description": "",
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "XLCTS5MC22P2K22IYL54VGYJ",
+          "name": "Regular",
+          "price": 1500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1500
+    },
+    {
+      "id": "FNLFMIKGH4JZBRFR6ZJHSYWI",
+      "name": "Proper Garden",
+      "description": null,
+      "category": "salads",
+      "variations": [
+        {
+          "id": "CPQYGDGKUARPAL22AIYICD2J",
+          "name": "Regular",
+          "price": 1400
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1400
+    },
+    {
+      "id": "Q62ZSLOMMMMKHUQF33RU755D",
+      "name": "Ultimate Surf And Turf Grits",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "N7QMSQ6MKHYD55G24HJ2T7EM",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 4000
+    },
+    {
+      "id": "C7VFONTTFUZ23FDYXNXFEGSL",
+      "name": "Spinach & Strawberry Salad",
+      "description": "",
+      "category": "salads",
+      "variations": [
+        {
+          "id": "UHNYOUSK5O3TRM5TBGCJ57KU",
+          "name": "Regular",
+          "price": 1700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1700
+    },
+    {
+      "id": "33GYTTT3W2PATLQY4OUNTCTL",
+      "name": "Cake Fee",
+      "description": null,
+      "category": "desserts",
+      "variations": [
+        {
+          "id": "QE2B5L625N6FMZAWEGH7KK5H",
+          "name": "Regular",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
+      "id": "DFN63PAAP5USEYHSQHD5LRT3",
+      "name": "Crab Cake Egg Rolls",
+      "description": "",
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "J3BPSTZGABYWVLSJIPYH2Y4I",
+          "name": "Regular",
+          "price": 1200
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1200
+    },
+    {
+      "id": "4RSTJXILEXYRMAE5G7HBH33U",
+      "name": "Salmon Bites",
+      "description": "",
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "XQ4WYWNATETSLMFHRVJ55JMJ",
+          "name": "Regular",
+          "price": 1200
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1200
+    },
+    {
+      "id": "DCVB77XMMNXBKLD5RULYE4PB",
+      "name": "Fried Lobster Mac And Cheese",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "7JJZRRHH7UKGHKKVXXJOSO4A",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 4000
+    },
+    {
+      "id": "NEIGTFFQFCQ4MIDKU4TOZMYK",
+      "name": "Side Of Honey Jerk Lamb",
+      "description": null,
+      "category": "protein",
+      "variations": [
+        {
+          "id": "6SJHFUBVKSG5BCNFBY45ZGUB",
+          "name": "Regular",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
+      "id": "RICWCHC2FMECZC6S2HCTJ4GW",
+      "name": "Red Snapper",
+      "description": null,
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "4QKBLKBCGEPJIHQRBEYZZA6B",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 4000
+    },
+    {
+      "id": "YAGKLAZAS3UJWNZ5MUBZJ3JJ",
+      "name": "Rice",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "FCSW2E3VZLGWO5LVBONA3BIH",
+          "name": "Regular",
+          "price": 700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 700
+    },
+    {
+      "id": "DG35CSIKNPEOIXG3IYIDVBNZ",
+      "name": "Fresh Fruit",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "G7SAAMK7QPMQZGRA2GRUNCGK",
+          "name": "Regular",
+          "price": 500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 500
+    },
+    {
+      "id": "ODDSW5WH3MMO5JEVB3EDF2CD",
+      "name": "Build Your Own Rasta Pasta",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "SYQQU75QKXJJ35LRBJNKZZDZ",
+          "name": "Regular",
+          "price": 1800
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1800
+    },
+    {
+      "id": "TZSBXZ57YIQGOMQWKRZP77MJ",
+      "name": "Crab Fried Rice",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "7IZ5HWOCBRU263ZKU5XU4FUN",
+          "name": "Regular",
+          "price": 1600
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1600
+    },
+    {
+      "id": "UZWT6B5OPU36WCKZ53J7YBKK",
+      "name": "Build Your Own Pasta",
+      "description": null,
+      "category": "pasta",
+      "variations": [
+        {
+          "id": "DFWQICIOO5D5SDSAAPBCNTBU",
+          "name": "Regular",
+          "price": 1800
+        }
+      ],
+      "modifierListIds": [
+        "EAOE3UPUWX5JQE67P4RVBI3L"
+      ],
+      "imageUrl": null,
+      "price": 1800
+    },
+    {
+      "id": "2JBKQDB4SGUY5YAPD3B37ARX",
+      "name": "Mash",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "LJVROMLHCCOCNQLNLYP4C47K",
+          "name": "Regular",
+          "price": 700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 700
+    },
+    {
+      "id": "IEUDGLDXY46SZXTK5ZRIU2BL",
+      "name": "Stuffed Salmon",
+      "description": null,
+      "category": "protein",
+      "variations": [
+        {
+          "id": "7VLZLPNJS73J2Q7VFLTGVL7G",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 4000
+    },
+    {
+      "id": "Y7KWXZ5B4TE6L37SO4HML7O7",
+      "name": "Turkey Bacon",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "NVPRMG7LIPQSVS6BVABR4SCA",
+          "name": "Regular",
+          "price": 500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 500
+    },
+    {
+      "id": "MCNXBDADU7RTSMXVWOBO4SYY",
+      "name": "Caesar Salad",
+      "description": "",
+      "category": "salads",
+      "variations": [
+        {
+          "id": "BZB6OY5G4VDRBUP366LBW33O",
+          "name": "Regular",
+          "price": 1700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1700
+    },
+    {
+      "id": "GR6CUML6RVECFMFCAFPZTTUL",
+      "name": "Salmon Filet",
+      "description": "",
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "SG5AYP7YMD5GPL5CTGJWIBWZ",
+          "name": "Regular",
+          "price": 3000
+        },
+        {
+          "id": "QXFLO6LTSK3OU6SDP3RRM4JJ",
+          "name": "Regular",
+          "price": 2500
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 3000
+    },
+    {
+      "id": "NZBOM3PROELEHFSQZXEYNYCQ",
+      "name": "Fries",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "RSKQNBYOMT3JO7OYNRJ6P4FL",
+          "name": "Regular",
+          "price": 700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 700
+    },
+    {
+      "id": "S5EUWB2OOSACXSG2MHEJ6CSH",
+      "name": "Side Salad",
+      "description": "",
+      "category": "sides",
+      "variations": [
+        {
+          "id": "FER2RLVYFLZFKRPGYF5URTCO",
+          "name": "Regular",
+          "price": 700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 700
+    },
+    {
+      "id": "PKLRMJJ53HALFC2A5PJ3JVRP",
+      "name": "Wings",
+      "description": "",
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "UUWGHYSMS6C5BULKDU4K5KRY",
+          "name": "Regular",
+          "price": 1300
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1300
+    },
+    {
+      "id": "QA2EQ6MF4RFTWSJBX7YKHP2G",
+      "name": "Crab Cake",
+      "description": "",
+      "category": "protein",
+      "variations": [
+        {
+          "id": "KTCO2XROFEXDKZWMESTEEZWB",
+          "name": "Regular",
+          "price": 3000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 3000
+    },
+    {
+      "id": "ZKGEY4QANOI5GONI7TJGC6ES",
+      "name": "Cajun Fried Lobster Tail",
+      "description": "",
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "JVC2YDSFQNJXHS4EU2WZHEL3",
+          "name": "Regular",
+          "price": 3000
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 3000
+    },
+    {
+      "id": "M5A6T44SU2TEVYJJCUKSFUU7",
+      "name": "Colossal Fried Shrimp",
+      "description": "",
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "P73BILYW7WGNZIIXF2XDVUUS",
+          "name": "Regular",
+          "price": 1400
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1400
+    },
+    {
+      "id": "ABKGPJAZL62QL2ARPKAJDEAQ",
+      "name": "Rigotoni",
+      "description": null,
+      "category": "pasta",
+      "variations": [
+        {
+          "id": "6YZUEB7D2TSBGHDSOOIVNSZO",
+          "name": "Regular",
+          "price": 3000
+        }
+      ],
+      "modifierListIds": [
+        "EAOE3UPUWX5JQE67P4RVBI3L"
+      ],
+      "imageUrl": null,
+      "price": 3000
+    },
+    {
+      "id": "AEZI3H23MEVHSBE6SB5LXSO4",
+      "name": "Single Jumbo Lump Crab Cake",
+      "description": null,
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "HZYPYVLRBPLVRDDV6MZUWUZM",
+          "name": "Regular",
+          "price": 4500
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 4500
+    },
+    {
+      "id": "J3YUZVJR7EF3WJFQFEVZHX5R",
+      "name": "Asparagus's",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "ZAFTSRF67UCMA4OUPNOM4WP6",
+          "name": "Regular",
+          "price": 700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 700
+    },
+    {
+      "id": "CZ47IEFR4VTLFMC5HDLQGRGA",
+      "name": "Veggie Medley",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "HUOCONCLX77ADEKUPRMFW6MK",
+          "name": "Regular",
+          "price": 1000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1000
+    },
+    {
+      "id": "HPL26HWWYNI3PL7AA6BBALYD",
+      "name": "Honey Jerk Lamb Chops",
+      "description": null,
+      "category": "entrees-land",
+      "variations": [
+        {
+          "id": "PKJJBZC5LO7WZ6VLCJX6V6LQ",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 4000
+    },
+    {
+      "id": "6LCYRZXQMKCTHAL3SPZYK7RP",
+      "name": "Seafood Omelette",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "RETOM4LXP5ADVQ7C7ZP4BW6K",
+          "name": "Regular",
+          "price": 1800
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1800
+    },
+    {
+      "id": "LFG2ZLRSCM6KZYU47DEOM7MG",
+      "name": "Lava Cake",
+      "description": null,
+      "category": "desserts",
+      "variations": [
+        {
+          "id": "T5EFB3ALRTS4JOYRZ4P22HHP",
+          "name": "Regular",
+          "price": 1350
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1350
+    },
+    {
+      "id": "XQHTXYJ2VVYM7MTZSXNKFQKT",
+      "name": "Mac And Cheese",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "S6XVZXL3GMVRQP76IY4WPRZS",
+          "name": "Regular",
+          "price": 1000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1000
+    },
+    {
+      "id": "AAWMBVWYJ7ZUAGHDXF4IW7EU",
+      "name": "Egg Your Way",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "MGJRECUC4RELY5QKRWFI723N",
+          "name": "Regular",
+          "price": 400
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 400
+    },
+    {
+      "id": "UYTR3JC77STEHNMSRIQOHUAW",
+      "name": "French Toast",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "CWVQNYANZSJ6MWPWRPPAQFMC",
+          "name": "Regular",
+          "price": 1700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1700
+    },
+    {
+      "id": "5LD5AGUHSIZXIXES7XLKUFMP",
+      "name": "Oxtails",
+      "description": null,
+      "category": "entrees-land",
+      "variations": [
+        {
+          "id": "Y6OBSNJWTQNTSHQIQEPCVGDS",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 4000
+    },
+    {
+      "id": "47AIRSS6JBX23JRBJZI43J6G",
+      "name": "Ny Strip",
+      "description": null,
+      "category": "protein",
+      "variations": [
+        {
+          "id": "AJ73D3FMLAKSUJ4QHF72NPY7",
+          "name": "Regular",
+          "price": 3500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 3500
+    },
+    {
+      "id": "FHPQZGPKHR4SSDJ4HN2O7XUX",
+      "name": "Rasta Pasta",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "7X2DJC3HEJ74SX3NL6TXB5GH",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 4000
+    },
+    {
+      "id": "3PWWMEASHLZVJHPDVFEYUCT7",
+      "name": "Sausage (beef/pork)",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "WWDBC5T4OC3LJFZAONQERWIG",
+          "name": "Regular",
+          "price": 500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 500
+    },
+    {
+      "id": "7KEHP5RHHCU557JI7Q34JGAG",
+      "name": "Ultimate Seafood Pasta",
+      "description": null,
+      "category": "pasta",
+      "variations": [
+        {
+          "id": "K6DIZCY6SHUPBQEICHJ5PNXT",
+          "name": "Regular",
+          "price": 5500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 5500
+    },
+    {
+      "id": "GCLY3JC3SORR3YDXOJFLAL37",
+      "name": "Seafood Gumbo",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "DW7HZ7N22SLLBBPGPU2NS3QH",
+          "name": "Regular",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
+      "id": "NSZRQOVDN4723IUEJN46FS6E",
+      "name": "Double Lump Crab Cake",
+      "description": "",
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "C6A2CT2GWYXE4X6GEPY3H5PH",
+          "name": "Regular",
+          "price": 8000
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 8000
+    },
+    {
+      "id": "U7FOLK6MSNBQPS63HWLJL4T7",
+      "name": "Sweet Potato Pound Cake With Ice Cream",
+      "description": null,
+      "category": "desserts",
+      "variations": [
+        {
+          "id": "MGRCC7UMNQCPHLEQ73OCXJ7S",
+          "name": "Regular",
+          "price": 1500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1500
+    },
+    {
+      "id": "OJP2AKVF6BAQN7KVSTRX476M",
+      "name": "Slow Cooked Kale",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "K7XWXFIJKS5MCGNO4I6BQSRC",
+          "name": "Regular",
+          "price": 700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 700
+    },
+    {
+      "id": "NKIH5N2YLGZQMZX6Y3R55VNC",
+      "name": "Crab + Honey Jerk Lamb Chops",
+      "description": null,
+      "category": "entrees-land",
+      "variations": [
+        {
+          "id": "N7DMXQM53ZHBUACPXH7VYRIP",
+          "name": "Regular",
+          "price": 7000
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 7000
+    },
+    {
+      "id": "GKGRXCPACY7LEXQE2CLUM6RR",
+      "name": "Cajun Butter Lobster",
+      "description": "",
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "L2YAQ3FDPYNBDVDR2CEFTIZA",
+          "name": "Regular",
+          "price": 3000
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 3000
+    },
+    {
+      "id": "XQ2VYFX2PGBV3ZGDX5TQ3VQF",
+      "name": "Crab Cake Fries",
+      "description": "",
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "QL37Y2ZSFWPSEGR63NOWUBTO",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 4000
+    }
+  ],
+  "modifierLists": [
+    {
+      "id": "C43X3WPKYDK3ONUKHUIUTKQ2",
+      "name": "Temperature",
+      "modifiers": [
+        {
+          "id": "4KVAJHFDSJ4PFKWORWJPFN6Z",
+          "name": "Rare",
+          "price": 0
+        },
+        {
+          "id": "7ZDVD4WDUNRIYOSJBMZVSR6S",
+          "name": "Medium Rare",
+          "price": 0
+        },
+        {
+          "id": "FSKSAYOH46G5CY57NCMYH5L5",
+          "name": "Medium",
+          "price": 0
+        },
+        {
+          "id": "P5AGHGCZNHBHB7WMGA44EZZJ",
+          "name": "Well Done",
+          "price": 0
+        }
+      ]
+    },
+    {
+      "id": "R36X2UV64QOYY4K2H7OHLA4K",
+      "name": "Two Choice Sides",
+      "modifiers": [
+        {
+          "id": "6JFBBZ5ZZLYVIUCUMWE4ZSGF",
+          "name": "Cream Spinach",
+          "price": 0
+        },
+        {
+          "id": "TWEFAQAMTNXS5RWRZDCIZRQR",
+          "name": "Double Side",
+          "price": 0
+        },
+        {
+          "id": "7XHMUDUMPK3EOHHOFIWARASP",
+          "name": "Fries",
+          "price": 0
+        },
+        {
+          "id": "VPSUPUGFRR3JZXYA6RNIVVBG",
+          "name": "Kale",
+          "price": 0
+        },
+        {
+          "id": "KVIRM5SLFEUWWUSC76QDVSZL",
+          "name": "Mac and Cheese",
+          "price": 0
+        },
+        {
+          "id": "SHPWYF7P35QPPFGOSZNAQP7G",
+          "name": "Mash Potatoes",
+          "price": 0
+        },
+        {
+          "id": "SFRBPOSXJPGYJTXDF3FQ6PWV",
+          "name": "Rice",
+          "price": 0
+        },
+        {
+          "id": "AJEY3W2G4VU7HLK746B6Z2XS",
+          "name": "Roasted Asparagus",
+          "price": 0
+        },
+        {
+          "id": "J5FOY2ZDNKEKKAIZEKRKFBZ4",
+          "name": "Roasted Broccolini",
+          "price": 0
+        },
+        {
+          "id": "3RBO73NVWFQX5IE6XHR7H4AL",
+          "name": "Roasted Brussels",
+          "price": 0
+        },
+        {
+          "id": "BLFND4DDW2KLRC2TG7DBCKHQ",
+          "name": "Side Salad",
+          "price": 0
+        },
+        {
+          "id": "SJEYVDZNSJ6KJMFGHKTGQRQ7",
+          "name": "Sweet and Spicy Brussels",
+          "price": 500
+        },
+        {
+          "id": "ILQX4KOHGALJWRY5HKMGZEKV",
+          "name": "Sweet Potatoe Casserole",
+          "price": 0
+        },
+        {
+          "id": "H7CQX6Y6P66LGLNFP6DMNKVY",
+          "name": "Veggie Medley",
+          "price": 0
+        },
+        {
+          "id": "ZGDWO4LRUGP6KKYGMP6S4UTY",
+          "name": "Yams",
+          "price": 0
+        }
+      ]
+    },
+    {
+      "id": "62XKTXVAIMBUVS4BJPLZJE7J",
+      "name": "Meat Temp",
+      "modifiers": [
+        {
+          "id": "RMRKYSSDTV6JBAHY5DUFOKWN",
+          "name": "Med",
+          "price": 0
+        },
+        {
+          "id": "XX6P4RW7SVGAX34U3IET2GA7",
+          "name": "Med Rare",
+          "price": 0
+        },
+        {
+          "id": "S5CRNGKJKDLMUADATCD4KUQ6",
+          "name": "Med Well",
+          "price": 0
+        }
+      ]
+    },
+    {
+      "id": "EAOE3UPUWX5JQE67P4RVBI3L",
+      "name": "Protein",
+      "modifiers": [
+        {
+          "id": "IAFRIFRNUBFJI67F4G5JNF4U",
+          "name": "Bbq Jerk Lamb",
+          "price": 3000
+        },
+        {
+          "id": "RS63FHCBTFKLYWPVB3Q776VG",
+          "name": "Chicken Breast",
+          "price": 1200
+        },
+        {
+          "id": "P6ZQNL3KFFUIY6MQ2Y4UIJ7S",
+          "name": "Crab Cake",
+          "price": 3000
+        },
+        {
+          "id": "263VHPGP3L6I35BCFXREUWJU",
+          "name": "Fried Catfish",
+          "price": 1500
+        },
+        {
+          "id": "IHG3647V63ZHZA2CYEN5PCIM",
+          "name": "Fried Lobster",
+          "price": 2500
+        },
+        {
+          "id": "CGADYWJB6XKFRPTSV4E27WSM",
+          "name": "Fried Shrimp",
+          "price": 1400
+        },
+        {
+          "id": "34ARGCMJ4Z2ACQI2K55Q2WJH",
+          "name": "Grilled Lobster",
+          "price": 2000
+        },
+        {
+          "id": "AXVBPRA4WOU7WTRW2IIMH7UV",
+          "name": "Honey Jerk Lamb",
+          "price": 3000
+        },
+        {
+          "id": "YUHE557F4FFFK6URTVZQWZQS",
+          "name": "Salmon Filet",
+          "price": 2500
+        },
+        {
+          "id": "N6GC5I77WPVA3GSRFSSXXEPA",
+          "name": "Shrimp",
+          "price": 1300
+        },
+        {
+          "id": "P74KNNHY3HTT3SWDUDFZNS6H",
+          "name": "Stuffed Lobster",
+          "price": 4500
+        },
+        {
+          "id": "ZTKW6TD7AUVJHER63F46KBFV",
+          "name": "Stuffed Salmon",
+          "price": 4500
+        }
+      ]
+    }
+  ],
+  "fetchedAt": "2026-02-17T17:03:39.269639Z"
+}

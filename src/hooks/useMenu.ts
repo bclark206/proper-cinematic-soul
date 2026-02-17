@@ -73,7 +73,7 @@ export function useMenu() {
       setError(null);
 
       try {
-        const res = await fetch("/api/catalog");
+        const res = await fetch("/catalog.json");
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: CatalogResponse = await res.json();
 
