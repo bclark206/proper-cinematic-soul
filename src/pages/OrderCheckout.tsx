@@ -114,22 +114,7 @@ const OrderCheckout = () => {
         // Apple Pay not available on this device/browser
       }
 
-      // Initialize Google Pay
-      try {
-        const googlePayRequest = payments.paymentRequest({
-          countryCode: "US",
-          currencyCode: "USD",
-          total: { amount: (orderTotal / 100).toFixed(2), label: "Proper Cuisine" },
-        });
-        const googlePay = await payments.googlePay(googlePayRequest);
-        if (googlePay) {
-          await googlePay.attach("#google-pay-container");
-          googlePayRef.current = googlePay;
-          setGooglePayAvailable(true);
-        }
-      } catch {
-        // Google Pay not available
-      }
+      // Google Pay removed
 
       // Initialize Cash App Pay
       try {
@@ -596,16 +581,6 @@ const OrderCheckout = () => {
                   <Apple className="w-5 h-5" />
                   Pay
                 </button>
-
-                {/* Google Pay */}
-                <div
-                  id="google-pay-container"
-                  className="w-full rounded-xl overflow-hidden [&>div]:!w-full [&>div>button]:!w-full [&>div>button]:!border-0 [&>div>button]:!rounded-xl"
-                  style={{
-                    minHeight: googlePayAvailable ? "48px" : "0",
-                    display: googlePayAvailable ? "block" : "none",
-                  }}
-                />
 
                 {/* Cash App Pay */}
                 <div
