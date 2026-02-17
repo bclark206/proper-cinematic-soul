@@ -1,6 +1,6 @@
+import { useRef, useEffect } from "react";
 import { CATEGORIES, type CategorySlug } from "@/data/menu";
 import { cn } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface CategoryNavProps {
   activeCategory: CategorySlug;
@@ -8,28 +8,46 @@ interface CategoryNavProps {
 }
 
 const CategoryNav = ({ activeCategory, onSelect }: CategoryNavProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  // Scroll active category into view
+  useEffect(() => {
+    const activeButton = buttonRefs.current[activeCategory];
+    if (activeButton && scrollRef.current) {
+      const container = scrollRef.current;
+      const buttonLeft = activeButton.offsetLeft;
+      const buttonWidth = activeButton.offsetWidth;
+      const containerWidth = container.offsetWidth;
+      const scrollLeft = buttonLeft - containerWidth / 2 + buttonWidth / 2;
+      container.scrollTo({ left: scrollLeft, behavior: "smooth" });
+    }
+  }, [activeCategory]);
+
   return (
-    <div className="sticky top-20 z-40 bg-jet-black/95 backdrop-blur-md border-b border-gold/10">
+    <div className="sticky top-20 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-gold/8">
       <div className="max-w-7xl mx-auto">
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex space-x-1 px-4 py-3 sm:px-6 sm:justify-center">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.slug}
-                onClick={() => onSelect(cat.slug)}
-                className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap",
-                  activeCategory === cat.slug
-                    ? "bg-gradient-to-r from-gold to-[hsl(43,35%,68%)] text-jet-black shadow-gold"
-                    : "text-cream/70 hover:text-gold hover:bg-gold/10"
-                )}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-          <ScrollBar orientation="horizontal" className="invisible" />
-        </ScrollArea>
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto scrollbar-hide gap-1 px-4 py-3 sm:px-6 sm:justify-center"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.slug}
+              ref={(el) => { buttonRefs.current[cat.slug] = el; }}
+              onClick={() => onSelect(cat.slug)}
+              className={cn(
+                "px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap shrink-0",
+                activeCategory === cat.slug
+                  ? "bg-gradient-to-r from-gold to-[hsl(43,40%,62%)] text-jet-black shadow-[0_2px_12px_rgba(197,168,106,0.3)] font-semibold"
+                  : "text-cream/50 hover:text-gold hover:bg-gold/8 border border-transparent hover:border-gold/15"
+              )}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

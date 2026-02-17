@@ -647,3 +647,27 @@ export function getModifierList(id: string): ModifierList | undefined {
 export function getMenuItemsByCategory(category: CategorySlug): MenuItem[] {
   return MENU_ITEMS.filter((item) => item.category === category);
 }
+
+// Square image ID → URL mapping from square_images.json
+const IMAGE_URL_MAP: Record<string, string> = {
+  "AKRJ63HJUUKHNXBJ5IPZO2M2": "https://items-images-production.s3.us-west-2.amazonaws.com/files/5acd9ac1ab3e5d394350c53de8164b4fd01122d8/original.png",
+  "MY5A5G7TGM4A4BYLZFH247IK": "https://items-images-production.s3.us-west-2.amazonaws.com/files/a14c7e7f487606bdb5429761983ff04b8404dc16/original.png",
+  "WV7LCGHYEUASCCWL2AOPKCXU": "https://items-images-production.s3.us-west-2.amazonaws.com/files/45d76f0465f1b336f9e1970b9bfb0ae61eecc7df/original.jpeg",
+  "FCYPLZC7VD7F6Y4BNNGPJTUK": "https://items-images-production.s3.us-west-2.amazonaws.com/files/9462024edfe36a4bc2378a2c8a6a94a3f4aba833/original.png",
+  "5M7NZWS7D3SDKZR3SZSGQHLS": "https://items-images-production.s3.us-west-2.amazonaws.com/files/b6646ff38f3f97cdb8882de90bbf39cd949182c6/original.png",
+  "GFEDUXWAIRVLUYU7JHXWWAKP": "https://items-images-production.s3.us-west-2.amazonaws.com/files/44f40a8bd1cfdba977dc13a54b34c6889a0fb51a/original.jpeg",
+  "M7JVBN2UDPANVHVLUI53QHP7": "https://items-images-production.s3.us-west-2.amazonaws.com/files/60c49dcec579f040824c376451c336233b502d13/original.png",
+  "GOCCST2QWSTRAGEE6OHM7HDU": "https://items-images-production.s3.us-west-2.amazonaws.com/files/0661781d2bab38babdf9d8f12b50b92c771ca8ae/original.jpeg",
+  "GXH6LZE5PXVACZGNOF6OMGIL": "https://items-images-production.s3.us-west-2.amazonaws.com/files/2db5511efee9a40e17aff7821e26bfa2463a6fc7/original.png",
+  "4R27JTLDUH556R6OXXLIO6I6": "https://items-images-production.s3.us-west-2.amazonaws.com/files/b11f22b78e9944bb7c66bfe53b0d71aa956e933b/original.png",
+  "CSBVSTP5LUV7EQCACNJUDF7S": "https://items-images-production.s3.us-west-2.amazonaws.com/files/2eb3c07a8c9e774e17b7f8ae975d13363b96c357/original.png",
+  "GLP44IQANJSKVG6AV3JVMBFN": "https://items-images-production.s3.us-west-2.amazonaws.com/files/e5ea8067d31f40bbae345824305a483245879c7c/original.png",
+  "US5CSEIJFTS4CNQKJKHGE4Q6": "https://items-images-production.s3.us-west-2.amazonaws.com/files/d4a6ad48350693f204f1628e7f6a3a26b0c6f73d/original.png",
+  "4OQ7HNXSYXJRVTZIKSSCKLFR": "https://items-images-production.s3.us-west-2.amazonaws.com/files/1cd5fc61d25bcced5709d9b82799796553c853b4/original.jpeg",
+  "TBYO5CF4T22UJSUBFUTBGLEI": "https://items-images-production.s3.us-west-2.amazonaws.com/files/05bad1e1f47d3059e219257286a8beab647c0914/original.png",
+};
+
+export function getItemImageUrl(imageId: string | null): string | null {
+  if (!imageId) return null;
+  return IMAGE_URL_MAP[imageId] || null;
+}
