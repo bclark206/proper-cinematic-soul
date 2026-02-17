@@ -93,6 +93,34 @@ const OrderCheckout = () => {
       cardRef.current = card;
       setCardReady(true);
       setSquareError(null);
+
+      // Initialize Apple Pay
+      try {
+        const applePayRequest = payments.paymentRequest({
+          countryCode: 'US',
+          currencyCode: 'USD',
+          total: { amount: (orderTotal / 100).toFixed(2), label: 'Proper Cuisine' },
+        });
+        const applePay = await payments.applePay(applePayRequest);
+        if (applePay) {
+          const applePayBtn = document.getElementById('apple-pay-container');
+          if (applePayBtn) applePayBtn.style.display = 'block';
+          (window as any).__applePay = applePay;
+        }
+      } catch (e) { console.log('Apple Pay not available:', e); }
+
+      // Initialize Google Pay
+      try {
+        const googlePayRequest = payments.paymentRequest({
+          countryCode: 'US',
+          currencyCode: 'USD',
+          total: { amount: (orderTotal / 100).toFixed(2), label: 'Proper Cuisine' },
+        });
+        const googlePay = await payments.googlePay(googlePayRequest);
+        if (googlePay) {
+          await googlePay.attach('#google-pay-container');
+        }
+      } catch (e) { console.log('Google Pay not available:', e); }
     } catch (err: any) {
       console.error("Square init error:", err);
       setSquareError("Could not load payment form. Please refresh and try again.");
@@ -421,12 +449,16 @@ const OrderCheckout = () => {
                   </p>
                 )}
 
-                {cardReady && (
-                  <p className="text-green-400/50 text-xs mt-3 text-center flex items-center justify-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400/60" />
-                    Card form ready
-                  </p>
-                )}
+                {/* Digital Wallet Options */}
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center gap-3 my-3">
+                    <div className="flex-1 h-px bg-cream/10" />
+                    <span className="text-cream/30 text-xs uppercase tracking-wider">or pay with</span>
+                    <div className="flex-1 h-px bg-cream/10" />
+                  </div>
+                  <div id="apple-pay-container" style={{ display: 'none' }} className="min-h-[48px]" />
+                  <div id="google-pay-container" className="min-h-[48px]" />
+                </div>
               </div>
             </div>
 
