@@ -242,7 +242,7 @@ const OrderCheckout = () => {
     setIsSubmitting(true);
 
     try {
-      const ORDER_API_URL = "https://order-api.propercuisine.com/create-order";
+      const ORDER_API_URL = "https://examining-fit-finally-controlled.trycloudflare.com";
 
       const apiItems = cart.items.map((item) => ({
         variationId: item.variationId,
