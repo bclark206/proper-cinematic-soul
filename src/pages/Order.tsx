@@ -106,7 +106,7 @@ const Order = () => {
           return (
             <section
               key={cat.slug}
-              ref={(el) => { sectionRefs.current[cat.slug] = el; }}
+              ref={(el: HTMLElement | null) => { if (el) sectionRefs.current[cat.slug] = el as HTMLDivElement; }}
               className="mb-16"
             >
               <div className="mb-8">
