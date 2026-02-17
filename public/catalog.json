@@ -77,7 +77,7 @@
     {
       "id": "5XEQ6FV62RZ7VECDKR2KH67B",
       "name": "Surf And Turf Fries",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -157,7 +157,7 @@
     {
       "id": "JKHIPL232KVCLZPRHBCFD5OU",
       "name": "Fried Salmon Bites",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -173,7 +173,7 @@
     {
       "id": "N7J77HTMTAGYCPSYE6UHFKOJ",
       "name": "Bbq Jerk Lamp Chops",
-      "description": "",
+      "description": null,
       "category": "entrees-land",
       "variations": [
         {
@@ -305,7 +305,7 @@
     {
       "id": "V6TOWYINJHJMBILSHV4RML6M",
       "name": "Cheesesteak Egg Rolls",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -353,7 +353,7 @@
     {
       "id": "C7VFONTTFUZ23FDYXNXFEGSL",
       "name": "Spinach & Strawberry Salad",
-      "description": "",
+      "description": null,
       "category": "salads",
       "variations": [
         {
@@ -385,7 +385,7 @@
     {
       "id": "DFN63PAAP5USEYHSQHD5LRT3",
       "name": "Crab Cake Egg Rolls",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -401,7 +401,7 @@
     {
       "id": "4RSTJXILEXYRMAE5G7HBH33U",
       "name": "Salmon Bites",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -597,7 +597,7 @@
     {
       "id": "MCNXBDADU7RTSMXVWOBO4SYY",
       "name": "Caesar Salad",
-      "description": "",
+      "description": null,
       "category": "salads",
       "variations": [
         {
@@ -613,7 +613,7 @@
     {
       "id": "GR6CUML6RVECFMFCAFPZTTUL",
       "name": "Salmon Filet",
-      "description": "",
+      "description": null,
       "category": "entrees-sea",
       "variations": [
         {
@@ -652,7 +652,7 @@
     {
       "id": "S5EUWB2OOSACXSG2MHEJ6CSH",
       "name": "Side Salad",
-      "description": "",
+      "description": null,
       "category": "sides",
       "variations": [
         {
@@ -668,7 +668,7 @@
     {
       "id": "PKLRMJJ53HALFC2A5PJ3JVRP",
       "name": "Wings",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -684,7 +684,7 @@
     {
       "id": "QA2EQ6MF4RFTWSJBX7YKHP2G",
       "name": "Crab Cake",
-      "description": "",
+      "description": null,
       "category": "protein",
       "variations": [
         {
@@ -700,7 +700,7 @@
     {
       "id": "ZKGEY4QANOI5GONI7TJGC6ES",
       "name": "Cajun Fried Lobster Tail",
-      "description": "",
+      "description": null,
       "category": "entrees-sea",
       "variations": [
         {
@@ -718,7 +718,7 @@
     {
       "id": "M5A6T44SU2TEVYJJCUKSFUU7",
       "name": "Colossal Fried Shrimp",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -996,7 +996,7 @@
     {
       "id": "NSZRQOVDN4723IUEJN46FS6E",
       "name": "Double Lump Crab Cake",
-      "description": "",
+      "description": null,
       "category": "entrees-sea",
       "variations": [
         {
@@ -1064,7 +1064,7 @@
     {
       "id": "GKGRXCPACY7LEXQE2CLUM6RR",
       "name": "Cajun Butter Lobster",
-      "description": "",
+      "description": null,
       "category": "entrees-sea",
       "variations": [
         {
@@ -1292,5 +1292,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-17T18:34:04.548635Z"
+  "fetchedAt": "2026-02-17T19:04:04.523198Z"
 }
