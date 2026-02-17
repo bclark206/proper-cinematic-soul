@@ -758,14 +758,14 @@
         {
           "id": "HZYPYVLRBPLVRDDV6MZUWUZM",
           "name": "Regular",
-          "price": 4500
+          "price": 2500
         }
       ],
       "modifierListIds": [
         "R36X2UV64QOYY4K2H7OHLA4K"
       ],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/b11f22b78e9944bb7c66bfe53b0d71aa956e933b/original.png",
-      "price": 4500
+      "price": 2500
     },
     {
       "id": "J3YUZVJR7EF3WJFQFEVZHX5R",
@@ -1082,7 +1082,7 @@
     {
       "id": "XQ2VYFX2PGBV3ZGDX5TQ3VQF",
       "name": "Crab Cake Fries",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -1292,5 +1292,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-17T17:17:46.310099Z"
+  "fetchedAt": "2026-02-17T17:34:04.790829Z"
 }
