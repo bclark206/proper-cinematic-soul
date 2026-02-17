@@ -79,12 +79,21 @@ const OrderCheckout = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [pickupTime, setPickupTime] = useState("asap");
-  const [tipPercent, setTipPercent] = useState<number | null>(0.20);
-  const [customTip, setCustomTip] = useState("");
+  // Restore form data from sessionStorage (Cash App Pay redirect return)
+  const savedForm = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem("proper_cashapp_form");
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return null;
+  }, []);
+
+  const [name, setName] = useState(savedForm?.name || "");
+  const [phone, setPhone] = useState(savedForm?.phone || "");
+  const [email, setEmail] = useState(savedForm?.email || "");
+  const [pickupTime, setPickupTime] = useState(savedForm?.pickupTime || "asap");
+  const [tipPercent, setTipPercent] = useState<number | null>(savedForm?.tipPercent ?? 0.20);
+  const [customTip, setCustomTip] = useState(savedForm?.customTip || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cardReady, setCardReady] = useState(false);
   const [applePayAvailable, setApplePayAvailable] = useState(false);
@@ -109,6 +118,15 @@ const OrderCheckout = () => {
   }, [tipPercent, customTip, cart.subtotal]);
 
   const orderTotal = cart.subtotal + cart.tax + tipAmount;
+
+  // Keep form data saved for Cash App Pay redirect return (mobile)
+  useEffect(() => {
+    if (cashAppPayAvailable) {
+      sessionStorage.setItem("proper_cashapp_form", JSON.stringify({
+        name, phone, email, pickupTime, tipPercent, customTip
+      }));
+    }
+  }, [name, phone, email, pickupTime, tipPercent, customTip, cashAppPayAvailable]);
 
   // Load Square Web Payments SDK
   const initSquare = useCallback(async () => {
@@ -158,7 +176,11 @@ const OrderCheckout = () => {
           cashAppPay.addEventListener("ontokenization", (event: any) => {
             const { tokenResult } = event.detail;
             if (tokenResult.status === "OK") {
+              // Clean up saved form data
+              sessionStorage.removeItem("proper_cashapp_form");
               processOrderRef.current?.(tokenResult.token);
+            } else if (tokenResult.status === "Cancel") {
+              sessionStorage.removeItem("proper_cashapp_form");
             }
           });
           cashAppPayRef.current = cashAppPay;
