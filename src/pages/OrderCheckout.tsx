@@ -32,12 +32,37 @@ const TIP_OPTIONS = [
   { label: "25%", value: 0.25 },
 ];
 
+// Store hours from Square: Mon-Fri 5PM-12AM, Sat-Sun 12PM-12AM
+const STORE_HOURS: Record<number, [number, number]> = {
+  0: [12, 24], // Sunday
+  1: [17, 24], // Monday
+  2: [17, 24], // Tuesday
+  3: [17, 24], // Wednesday
+  4: [17, 24], // Thursday
+  5: [17, 24], // Friday
+  6: [12, 24], // Saturday
+};
+
+function isStoreOpen(): boolean {
+  const now = new Date();
+  const day = now.getDay();
+  const hour = now.getHours() + now.getMinutes() / 60;
+  const [open, close] = STORE_HOURS[day];
+  return hour >= open && hour < close;
+}
+
 function generatePickupTimes(): { label: string; value: string }[] {
   const now = new Date();
+  const day = now.getDay();
+  const [openHour, closeHour] = STORE_HOURS[day];
   const times: { label: string; value: string }[] = [];
-  const startMin = 20;
+  const startMin = 25; // minimum prep time
+
   for (let i = 0; i < 8; i++) {
     const d = new Date(now.getTime() + (startMin + i * 15) * 60000);
+    const dHour = d.getHours() + d.getMinutes() / 60;
+    // Only show times within store hours
+    if (dHour < openHour || dHour >= closeHour) continue;
     const hours = d.getHours();
     const minutes = d.getMinutes();
     const ampm = hours >= 12 ? "PM" : "AM";
