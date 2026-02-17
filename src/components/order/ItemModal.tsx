@@ -50,7 +50,7 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
         );
       }
       const currentForList = prev.filter((m) => m.listId === list.id);
-      if (list.name === "Choose Two Sides" && currentForList.length >= 2) {
+      if (list.name.toLowerCase().includes("two") && list.name.toLowerCase().includes("side") && currentForList.length >= 2) {
         const withoutOldest = prev.filter(
           (m) => !(m.listId === list.id && m.modifierId === currentForList[0].modifierId)
         );
@@ -134,7 +134,7 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
               const selectedForList = selectedModifiers.filter(
                 (m) => m.listId === list.id
               );
-              const maxSelections = list.name === "Choose Two Sides" ? 2 : undefined;
+              const maxSelections = list.name.toLowerCase().includes("two") && list.name.toLowerCase().includes("side") ? 2 : undefined;
 
               return (
                 <div key={list.id}>
