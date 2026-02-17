@@ -73,7 +73,7 @@ export function useMenu() {
       setError(null);
 
       try {
-        const res = await fetch("/catalog.json");
+        const res = await fetch("https://raw.githubusercontent.com/bclark206/proper-cinematic-soul/main/public/catalog.json");
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: CatalogResponse = await res.json();
 

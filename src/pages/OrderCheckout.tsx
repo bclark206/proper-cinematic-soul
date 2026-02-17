@@ -242,13 +242,37 @@ const OrderCheckout = () => {
     setIsSubmitting(true);
 
     try {
-      // In production, send nonce + order to /api/create-order
-      await new Promise((r) => setTimeout(r, 2000));
+      const ORDER_API_URL = "https://order-api.propercuisine.com/create-order";
 
-      const confirmationNumber = `PC-${Date.now().toString(36).toUpperCase()}`;
+      const apiItems = cart.items.map((item) => ({
+        variationId: item.variationId,
+        quantity: item.quantity,
+        modifiers: item.modifiers.map((m) => ({ modifierId: m.modifierId })),
+        note: item.specialInstructions || undefined,
+      }));
+
+      const res = await fetch(ORDER_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: apiItems,
+          customer: { name, phone, email },
+          tip: tipAmount,
+          sourceId: nonce,
+          pickupTime: pickupTime === "asap" ? "asap" : pickupTime,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Order failed");
+      }
 
       const orderData = {
-        confirmationNumber,
+        confirmationNumber: result.confirmationNumber,
+        orderId: result.orderId,
+        paymentId: result.paymentId,
         items: cart.items,
         subtotal: cart.subtotal,
         tax: cart.tax,
@@ -260,7 +284,6 @@ const OrderCheckout = () => {
             ? "ASAP (20–30 min)"
             : pickupTimes.find((t) => t.value === pickupTime)?.label || "ASAP",
         createdAt: new Date().toISOString(),
-        paymentNonce: nonce,
       };
       sessionStorage.setItem("proper-order-confirmation", JSON.stringify(orderData));
 

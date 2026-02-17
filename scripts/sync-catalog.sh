@@ -12,15 +12,20 @@ import sys, json, urllib.request, datetime
 token, out_path = sys.argv[1], sys.argv[2]
 
 all_objects, cursor = [], None
-while True:
-    url = "https://connect.squareup.com/v2/catalog/list"
-    if cursor: url += f"?cursor={cursor}"
-    req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}", "Square-Version": "2024-01-18", "Content-Type": "application/json"})
-    with urllib.request.urlopen(req) as resp:
-        data = json.loads(resp.read())
-    all_objects.extend(data.get("objects", []))
-    cursor = data.get("cursor")
-    if not cursor: break
+# Fetch all catalog types including IMAGE
+for types_param in ["", "types=IMAGE"]:
+    cursor = None
+    while True:
+        url = "https://connect.squareup.com/v2/catalog/list"
+        sep = "?"
+        if types_param: url += f"?{types_param}"; sep = "&"
+        if cursor: url += f"{sep}cursor={cursor}"
+        req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}", "Square-Version": "2024-01-18", "Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+        all_objects.extend(data.get("objects", []))
+        cursor = data.get("cursor")
+        if not cursor: break
 
 categories, images, modifier_lists, items = {}, {}, {}, []
 for obj in all_objects:
