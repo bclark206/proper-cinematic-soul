@@ -53,12 +53,12 @@ const MenuCard = ({ item, onClick, getItemImageUrl }: MenuCardProps) => {
       </div>
 
       {/* Content */}
-      <div className="p-4 sm:p-5">
-        <h3 className="font-display text-base sm:text-lg font-semibold text-pure-white group-hover:text-gold transition-colors duration-300 leading-tight mb-1.5">
+      <div className="p-3.5 sm:p-5">
+        <h3 className="font-display text-sm sm:text-lg font-semibold text-pure-white group-hover:text-gold transition-colors duration-300 leading-tight mb-1">
           {item.name}
         </h3>
         {item.description && (
-          <p className="text-cream/40 text-sm leading-relaxed line-clamp-2">
+          <p className="text-cream/40 text-xs sm:text-sm leading-relaxed line-clamp-2">
             {item.description}
           </p>
         )}

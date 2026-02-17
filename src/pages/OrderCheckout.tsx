@@ -96,6 +96,7 @@ const OrderCheckout = () => {
   const applePayRef = useRef<any>(null);
   const googlePayRef = useRef<any>(null);
   const cashAppPayRef = useRef<any>(null);
+  const processOrderRef = useRef<(nonce: string | null) => Promise<void>>();
 
   const pickupTimes = useMemo(() => generatePickupTimes(), []);
 
@@ -149,16 +150,22 @@ const OrderCheckout = () => {
           total: { amount: (orderTotal / 100).toFixed(2), label: "Proper Cuisine" },
         });
         const cashAppPay = await payments.cashAppPay(cashAppRequest, {
-          redirectURL: window.location.origin + "/order/confirmation",
+          redirectURL: window.location.href,
           referenceId: "proper-" + Date.now(),
         });
         if (cashAppPay) {
           await cashAppPay.attach("#cashapp-pay-container");
+          cashAppPay.addEventListener("ontokenization", (event: any) => {
+            const { tokenResult } = event.detail;
+            if (tokenResult.status === "OK") {
+              processOrderRef.current?.(tokenResult.token);
+            }
+          });
           cashAppPayRef.current = cashAppPay;
           setCashAppPayAvailable(true);
         }
-      } catch {
-        // Cash App Pay not available
+      } catch (e) {
+        console.error("Cash App Pay init error:", e);
       }
     } catch (err: any) {
       console.error("Square init error:", err);
@@ -229,7 +236,7 @@ const OrderCheckout = () => {
     }
   };
 
-  const processOrder = async (nonce: string | null) => {
+  const processOrder: (nonce: string | null) => Promise<void> = async (nonce) => {
     if (!name.trim() || !phone.trim() || !email.trim()) {
       toast({
         title: "Missing Information",
@@ -300,6 +307,9 @@ const OrderCheckout = () => {
     }
   };
 
+  // Keep ref updated so Cash App callback uses latest closure
+  processOrderRef.current = processOrder;
+
   const handleSubmit = async () => {
     if (!name.trim() || !phone.trim() || !email.trim()) {
       toast({
@@ -352,7 +362,7 @@ const OrderCheckout = () => {
     <div className="min-h-screen bg-[#0a0a0a]">
       <Navigation />
 
-      <main className="pt-28 pb-40 px-4 sm:px-6">
+      <main className="pt-24 sm:pt-28 pb-32 sm:pb-40 px-3 sm:px-6">
         <div className="max-w-2xl mx-auto">
           {/* Back link */}
           <Link
@@ -433,10 +443,10 @@ const OrderCheckout = () => {
                     <Clock className="w-3.5 h-3.5 text-gold/60" />
                     Pickup Time
                   </Label>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     <button
                       onClick={() => setPickupTime("asap")}
-                      className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border ${
+                      className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border ${
                         pickupTime === "asap"
                           ? "border-gold bg-gold/10 text-gold"
                           : "border-[#2a2a2a] bg-[#141414] text-cream/50 hover:border-gold/25"
@@ -449,7 +459,7 @@ const OrderCheckout = () => {
                       <button
                         key={t.value}
                         onClick={() => setPickupTime(t.value)}
-                        className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border ${
+                        className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border ${
                           pickupTime === t.value
                             ? "border-gold bg-gold/10 text-gold"
                             : "border-[#2a2a2a] bg-[#141414] text-cream/50 hover:border-gold/25"
@@ -547,7 +557,7 @@ const OrderCheckout = () => {
                   <p className="text-cream/30 text-xs">Show appreciation for our team</p>
                 </div>
               </div>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {TIP_OPTIONS.map((opt) => {
                   const isActive = tipPercent === opt.value;
                   return (
@@ -612,7 +622,7 @@ const OrderCheckout = () => {
                   <CreditCard className="w-4 h-4 text-gold" />
                 </div>
                 <h2 className="font-display text-lg text-pure-white font-medium">Payment</h2>
-                <div className="ml-auto flex items-center gap-1.5 text-cream/25 text-xs">
+                <div className="ml-auto flex items-center gap-1.5 text-cream/25 text-xs hidden sm:flex">
                   <Shield className="w-3.5 h-3.5" />
                   <span>Secured by Square</span>
                 </div>
@@ -633,10 +643,13 @@ const OrderCheckout = () => {
                 {/* Cash App Pay */}
                 <div
                   id="cashapp-pay-container"
-                  className="w-full rounded-xl overflow-hidden [&>div]:!w-full [&>div>button]:!w-full [&>div>button]:!border-0 [&>div>button]:!rounded-xl"
+                  className="w-full rounded-xl overflow-hidden [&>div]:!w-full [&>div>button]:!w-full [&>div>button]:!border-0 [&>div>button]:!rounded-xl [&>div>button]:!h-12"
                   style={{
                     minHeight: cashAppPayAvailable ? "48px" : "0",
-                    display: cashAppPayAvailable ? "block" : "none",
+                    overflow: cashAppPayAvailable ? "visible" : "hidden",
+                    opacity: cashAppPayAvailable ? 1 : 0,
+                    position: cashAppPayAvailable ? "relative" : "absolute",
+                    pointerEvents: cashAppPayAvailable ? "auto" : "none",
                   }}
                 />
               </div>

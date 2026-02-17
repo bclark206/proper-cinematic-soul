@@ -96,7 +96,7 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="bg-[#111111] border-gold/15 text-pure-white max-w-lg max-h-[90vh] overflow-y-auto p-0 rounded-2xl">
+      <DialogContent className="bg-[#111111] border-gold/15 text-pure-white w-[calc(100%-2rem)] max-w-lg max-h-[90vh] sm:max-h-[90vh] overflow-y-auto p-0 rounded-2xl sm:rounded-2xl mx-auto">
         {/* Item Image */}
         {imageUrl ? (
           <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-2xl">
@@ -113,7 +113,7 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
           </div>
         )}
 
-        <div className="px-6 pb-6">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6">
           <DialogHeader className="mb-4">
             <DialogTitle className="font-display text-2xl text-pure-white leading-tight">
               {item.name}
@@ -148,7 +148,7 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
                       </span>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {list.modifiers.map((mod) => {
                       const isSelected = selectedForList.some(
                         (m) => m.modifierId === mod.id
@@ -198,20 +198,20 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
             </div>
 
             {/* Quantity + Add to Cart */}
-            <div className="flex items-center gap-3 pt-2">
-              <div className="flex items-center border border-[#2a2a2a] rounded-xl overflow-hidden bg-[#1a1a1a]">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              <div className="flex items-center justify-center border border-[#2a2a2a] rounded-xl overflow-hidden bg-[#1a1a1a] self-center">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3.5 py-3 text-cream/60 hover:text-gold hover:bg-gold/10 transition-colors"
+                  className="px-4 py-3 text-cream/60 hover:text-gold hover:bg-gold/10 transition-colors"
                 >
                   <Minus className="w-4 h-4" />
                 </button>
-                <span className="px-4 py-3 text-pure-white font-semibold min-w-[3rem] text-center text-base">
+                <span className="px-5 py-3 text-pure-white font-semibold min-w-[3rem] text-center text-base">
                   {quantity}
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-3.5 py-3 text-cream/60 hover:text-gold hover:bg-gold/10 transition-colors"
+                  className="px-4 py-3 text-cream/60 hover:text-gold hover:bg-gold/10 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -220,7 +220,7 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
               <Button
                 variant="gold"
                 size="lg"
-                className="flex-1 text-base font-semibold rounded-xl h-[50px]"
+                className="flex-1 text-base font-semibold rounded-xl h-[50px] w-full sm:w-auto"
                 onClick={handleAdd}
               >
                 Add to Cart — {formatPrice(lineTotal)}

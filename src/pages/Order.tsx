@@ -84,23 +84,23 @@ const Order = () => {
               Order <span className="text-gold">Online</span>
             </h1>
             <div className="w-20 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-8" />
-            <p className="text-cream/40 text-base sm:text-lg max-w-2xl mx-auto mb-12 fade-in-slow leading-relaxed">
+            <p className="text-cream/40 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-8 sm:mb-12 fade-in-slow leading-relaxed px-2">
               Enjoy our signature dishes from the comfort of your home. Place your order for pickup and we&apos;ll have it ready for you.
             </p>
 
             {/* Info Chips */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 fade-in-slow">
-              <div className="flex items-center gap-2.5 bg-[#141414] border border-[#222222] rounded-full px-5 py-2.5">
-                <Clock className="w-4 h-4 text-gold" />
-                <span className="text-cream/60 text-sm">20–45 min prep</span>
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 fade-in-slow px-2">
+              <div className="flex items-center gap-2 bg-[#141414] border border-[#222222] rounded-full px-4 py-2 sm:px-5 sm:py-2.5">
+                <Clock className="w-4 h-4 text-gold shrink-0" />
+                <span className="text-cream/60 text-xs sm:text-sm">20–45 min prep</span>
               </div>
-              <div className="flex items-center gap-2.5 bg-[#141414] border border-[#222222] rounded-full px-5 py-2.5">
-                <MapPin className="w-4 h-4 text-gold" />
-                <span className="text-cream/60 text-sm">Pickup Only</span>
+              <div className="flex items-center gap-2 bg-[#141414] border border-[#222222] rounded-full px-4 py-2 sm:px-5 sm:py-2.5">
+                <MapPin className="w-4 h-4 text-gold shrink-0" />
+                <span className="text-cream/60 text-xs sm:text-sm">Pickup Only</span>
               </div>
-              <div className="flex items-center gap-2.5 bg-[#141414] border border-[#222222] rounded-full px-5 py-2.5">
-                <Phone className="w-4 h-4 text-gold" />
-                <span className="text-cream/60 text-sm">(443) 432-2771</span>
+              <div className="flex items-center gap-2 bg-[#141414] border border-[#222222] rounded-full px-4 py-2 sm:px-5 sm:py-2.5">
+                <Phone className="w-4 h-4 text-gold shrink-0" />
+                <span className="text-cream/60 text-xs sm:text-sm">(443) 432-2771</span>
               </div>
             </div>
           </div>
