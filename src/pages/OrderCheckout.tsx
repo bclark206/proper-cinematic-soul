@@ -320,6 +320,11 @@ const OrderCheckout = () => {
           pickupTime === "asap"
             ? "ASAP (20–30 min)"
             : pickupTimes.find((t) => t.value === pickupTime)?.label || "ASAP",
+        orderType: orderType.toUpperCase(),
+        ...(orderType === "delivery" && {
+          deliveryAddress,
+          deliveryNotes: deliveryNotes.trim() || undefined,
+        }),
         createdAt: new Date().toISOString(),
       };
       sessionStorage.setItem("proper-order-confirmation", JSON.stringify(orderData));

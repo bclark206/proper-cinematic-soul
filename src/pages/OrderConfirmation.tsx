@@ -4,6 +4,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/data/menu";
+import { ESTIMATED_DELIVERY_TIME } from "@/hooks/useCart";
 import {
   CheckCircle,
   Clock,
@@ -12,6 +13,7 @@ import {
   ChefHat,
   ArrowRight,
   Copy,
+  Truck,
 } from "lucide-react";
 
 interface OrderData {
@@ -29,6 +31,15 @@ interface OrderData {
   total: number;
   customer: { name: string; phone: string; email: string };
   pickupTime: string;
+  orderType?: string;
+  deliveryAddress?: {
+    street: string;
+    apt: string;
+    city: string;
+    state: string;
+    zip: string;
+  };
+  deliveryNotes?: string;
   createdAt: string;
 }
 
@@ -116,38 +127,76 @@ const OrderConfirmation = () => {
             )}
           </div>
 
-          {/* Pickup Info */}
-          <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-5">
-            <div className="grid sm:grid-cols-3 gap-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
-                  <Clock className="w-5 h-5 text-gold" />
+          {/* Order Info */}
+          <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-5" data-testid="order-info-section">
+            {order.orderType === "DELIVERY" ? (
+              <div className="grid sm:grid-cols-3 gap-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-cream/35 text-xs">Est. Delivery Time</p>
+                    <p className="text-cream font-medium" data-testid="estimated-delivery-time">{ESTIMATED_DELIVERY_TIME}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-cream/35 text-xs">Pickup Time</p>
-                  <p className="text-cream font-medium">{order.pickupTime}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
+                    <Truck className="w-5 h-5 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-cream/35 text-xs">Delivery Address</p>
+                    <p className="text-cream font-medium text-sm" data-testid="delivery-address">
+                      {order.deliveryAddress?.street}
+                      {order.deliveryAddress?.apt && `, ${order.deliveryAddress.apt}`}
+                    </p>
+                    <p className="text-cream/40 text-xs">
+                      {order.deliveryAddress?.city}, {order.deliveryAddress?.state} {order.deliveryAddress?.zip}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
+                    <Phone className="w-5 h-5 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-cream/35 text-xs">Questions?</p>
+                    <p className="text-cream font-medium">(443) 432-2771</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
-                  <MapPin className="w-5 h-5 text-gold" />
+            ) : (
+              <div className="grid sm:grid-cols-3 gap-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-cream/35 text-xs">Pickup Time</p>
+                    <p className="text-cream font-medium">{order.pickupTime}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-cream/35 text-xs">Pickup Location</p>
-                  <p className="text-cream font-medium text-sm">206 E Redwood St</p>
-                  <p className="text-cream/40 text-xs">Baltimore, MD 21202</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
+                    <MapPin className="w-5 h-5 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-cream/35 text-xs">Pickup Location</p>
+                    <p className="text-cream font-medium text-sm">206 E Redwood St</p>
+                    <p className="text-cream/40 text-xs">Baltimore, MD 21202</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
+                    <Phone className="w-5 h-5 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-cream/35 text-xs">Questions?</p>
+                    <p className="text-cream font-medium">(443) 432-2771</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5 text-gold" />
-                </div>
-                <div>
-                  <p className="text-cream/35 text-xs">Questions?</p>
-                  <p className="text-cream font-medium">(443) 432-2771</p>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Order Summary */}
@@ -211,23 +260,32 @@ const OrderConfirmation = () => {
             </div>
           </div>
 
-          {/* Map Link */}
-          <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-8 text-center">
-            <p className="text-cream/40 text-sm mb-3">
-              Get directions to Proper Cuisine
-            </p>
-            <Button variant="outline-gold" className="rounded-xl" asChild>
-              <a
-                href="https://maps.google.com/?q=206+E+Redwood+St+Baltimore+MD+21202"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2"
-              >
-                <MapPin className="w-4 h-4" />
-                Open in Maps
-              </a>
-            </Button>
-          </div>
+          {/* Map Link / Delivery Notes */}
+          {order.orderType === "DELIVERY" ? (
+            order.deliveryNotes && (
+              <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-8" data-testid="delivery-notes-section">
+                <p className="text-cream/35 text-xs mb-1">Delivery Notes</p>
+                <p className="text-cream text-sm" data-testid="delivery-notes">{order.deliveryNotes}</p>
+              </div>
+            )
+          ) : (
+            <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-8 text-center">
+              <p className="text-cream/40 text-sm mb-3">
+                Get directions to Proper Cuisine
+              </p>
+              <Button variant="outline-gold" className="rounded-xl" asChild>
+                <a
+                  href="https://maps.google.com/?q=206+E+Redwood+St+Baltimore+MD+21202"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2"
+                >
+                  <MapPin className="w-4 h-4" />
+                  Open in Maps
+                </a>
+              </Button>
+            </div>
+          )}
 
           {/* Back to site */}
           <div className="text-center">
