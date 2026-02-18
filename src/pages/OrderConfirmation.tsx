@@ -14,6 +14,8 @@ import {
   ArrowRight,
   Copy,
   Truck,
+  Sparkles,
+  PartyPopper,
 } from "lucide-react";
 
 interface OrderData {
@@ -92,23 +94,31 @@ const OrderConfirmation = () => {
 
       <main className="pt-28 pb-16 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
-          {/* Success Header */}
+          {/* Celebratory Header */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gold/10 mb-6 fade-in-up">
-              <CheckCircle className="w-10 h-10 text-gold" />
+            <div className="relative inline-flex items-center justify-center w-24 h-24 mb-6 celebration-bounce">
+              <div className="absolute inset-0 rounded-full bg-gold/15 pulse-ring" />
+              <div className="relative w-24 h-24 rounded-full bg-gold/10 flex items-center justify-center border border-gold/20">
+                <CheckCircle className="w-12 h-12 text-gold" />
+              </div>
+              <Sparkles className="absolute -top-1 -right-1 w-5 h-5 text-gold/70" data-testid="sparkle-icon" />
+              <PartyPopper className="absolute -bottom-1 -left-1 w-5 h-5 text-gold/60" data-testid="party-icon" />
             </div>
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-pure-white mb-4 fade-in-up">
-              Order <span className="text-gold">Confirmed!</span>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-pure-white mb-3 stagger-in" style={{ animationDelay: "0.2s" }}>
+              Order <span className="gold-shimmer">Confirmed!</span>
             </h1>
+            <p className="text-cream/50 text-lg mb-5 stagger-in" style={{ animationDelay: "0.4s" }}>
+              Thank you for choosing Proper Cuisine
+            </p>
             <div className="w-20 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-6" />
-            <div className="inline-flex items-center gap-2 bg-gold/8 text-gold px-5 py-2.5 rounded-full fade-in-slow border border-gold/15">
+            <div className="inline-flex items-center gap-2.5 bg-gold/8 text-gold px-6 py-3 rounded-full stagger-in border border-gold/20" style={{ animationDelay: "0.6s" }} data-testid="kitchen-status">
               <ChefHat className="w-5 h-5" />
-              <span className="font-medium text-sm">Your order has been sent to the kitchen!</span>
+              <span className="font-medium">Your order is on its way to the kitchen!</span>
             </div>
           </div>
 
           {/* Order Number */}
-          <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-5 text-center">
+          <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-5 text-center stagger-in" style={{ animationDelay: "0.8s" }}>
             <p className="text-cream/35 text-sm mb-2">Order Number</p>
             <div className="flex items-center justify-center gap-3">
               <p className="font-display text-3xl font-bold text-gold tracking-wider">
@@ -128,7 +138,7 @@ const OrderConfirmation = () => {
           </div>
 
           {/* Order Info */}
-          <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-5" data-testid="order-info-section">
+          <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-5 stagger-in" style={{ animationDelay: "0.9s" }} data-testid="order-info-section">
             {order.orderType === "DELIVERY" ? (
               <div className="grid sm:grid-cols-3 gap-6">
                 <div className="flex items-center gap-3">
@@ -200,7 +210,7 @@ const OrderConfirmation = () => {
           </div>
 
           {/* Order Summary */}
-          <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-5">
+          <div className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-6 mb-5 stagger-in" style={{ animationDelay: "1s" }}>
             <h2 className="font-display text-lg text-pure-white font-medium mb-5">
               Order Summary
             </h2>

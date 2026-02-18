@@ -173,6 +173,45 @@ describe("OrderConfirmation - Delivery Order", () => {
   });
 });
 
+describe("OrderConfirmation - Celebratory Header", () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
+  it("shows celebratory kitchen status message", () => {
+    renderConfirmation(pickupOrderData);
+    expect(
+      screen.getByText("Your order is on its way to the kitchen!")
+    ).toBeInTheDocument();
+  });
+
+  it("shows thank you message", () => {
+    renderConfirmation(pickupOrderData);
+    expect(
+      screen.getByText("Thank you for choosing Proper Cuisine")
+    ).toBeInTheDocument();
+  });
+
+  it("shows sparkle and party icons for celebratory feel", () => {
+    renderConfirmation(pickupOrderData);
+    expect(screen.getByTestId("sparkle-icon")).toBeInTheDocument();
+    expect(screen.getByTestId("party-icon")).toBeInTheDocument();
+  });
+
+  it("shows Order Confirmed heading", () => {
+    renderConfirmation(pickupOrderData);
+    expect(screen.getByText("Confirmed!")).toBeInTheDocument();
+  });
+
+  it("renders kitchen status badge with chef hat", () => {
+    renderConfirmation(pickupOrderData);
+    const badge = screen.getByTestId("kitchen-status");
+    expect(badge).toHaveTextContent(
+      "Your order is on its way to the kitchen!"
+    );
+  });
+});
+
 describe("OrderConfirmation - No Order", () => {
   beforeEach(() => {
     sessionStorage.clear();
