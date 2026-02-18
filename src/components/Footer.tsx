@@ -17,13 +17,13 @@ const Footer = () => {
             </p>
             
             <div className="flex space-x-4">
-              <a href="https://instagram.com/thepropercuisine" className="text-cream hover:text-gold transition-colors">
+              <a href="https://instagram.com/thepropercuisine" className="text-cream hover:text-gold transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
                 <Instagram className="w-6 h-6" />
               </a>
-              <a href="#" className="text-cream hover:text-gold transition-colors">
+              <a href="#" className="text-cream hover:text-gold transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
                 <Facebook className="w-6 h-6" />
               </a>
-              <a href="#" className="text-cream hover:text-gold transition-colors">
+              <a href="#" className="text-cream hover:text-gold transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
                 <Twitter className="w-6 h-6" />
               </a>
             </div>
@@ -86,13 +86,13 @@ const Footer = () => {
           </p>
           
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4 md:mt-0">
-            <Link to="/sms-compliance" className="text-cream/60 hover:text-gold text-sm transition-colors">
+            <Link to="/sms-compliance" className="text-cream/60 hover:text-gold text-sm transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
               SMS Updates
             </Link>
-            <Link to="/privacy-policy" className="text-cream/60 hover:text-gold text-sm transition-colors">
+            <Link to="/privacy-policy" className="text-cream/60 hover:text-gold text-sm transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
               Privacy Policy
             </Link>
-            <Link to="/terms-conditions" className="text-cream/60 hover:text-gold text-sm transition-colors">
+            <Link to="/terms-conditions" className="text-cream/60 hover:text-gold text-sm transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
               Terms & Conditions
             </Link>
           </div>

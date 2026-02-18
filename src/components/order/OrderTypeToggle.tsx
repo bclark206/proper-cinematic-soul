@@ -15,6 +15,7 @@ const OrderTypeToggle = ({ orderType, onOrderTypeChange }: OrderTypeToggleProps)
           className={`
             inline-flex items-center gap-2 rounded-full px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-medium
             transition-all duration-200
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414]
             ${
               orderType === "pickup"
                 ? "bg-gold text-jet-black shadow-gold"
@@ -32,6 +33,7 @@ const OrderTypeToggle = ({ orderType, onOrderTypeChange }: OrderTypeToggleProps)
           className={`
             inline-flex items-center gap-2 rounded-full px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-medium
             transition-all duration-200
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414]
             ${
               orderType === "delivery"
                 ? "bg-gold text-jet-black shadow-gold"

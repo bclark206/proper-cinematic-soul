@@ -15,7 +15,7 @@ const MenuCard = ({ item, onClick, getItemImageUrl }: MenuCardProps) => {
   return (
     <button
       type="button"
-      className="group relative bg-[#131313] border border-[#1f1f1f] hover:border-gold/30 rounded-xl overflow-hidden cursor-pointer text-left w-full transition-all duration-500 ease-out hover:shadow-[0_12px_48px_rgba(197,168,106,0.1)] hover:-translate-y-1.5 active:scale-[0.98]"
+      className="group relative bg-[#131313] border border-[#1f1f1f] hover:border-gold/30 rounded-xl overflow-hidden cursor-pointer text-left w-full transition-all duration-500 ease-out hover:shadow-[0_12px_48px_rgba(197,168,106,0.1)] hover:-translate-y-1.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
       onClick={() => onClick(item)}
     >
       {/* Image Area — square on mobile, taller on desktop */}

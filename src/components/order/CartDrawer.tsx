@@ -110,7 +110,7 @@ const CartDrawer = ({ cart, getItemImageUrl, orderType }: CartDrawerProps) => {
                         </h4>
                         <button
                           onClick={() => cart.removeItem(item.cartItemId)}
-                          className="text-cream/15 hover:text-red-400 transition-colors p-1 rounded-lg hover:bg-red-400/10 -mt-0.5 -mr-1 flex-shrink-0"
+                          className="text-cream/15 hover:text-red-400 transition-colors p-1 rounded-lg hover:bg-red-400/10 -mt-0.5 -mr-1 flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 focus-visible:text-red-400"
                           aria-label={`Remove ${item.name}`}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -149,7 +149,7 @@ const CartDrawer = ({ cart, getItemImageUrl, orderType }: CartDrawerProps) => {
                             item.quantity - 1
                           )
                         }
-                        className="px-2.5 py-1.5 text-cream/40 hover:text-gold hover:bg-gold/10 active:bg-gold/20 transition-colors"
+                        className="px-2.5 py-1.5 text-cream/40 hover:text-gold hover:bg-gold/10 active:bg-gold/20 transition-colors focus-visible:outline-none focus-visible:text-gold focus-visible:bg-gold/10"
                         aria-label="Decrease quantity"
                       >
                         <Minus className="w-3 h-3" />
@@ -164,7 +164,7 @@ const CartDrawer = ({ cart, getItemImageUrl, orderType }: CartDrawerProps) => {
                             item.quantity + 1
                           )
                         }
-                        className="px-2.5 py-1.5 text-cream/40 hover:text-gold hover:bg-gold/10 active:bg-gold/20 transition-colors"
+                        className="px-2.5 py-1.5 text-cream/40 hover:text-gold hover:bg-gold/10 active:bg-gold/20 transition-colors focus-visible:outline-none focus-visible:text-gold focus-visible:bg-gold/10"
                         aria-label="Increase quantity"
                       >
                         <Plus className="w-3 h-3" />

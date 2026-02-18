@@ -19,10 +19,10 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         // Proper Cuisine custom variants
-        gold: "bg-gradient-gold text-jet-black border border-gold font-medium hover:shadow-gold hover:-translate-y-0.5 transition-all duration-300",
-        "outline-gold": "bg-transparent text-gold border-2 border-gold font-medium hover:bg-gold hover:text-jet-black hover:-translate-y-0.5 transition-all duration-300",
-        "hero": "bg-gradient-gold text-jet-black border border-gold font-semibold text-base px-8 py-4 hover:shadow-gold hover:-translate-y-1 transition-all duration-300",
-        "dark-elegant": "bg-jet-black text-gold border border-gold/20 font-medium hover:bg-gold hover:text-jet-black hover:border-gold transition-all duration-300"
+        gold: "bg-gradient-gold text-jet-black border border-gold font-medium hover:shadow-gold hover:-translate-y-0.5 focus-visible:shadow-gold focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-300",
+        "outline-gold": "bg-transparent text-gold border-2 border-gold font-medium hover:bg-gold hover:text-jet-black hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-300",
+        "hero": "bg-gradient-gold text-jet-black border border-gold font-semibold text-base px-8 py-4 hover:shadow-gold hover:-translate-y-1 focus-visible:shadow-gold focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-300",
+        "dark-elegant": "bg-jet-black text-gold border border-gold/20 font-medium hover:bg-gold hover:text-jet-black hover:border-gold focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-300"
       },
       size: {
         default: "h-10 px-4 py-2",

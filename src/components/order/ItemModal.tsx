@@ -175,7 +175,7 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
                           toggleModifier(list, mod.id, mod.name, mod.price)
                         }
                         className={cn(
-                          "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm transition-all duration-200 border",
+                          "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm transition-all duration-200 border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]",
                           isSelected
                             ? "border-gold/60 bg-gold/10 text-gold"
                             : "border-[#2a2a2a] bg-[#161616] text-cream/60 hover:border-[#3a3a3a] hover:text-cream/80"
@@ -218,7 +218,7 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
             <div className="flex items-center border border-[#2a2a2a] rounded-full overflow-hidden bg-[#161616]">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="px-3.5 py-2.5 text-cream/60 hover:text-gold hover:bg-gold/10 transition-colors active:bg-gold/20"
+                className="px-3.5 py-2.5 text-cream/60 hover:text-gold hover:bg-gold/10 transition-colors active:bg-gold/20 focus-visible:outline-none focus-visible:text-gold focus-visible:bg-gold/10"
                 aria-label="Decrease quantity"
               >
                 <Minus className="w-4 h-4" />
@@ -228,7 +228,7 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
               </span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="px-3.5 py-2.5 text-cream/60 hover:text-gold hover:bg-gold/10 transition-colors active:bg-gold/20"
+                className="px-3.5 py-2.5 text-cream/60 hover:text-gold hover:bg-gold/10 transition-colors active:bg-gold/20 focus-visible:outline-none focus-visible:text-gold focus-visible:bg-gold/10"
                 aria-label="Increase quantity"
               >
                 <Plus className="w-4 h-4" />

@@ -39,6 +39,7 @@ const FloatingCart = ({ itemCount, onClick }: FloatingCartProps) => {
         "shadow-[0_4px_24px_rgba(197,168,106,0.35)]",
         "flex items-center justify-center",
         "hover:scale-105 active:scale-95 transition-all duration-300",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]",
         "animate-in fade-in slide-in-from-bottom-4",
         pulsing && "cart-pulse"
       )}

@@ -54,7 +54,7 @@ const Navigation = () => {
                 href={item.href} 
                 target={item.external ? "_blank" : undefined}
                 rel={item.external ? "noopener noreferrer" : undefined}
-                className="text-pure-white hover:text-gold transition-colors duration-300 font-medium"
+                className="text-pure-white hover:text-gold transition-colors duration-300 font-medium rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black"
               >
                 {item.label}
               </a>
@@ -82,7 +82,7 @@ const Navigation = () => {
 
           {/* Mobile menu button */}
           <div className="lg:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-pure-white hover:text-gold transition-colors">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-pure-white hover:text-gold transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
@@ -97,7 +97,7 @@ const Navigation = () => {
                   href={item.href} 
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noopener noreferrer" : undefined}
-                  className="block px-3 py-2 text-pure-white hover:text-gold transition-colors duration-300" 
+                  className="block px-3 py-2 text-pure-white hover:text-gold transition-colors duration-300 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black" 
                   onClick={() => !item.external && setIsOpen(false)}
                 >
                   {item.label}

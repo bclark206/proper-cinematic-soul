@@ -97,7 +97,7 @@ const CategoryNav = ({ categories, activeCategory, onSelect }: CategoryNavProps)
               onClick={() => onSelect(cat.slug)}
               aria-current={activeCategory === cat.slug ? "true" : undefined}
               className={cn(
-                "px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap shrink-0",
+                "px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]",
                 activeCategory === cat.slug
                   ? "text-gold font-semibold"
                   : "text-cream/50 hover:text-gold hover:bg-gold/8 border border-transparent hover:border-gold/15"
