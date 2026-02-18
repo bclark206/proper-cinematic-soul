@@ -7,10 +7,11 @@ import MenuCard from "@/components/order/MenuCard";
 import ItemModal from "@/components/order/ItemModal";
 import CartDrawer from "@/components/order/CartDrawer";
 import FloatingCart from "@/components/order/FloatingCart";
+import MenuCardSkeleton from "@/components/order/MenuCardSkeleton";
 import { useCart } from "@/hooks/useCart";
 import { useMenu } from "@/hooks/useMenu";
 import type { MenuItem } from "@/data/menu";
-import { Loader2, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 const Order = () => {
   const cart = useCart();
@@ -106,11 +107,22 @@ const Order = () => {
 
       {/* Menu Sections */}
       <main className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
-        {/* Loading State */}
+        {/* Loading Skeleton State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <Loader2 className="w-8 h-8 text-gold animate-spin" />
-            <p className="text-cream/50 text-sm">Loading menu...</p>
+          <div data-testid="menu-skeleton">
+            {[1, 2, 3].map((section) => (
+              <div key={section} className="mb-10 sm:mb-16">
+                <div className="mb-5 sm:mb-8">
+                  <div className="h-6 sm:h-8 w-40 sm:w-56 rounded bg-[#1a1a1a] animate-pulse" />
+                  <div className="w-12 h-[2px] bg-gold/20 rounded-full mt-3" />
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
+                  {Array.from({ length: section === 1 ? 6 : section === 2 ? 4 : 3 }).map((_, i) => (
+                    <MenuCardSkeleton key={i} />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
