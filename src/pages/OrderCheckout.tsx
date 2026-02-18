@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCart, DELIVERY_FEE, ESTIMATED_DELIVERY_TIME } from "@/hooks/useCart";
 import { useOrderType } from "@/hooks/useOrderType";
+import { useDeliveryAddress } from "@/hooks/useDeliveryAddress";
 import { formatPrice } from "@/data/menu";
+import { Textarea } from "@/components/ui/textarea";
 import {
   ArrowLeft,
   Clock,
@@ -24,6 +26,7 @@ import {
   Minus,
   Plus,
   Trash2,
+  MapPin,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -75,6 +78,7 @@ type PaymentMethod = "card" | "apple-pay" | "cashapp";
 const OrderCheckout = () => {
   const cart = useCart();
   const { orderType } = useOrderType();
+  const { address: deliveryAddress } = useDeliveryAddress();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -93,6 +97,7 @@ const OrderCheckout = () => {
   const [pickupTime, setPickupTime] = useState(savedForm?.pickupTime || "asap");
   const [tipPercent, setTipPercent] = useState<number | null>(savedForm?.tipPercent ?? 0.20);
   const [customTip, setCustomTip] = useState(savedForm?.customTip || "");
+  const [deliveryNotes, setDeliveryNotes] = useState(savedForm?.deliveryNotes || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cardReady, setCardReady] = useState(false);
   const [applePayAvailable, setApplePayAvailable] = useState(false);
@@ -122,10 +127,10 @@ const OrderCheckout = () => {
   useEffect(() => {
     if (cashAppPayAvailable) {
       sessionStorage.setItem("proper_cashapp_form", JSON.stringify({
-        name, phone, email, pickupTime, tipPercent, customTip
+        name, phone, email, pickupTime, tipPercent, customTip, deliveryNotes
       }));
     }
-  }, [name, phone, email, pickupTime, tipPercent, customTip, cashAppPayAvailable]);
+  }, [name, phone, email, pickupTime, tipPercent, customTip, deliveryNotes, cashAppPayAvailable]);
 
   // Load Square Web Payments SDK
   const initSquare = useCallback(async () => {
@@ -284,9 +289,13 @@ const OrderCheckout = () => {
           customer: { name, phone, email },
           tip: tipAmount,
           deliveryFee,
-          orderType,
+          orderType: orderType.toUpperCase(),
           sourceId: nonce,
           pickupTime: pickupTime === "asap" ? "asap" : pickupTime,
+          ...(orderType === "delivery" && {
+            deliveryAddress,
+            deliveryNotes: deliveryNotes.trim() || undefined,
+          }),
         }),
       });
 
@@ -465,6 +474,31 @@ const OrderCheckout = () => {
                   </div>
                 </div>
               </section>
+
+              {/* ─── Delivery Notes (delivery only) ─── */}
+              {orderType === "delivery" && (
+                <section data-testid="delivery-notes-section" className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-5 sm:p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 rounded-xl bg-gold/10 flex items-center justify-center">
+                      <MapPin className="w-4 h-4 text-gold" />
+                    </div>
+                    <div>
+                      <h2 className="font-display text-lg text-pure-white font-medium">
+                        Delivery Notes
+                      </h2>
+                      <p className="text-cream/30 text-xs">Gate codes, building entrance, etc.</p>
+                    </div>
+                  </div>
+                  <Textarea
+                    data-testid="delivery-notes-input"
+                    value={deliveryNotes}
+                    onChange={(e) => setDeliveryNotes(e.target.value)}
+                    placeholder="Leave at door, ring buzzer #3, gate code 1234..."
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-cream placeholder:text-cream/20 focus:border-gold/40 resize-none rounded-xl text-sm"
+                    rows={3}
+                  />
+                </section>
+              )}
 
               {/* ─── Pickup Time ─── */}
               <section data-testid="pickup-time-section" className="bg-[#111111] border border-[#1e1e1e] rounded-2xl p-5 sm:p-6">

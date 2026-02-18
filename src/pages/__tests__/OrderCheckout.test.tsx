@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import OrderCheckout from "../OrderCheckout";
 
@@ -67,10 +67,27 @@ vi.mock("@/hooks/useOrderType", () => ({
   }),
 }));
 
+// Mock useDeliveryAddress
+const mockDeliveryAddress = {
+  street: "123 Main St",
+  apt: "4B",
+  city: "Baltimore",
+  state: "MD",
+  zip: "21201",
+};
+vi.mock("@/hooks/useDeliveryAddress", () => ({
+  useDeliveryAddress: () => ({
+    address: mockDeliveryAddress,
+    setAddress: vi.fn(),
+    updateField: vi.fn(),
+  }),
+}));
+
 // Mock useToast
+const mockToast = vi.fn();
 vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({
-    toast: vi.fn(),
+    toast: mockToast,
   }),
 }));
 
@@ -326,5 +343,173 @@ describe("OrderCheckout - Delivery Fee", () => {
     renderCheckout();
     expect(screen.queryByText("Est. Delivery")).not.toBeInTheDocument();
     expect(screen.queryByText("45-60 minutes")).not.toBeInTheDocument();
+  });
+});
+
+describe("OrderCheckout - Delivery Notes", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("does not show delivery notes section for pickup orders", () => {
+    mockOrderType = "pickup";
+    const { container } = renderCheckout();
+    expect(container.querySelector('[data-testid="delivery-notes-section"]')).not.toBeInTheDocument();
+  });
+
+  it("shows delivery notes section for delivery orders", () => {
+    mockOrderType = "delivery";
+    const { container } = renderCheckout();
+    expect(container.querySelector('[data-testid="delivery-notes-section"]')).toBeInTheDocument();
+    expect(screen.getByText("Delivery Notes")).toBeInTheDocument();
+  });
+
+  it("renders delivery notes textarea for delivery orders", () => {
+    mockOrderType = "delivery";
+    renderCheckout();
+    const textarea = screen.getByTestId("delivery-notes-input");
+    expect(textarea).toBeInTheDocument();
+    expect(textarea).toHaveAttribute(
+      "placeholder",
+      "Leave at door, ring buzzer #3, gate code 1234..."
+    );
+  });
+
+  it("allows typing delivery notes", () => {
+    mockOrderType = "delivery";
+    renderCheckout();
+    const textarea = screen.getByTestId("delivery-notes-input") as HTMLTextAreaElement;
+    fireEvent.change(textarea, { target: { value: "Gate code: 5678" } });
+    expect(textarea.value).toBe("Gate code: 5678");
+  });
+});
+
+describe("OrderCheckout - API Request Body", () => {
+  let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          confirmationNumber: "PC-1234",
+          orderId: "order-1",
+          paymentId: "pay-1",
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      )
+    );
+  });
+
+  afterEach(() => {
+    fetchSpy.mockRestore();
+  });
+
+  const fillFormAndSubmit = () => {
+    fireEvent.change(screen.getByLabelText("Full Name"), { target: { value: "Jane Doe" } });
+    fireEvent.change(screen.getByLabelText("Phone Number"), { target: { value: "4435551234" } });
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "jane@test.com" } });
+    const placeOrderButtons = screen.getAllByText("Place Order");
+    fireEvent.click(placeOrderButtons[0]);
+  };
+
+  it("sends orderType as PICKUP (uppercase) for pickup orders", async () => {
+    mockOrderType = "pickup";
+    renderCheckout();
+    fillFormAndSubmit();
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalled();
+    });
+
+    const body = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+    expect(body.orderType).toBe("PICKUP");
+  });
+
+  it("sends orderType as DELIVERY (uppercase) for delivery orders", async () => {
+    mockOrderType = "delivery";
+    renderCheckout();
+    fillFormAndSubmit();
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalled();
+    });
+
+    const body = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+    expect(body.orderType).toBe("DELIVERY");
+  });
+
+  it("includes deliveryAddress in request body for delivery orders", async () => {
+    mockOrderType = "delivery";
+    renderCheckout();
+    fillFormAndSubmit();
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalled();
+    });
+
+    const body = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+    expect(body.deliveryAddress).toEqual({
+      street: "123 Main St",
+      apt: "4B",
+      city: "Baltimore",
+      state: "MD",
+      zip: "21201",
+    });
+  });
+
+  it("does not include deliveryAddress in request body for pickup orders", async () => {
+    mockOrderType = "pickup";
+    renderCheckout();
+    fillFormAndSubmit();
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalled();
+    });
+
+    const body = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+    expect(body.deliveryAddress).toBeUndefined();
+  });
+
+  it("includes deliveryNotes in request body for delivery orders when provided", async () => {
+    mockOrderType = "delivery";
+    renderCheckout();
+
+    const textarea = screen.getByTestId("delivery-notes-input");
+    fireEvent.change(textarea, { target: { value: "Gate code: 5678" } });
+    fillFormAndSubmit();
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalled();
+    });
+
+    const body = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+    expect(body.deliveryNotes).toBe("Gate code: 5678");
+  });
+
+  it("omits deliveryNotes from request body when empty", async () => {
+    mockOrderType = "delivery";
+    renderCheckout();
+    fillFormAndSubmit();
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalled();
+    });
+
+    const body = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+    expect(body.deliveryNotes).toBeUndefined();
+  });
+
+  it("does not include deliveryNotes in request body for pickup orders", async () => {
+    mockOrderType = "pickup";
+    renderCheckout();
+    fillFormAndSubmit();
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalled();
+    });
+
+    const body = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+    expect(body.deliveryNotes).toBeUndefined();
   });
 });
