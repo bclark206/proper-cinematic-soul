@@ -12,12 +12,15 @@ import MenuCardSkeleton from "@/components/order/MenuCardSkeleton";
 import { useCart } from "@/hooks/useCart";
 import { useMenu } from "@/hooks/useMenu";
 import { useOrderType } from "@/hooks/useOrderType";
+import { useDeliveryAddress } from "@/hooks/useDeliveryAddress";
+import DeliveryAddressForm from "@/components/order/DeliveryAddressForm";
 import type { MenuItem } from "@/data/menu";
 import { AlertCircle } from "lucide-react";
 
 const Order = () => {
   const cart = useCart();
   const { orderType, setOrderType } = useOrderType();
+  const { address, updateField } = useDeliveryAddress();
   const {
     categories,
     loading,
@@ -102,6 +105,9 @@ const Order = () => {
       {/* Order Type Toggle */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6">
         <OrderTypeToggle orderType={orderType} onOrderTypeChange={setOrderType} />
+        {orderType === "delivery" && (
+          <DeliveryAddressForm address={address} onFieldChange={updateField} />
+        )}
       </div>
 
       {/* Category Navigation */}
