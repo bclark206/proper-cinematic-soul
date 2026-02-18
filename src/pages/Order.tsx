@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import OrderHero from "@/components/order/OrderHero";
+import OrderTypeToggle from "@/components/order/OrderTypeToggle";
 import CategoryNav from "@/components/order/CategoryNav";
 import MenuCard from "@/components/order/MenuCard";
 import ItemModal from "@/components/order/ItemModal";
@@ -10,11 +11,13 @@ import FloatingCart from "@/components/order/FloatingCart";
 import MenuCardSkeleton from "@/components/order/MenuCardSkeleton";
 import { useCart } from "@/hooks/useCart";
 import { useMenu } from "@/hooks/useMenu";
+import { useOrderType } from "@/hooks/useOrderType";
 import type { MenuItem } from "@/data/menu";
 import { AlertCircle } from "lucide-react";
 
 const Order = () => {
   const cart = useCart();
+  const { orderType, setOrderType } = useOrderType();
   const {
     categories,
     loading,
@@ -95,6 +98,11 @@ const Order = () => {
       <Navigation />
 
       <OrderHero />
+
+      {/* Order Type Toggle */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6">
+        <OrderTypeToggle orderType={orderType} onOrderTypeChange={setOrderType} />
+      </div>
 
       {/* Category Navigation */}
       {categories.length > 0 && (
