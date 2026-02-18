@@ -15,11 +15,35 @@ import { useOrderType } from "@/hooks/useOrderType";
 import { useDeliveryAddress } from "@/hooks/useDeliveryAddress";
 import DeliveryAddressForm from "@/components/order/DeliveryAddressForm";
 import type { MenuItem } from "@/data/menu";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Clock } from "lucide-react";
+
+function useStoreOpen() {
+  const [isOpen, setIsOpen] = useState(true);
+  const [hours, setHours] = useState("");
+
+  useEffect(() => {
+    const check = () => {
+      const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+      const day = now.getDay();
+      const t = now.getHours() * 60 + now.getMinutes();
+      const weekend = day === 0 || day === 6;
+      const open = weekend ? 12 * 60 : 15 * 60;
+      const close = 22 * 60 + 30;
+      setIsOpen(t >= open && t <= close);
+      setHours(weekend ? "12:00 PM – 11:00 PM" : "3:00 PM – 11:00 PM");
+    };
+    check();
+    const interval = setInterval(check, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return { isOpen, hours };
+}
 
 const Order = () => {
   const cart = useCart();
   const { orderType, setOrderType } = useOrderType();
+  const { isOpen: storeIsOpen, hours: storeHours } = useStoreOpen();
   const { address, updateField } = useDeliveryAddress();
   const {
     categories,
@@ -101,6 +125,27 @@ const Order = () => {
       <Navigation />
 
       <OrderHero />
+
+      {/* Closed Banner */}
+      {!storeIsOpen && (
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 mt-6">
+          <div className="bg-gradient-to-r from-[#1a1208] to-[#1a1510] border border-gold/30 rounded-xl p-5 sm:p-8 text-center">
+            <Clock className="w-8 h-8 text-gold mx-auto mb-3" />
+            <h3 className="font-display text-xl sm:text-2xl text-pure-white font-bold mb-2">
+              We're Currently Closed
+            </h3>
+            <p className="text-cream/70 text-sm sm:text-base mb-1">
+              Online ordering is available during business hours
+            </p>
+            <p className="text-gold font-semibold text-base sm:text-lg">
+              Today's Hours: {storeHours}
+            </p>
+            <p className="text-cream/40 text-xs mt-3">
+              Mon–Fri: 3 PM – 11 PM &nbsp;|&nbsp; Sat–Sun: 12 PM – 11 PM
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Order Type Toggle */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6">
@@ -190,21 +235,25 @@ const Order = () => {
       {/* Item Modal */}
       <ItemModal
         item={selectedItem}
-        open={modalOpen}
+        open={modalOpen && storeIsOpen}
         onClose={() => setModalOpen(false)}
-        onAddToCart={cart.addItem}
+        onAddToCart={storeIsOpen ? cart.addItem : () => {}}
         getModifierList={getModifierList}
         getItemImageUrl={getItemImageUrl}
       />
 
-      {/* Cart Drawer */}
-      <CartDrawer cart={cart} getItemImageUrl={getItemImageUrl} orderType={orderType} />
+      {/* Cart Drawer - only when open */}
+      {storeIsOpen && (
+        <CartDrawer cart={cart} getItemImageUrl={getItemImageUrl} orderType={orderType} />
+      )}
 
-      {/* Floating Cart Button */}
-      <FloatingCart
-        itemCount={cart.itemCount}
-        onClick={() => cart.setIsOpen(true)}
-      />
+      {/* Floating Cart Button - only when open */}
+      {storeIsOpen && (
+        <FloatingCart
+          itemCount={cart.itemCount}
+          onClick={() => cart.setIsOpen(true)}
+        />
+      )}
 
       <Footer />
     </div>

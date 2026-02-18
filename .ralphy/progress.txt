@@ -1,2 +1,24 @@
 # Ralphy Progress Log
 
+- [✓] 2026-02-18 05:59 - Redesign the menu grid with better card layouts — larger food images, cleaner typography, subtle hover animations
+- [✓] 2026-02-18 06:03 - Add smooth category scroll navigation with sticky header and active indicator
+- [✓] 2026-02-18 06:08 - Improve the item detail modal — larger image, better description layout, cleaner modifier/option selection
+- [✓] 2026-02-18 06:14 - Redesign the cart drawer with better spacing, item images, and a more premium checkout feel
+- [✓] 2026-02-18 06:17 - Add a floating cart button that shows item count with a subtle pulse animation when items are added
+- [✓] 2026-02-18 06:26 - Improve mobile responsiveness — the ordering page should feel like a native app on phones
+- [✓] 2026-02-18 06:32 - Add a hero section at the top of the order page with restaurant branding (subtle, not overwhelming)
+- [✓] 2026-02-18 06:36 - Add loading skeleton states for menu items while catalog loads
+- [✓] 2026-02-18 06:42 - Improve the checkout page design — cleaner form layout, better payment method selection UI, order summary sidebar
+- [✓] 2026-02-18 06:46 - Add an order type toggle at the top: "Pickup" vs "Delivery" with a clean toggle/tab UI
+- [✓] 2026-02-18 06:51 - When "Delivery" is selected, show a delivery address form (street, apt, city, state, zip)
+- [✓] 2026-02-18 06:56 - Add a delivery fee display ($5.00 flat rate) that adds to the order total
+- [✓] 2026-02-18 06:59 - Add estimated delivery time display ("45-60 minutes")
+- [✓] 2026-02-18 07:04 - Pass order type ("PICKUP" or "DELIVERY") + delivery address + delivery notes to the backend POST /create-order request body
+- [✓] 2026-02-18 07:08 - Update the order confirmation page to show delivery address and estimated delivery time when order type is DELIVERY
+- [✓] 2026-02-18 07:10 - Add delivery radius note: "We deliver within 5 miles of 206 E Redwood St"
+- [✓] 2026-02-18 07:13 - **Backend**: Update /Users/oscarclark/.openclaw/workspace/proper-order-server/server.js — when orderType is "DELIVERY", create the Square order with fulfillments[0].type="DELIVERY" and delivery_details containing: recipient (display_name, phone_number, email_address), deliver_at (current time + 45 min in RFC3339), prep_time_duration "PT30M", delivery_window_duration "PT15M", note from delivery notes, and recipient.address (address_line_1, address_line_2, locality="Baltimore", administrative_district_level_1="MD", postal_code). For "PICKUP" orders keep existing pickup fulfillment logic.
+- [✓] 2026-02-18 07:15 - **Backend**: Add $5 delivery fee as a service_charges entry on delivery orders: { name: "Delivery Fee", amount_money: { amount: 500, currency: "USD" }, calculation_phase: "SUBTOTAL_PHASE" }
+- [✓] 2026-02-18 07:18 - Add subtle page transitions/animations (framer-motion if available, CSS if not)
+- [✓] 2026-02-18 07:28 - Ensure all interactive elements have proper hover/focus states
+- [✓] 2026-02-18 07:31 - Add empty cart state with a friendly message and CTA to browse menu
+- [✓] 2026-02-18 07:34 - Order confirmation page should feel celebratory — "Your order is on its way to the kitchen!"
