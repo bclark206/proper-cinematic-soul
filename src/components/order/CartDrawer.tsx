@@ -55,7 +55,7 @@ const CartDrawer = ({ cart, getItemImageUrl }: CartDrawerProps) => {
         </SheetHeader>
 
         {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
+        <div className="flex-1 overflow-y-auto scroll-touch px-4 sm:px-5 py-4 sm:py-5 space-y-3 sm:space-y-4">
           {cart.items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center px-6">
               <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-gold/8 to-gold/3 flex items-center justify-center mb-6">
@@ -146,7 +146,7 @@ const CartDrawer = ({ cart, getItemImageUrl }: CartDrawerProps) => {
                             item.quantity - 1
                           )
                         }
-                        className="px-2.5 py-1.5 text-cream/40 hover:text-gold hover:bg-gold/10 transition-colors"
+                        className="px-2.5 py-1.5 text-cream/40 hover:text-gold hover:bg-gold/10 active:bg-gold/20 transition-colors"
                         aria-label="Decrease quantity"
                       >
                         <Minus className="w-3 h-3" />
@@ -161,7 +161,7 @@ const CartDrawer = ({ cart, getItemImageUrl }: CartDrawerProps) => {
                             item.quantity + 1
                           )
                         }
-                        className="px-2.5 py-1.5 text-cream/40 hover:text-gold hover:bg-gold/10 transition-colors"
+                        className="px-2.5 py-1.5 text-cream/40 hover:text-gold hover:bg-gold/10 active:bg-gold/20 transition-colors"
                         aria-label="Increase quantity"
                       >
                         <Plus className="w-3 h-3" />
@@ -203,7 +203,7 @@ const CartDrawer = ({ cart, getItemImageUrl }: CartDrawerProps) => {
             </div>
 
             {/* Checkout Actions */}
-            <div className="px-6 pb-6 space-y-3">
+            <div className="px-6 pb-6 pb-safe space-y-3">
               {!cart.meetsMinimum && (
                 <p className="text-xs text-amber-400/60 text-center py-1">
                   Minimum order: $15.00

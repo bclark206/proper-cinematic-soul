@@ -75,7 +75,7 @@ const CategoryNav = ({ categories, activeCategory, onSelect }: CategoryNavProps)
       <div className="max-w-7xl mx-auto">
         <div
           ref={scrollRef}
-          className="relative flex overflow-x-auto scrollbar-hide gap-1 px-4 py-3 sm:px-6 sm:justify-center"
+          className="relative flex overflow-x-auto scrollbar-hide gap-0.5 sm:gap-1 px-3 py-2 sm:px-6 sm:py-3 sm:justify-center scroll-touch"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {/* Sliding indicator */}
@@ -97,7 +97,7 @@ const CategoryNav = ({ categories, activeCategory, onSelect }: CategoryNavProps)
               onClick={() => onSelect(cat.slug)}
               aria-current={activeCategory === cat.slug ? "true" : undefined}
               className={cn(
-                "px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap shrink-0",
+                "px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap shrink-0",
                 activeCategory === cat.slug
                   ? "text-gold font-semibold"
                   : "text-cream/50 hover:text-gold hover:bg-gold/8 border border-transparent hover:border-gold/15"

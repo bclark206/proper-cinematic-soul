@@ -33,7 +33,7 @@ const FloatingCart = ({ itemCount, onClick }: FloatingCartProps) => {
     <button
       onClick={onClick}
       className={cn(
-        "fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50",
+        "fixed bottom-6 right-4 sm:bottom-6 sm:right-6 z-50 mb-safe",
         "w-14 h-14 sm:w-16 sm:h-16 rounded-2xl",
         "bg-gradient-to-br from-gold to-[hsl(43,35%,55%)]",
         "shadow-[0_4px_24px_rgba(197,168,106,0.35)]",

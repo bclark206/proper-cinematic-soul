@@ -96,15 +96,15 @@ const Order = () => {
       <section className="relative pt-20">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(197,168,106,0.06)_0%,_transparent_60%)]" />
         <div className="relative">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
-            <p className="text-gold/60 font-display text-sm tracking-[0.35em] uppercase mb-5 fade-in-up">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-24 text-center">
+            <p className="text-gold/60 font-display text-xs sm:text-sm tracking-[0.35em] uppercase mb-3 sm:mb-5 fade-in-up">
               Proper Cuisine
             </p>
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-pure-white mb-6 fade-in-up">
+            <h1 className="font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-pure-white mb-4 sm:mb-6 fade-in-up">
               Order <span className="text-gold">Online</span>
             </h1>
-            <div className="w-20 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-8" />
-            <p className="text-cream/40 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-8 sm:mb-12 fade-in-slow leading-relaxed px-2">
+            <div className="w-16 sm:w-20 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-5 sm:mb-8" />
+            <p className="text-cream/40 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-6 sm:mb-12 fade-in-slow leading-relaxed px-2">
               Enjoy our signature dishes from the comfort of your home. Place your order for pickup and we&apos;ll have it ready for you.
             </p>
 
@@ -137,7 +137,7 @@ const Order = () => {
       )}
 
       {/* Menu Sections */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
         {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -169,16 +169,16 @@ const Order = () => {
             <section
               key={cat.slug}
               ref={(el: HTMLElement | null) => { if (el) sectionRefs.current[cat.slug] = el as HTMLDivElement; }}
-              className="mb-16"
+              className="mb-10 sm:mb-16"
             >
-              <div className="mb-8">
-                <h2 className="font-display text-2xl sm:text-3xl font-bold text-pure-white">
+              <div className="mb-5 sm:mb-8">
+                <h2 className="font-display text-xl sm:text-3xl font-bold text-pure-white">
                   {cat.name}
                 </h2>
                 <div className="w-12 h-[2px] bg-gradient-to-r from-gold to-transparent rounded-full mt-3" />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
                 {items.map((item) => (
                   <MenuCard
                     key={item.id}

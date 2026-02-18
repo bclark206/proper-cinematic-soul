@@ -67,10 +67,11 @@ describe("ItemModal", () => {
 
   it("renders item name and description", () => {
     render(<ItemModal {...defaultProps} />);
-    expect(screen.getByText("Grilled Salmon")).toBeInTheDocument();
+    // Name/description appear in both visible body and sr-only header
+    expect(screen.getAllByText("Grilled Salmon").length).toBeGreaterThan(0);
     expect(
-      screen.getByText("Atlantic salmon with lemon butter sauce")
-    ).toBeInTheDocument();
+      screen.getAllByText("Atlantic salmon with lemon butter sauce").length
+    ).toBeGreaterThan(0);
   });
 
   it("renders formatted price inline with title", () => {
@@ -81,12 +82,13 @@ describe("ItemModal", () => {
   it("renders fallback description when item has no description", () => {
     const itemNoDesc = { ...baseItem, description: null };
     render(<ItemModal {...defaultProps} item={itemNoDesc} />);
+    // Fallback appears in both visible body and sr-only header
     expect(
-      screen.getByText("A Proper Cuisine signature dish.")
-    ).toBeInTheDocument();
+      screen.getAllByText("A Proper Cuisine signature dish.").length
+    ).toBeGreaterThan(0);
   });
 
-  it("renders image with 4:3 aspect ratio when imageUrl is available", () => {
+  it("renders image with responsive aspect ratio when imageUrl is available", () => {
     const itemWithImage = { ...baseItem, imageUrl: "https://example.com/salmon.jpg" };
     const { container } = render(
       <ItemModal {...defaultProps} item={itemWithImage} />
@@ -95,15 +97,16 @@ describe("ItemModal", () => {
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute("src", "https://example.com/salmon.jpg");
     const imageWrapper = img.parentElement;
-    expect(imageWrapper?.className).toContain("aspect-[4/3]");
+    expect(imageWrapper?.className).toContain("aspect-[16/10]");
+    expect(imageWrapper?.className).toContain("sm:aspect-[4/3]");
   });
 
   it("renders placeholder icon when no image", () => {
     render(<ItemModal {...defaultProps} />);
-    // Placeholder renders in portal (document.body), with a 3:2 aspect
+    // Placeholder renders in portal (document.body), with responsive aspect
     const allDivs = document.body.querySelectorAll("div");
     const placeholder = Array.from(allDivs).find((d) =>
-      d.className.includes("aspect-[3/2]")
+      d.className.includes("aspect-[16/10]")
     );
     expect(placeholder).toBeDefined();
   });

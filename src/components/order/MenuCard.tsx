@@ -15,11 +15,11 @@ const MenuCard = ({ item, onClick, getItemImageUrl }: MenuCardProps) => {
   return (
     <button
       type="button"
-      className="group relative bg-[#131313] border border-[#1f1f1f] hover:border-gold/30 rounded-xl overflow-hidden cursor-pointer text-left w-full transition-all duration-500 ease-out hover:shadow-[0_12px_48px_rgba(197,168,106,0.1)] hover:-translate-y-1.5"
+      className="group relative bg-[#131313] border border-[#1f1f1f] hover:border-gold/30 rounded-xl overflow-hidden cursor-pointer text-left w-full transition-all duration-500 ease-out hover:shadow-[0_12px_48px_rgba(197,168,106,0.1)] hover:-translate-y-1.5 active:scale-[0.98]"
       onClick={() => onClick(item)}
     >
-      {/* Image Area — taller ratio for food photography */}
-      <div className="relative aspect-[3/2] overflow-hidden">
+      {/* Image Area — square on mobile, taller on desktop */}
+      <div className="relative aspect-square sm:aspect-[3/2] overflow-hidden">
         {imageUrl ? (
           <>
             <img
@@ -57,26 +57,26 @@ const MenuCard = ({ item, onClick, getItemImageUrl }: MenuCardProps) => {
         </div>
 
         {/* Price badge */}
-        <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-          <span className="text-gold font-semibold text-sm tracking-wide">
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-black/60 backdrop-blur-md px-2 py-0.5 sm:px-3 sm:py-1 rounded-full border border-white/10">
+          <span className="text-gold font-semibold text-xs sm:text-sm tracking-wide">
             {formatPrice(item.price)}
           </span>
         </div>
       </div>
 
       {/* Content */}
-      <div className="px-4 pt-4 pb-4 sm:px-5 sm:pt-5 sm:pb-5">
-        <h3 className="font-display text-base sm:text-lg font-semibold text-pure-white leading-snug tracking-tight group-hover:text-gold transition-colors duration-300">
+      <div className="px-2.5 pt-2.5 pb-3 sm:px-5 sm:pt-5 sm:pb-5">
+        <h3 className="font-display text-[0.8rem] sm:text-lg font-semibold text-pure-white leading-snug tracking-tight group-hover:text-gold transition-colors duration-300 line-clamp-2">
           {item.name}
         </h3>
         {item.description && (
-          <p className="mt-1.5 text-cream/35 text-[13px] sm:text-sm leading-relaxed line-clamp-2 font-light">
+          <p className="mt-1 sm:mt-1.5 text-cream/35 text-[11px] sm:text-sm leading-relaxed line-clamp-2 font-light hidden sm:block">
             {item.description}
           </p>
         )}
         {item.modifierListIds.length > 0 && (
-          <div className="mt-3">
-            <span className="inline-block text-[10px] uppercase tracking-[0.15em] text-gold/60 bg-gold/[0.06] px-2.5 py-1 rounded-full border border-gold/10">
+          <div className="mt-2 sm:mt-3">
+            <span className="inline-block text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-gold/60 bg-gold/[0.06] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-gold/10">
               Customizable
             </span>
           </div>

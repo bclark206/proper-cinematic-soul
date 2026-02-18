@@ -161,7 +161,7 @@ describe("MenuCard", () => {
     );
   });
 
-  it("uses taller aspect ratio (3/2) for the image area", () => {
+  it("uses square aspect on mobile with 3/2 on larger screens", () => {
     const { container } = render(
       <MenuCard
         item={baseItem}
@@ -169,8 +169,9 @@ describe("MenuCard", () => {
         getItemImageUrl={getItemImageUrl}
       />
     );
-    const imageArea = container.querySelector(".aspect-\\[3\\/2\\]");
+    const imageArea = container.querySelector(".aspect-square");
     expect(imageArea).toBeInTheDocument();
+    expect(imageArea?.className).toContain("sm:aspect-[3/2]");
   });
 
   it("has hover translate and shadow classes on the card", () => {

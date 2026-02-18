@@ -140,6 +140,8 @@ Fonts: Playfair Display (headings), Inter (body)
     font-feature-settings: "kern" 1, "liga" 1;
     -webkit-text-size-adjust: 100%;
     overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -251,9 +253,24 @@ Fonts: Playfair Display (headings), Inter (body)
   .text-display {
     font-family: var(--font-display);
   }
-  
+
   .text-body {
     font-family: var(--font-body);
+  }
+
+  /* Safe-area padding for notched devices */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mb-safe {
+    margin-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Native-feeling momentum scroll */
+  .scroll-touch {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }
 
