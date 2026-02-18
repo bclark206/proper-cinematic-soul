@@ -17,6 +17,7 @@ export interface CartItem {
   quantity: number;
   modifiers: SelectedModifier[];
   specialInstructions: string;
+  imageId: string | null;
 }
 
 const CART_STORAGE_KEY = "proper-cuisine-cart";

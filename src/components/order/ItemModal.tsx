@@ -78,6 +78,7 @@ const ItemModal = ({ item, open, onClose, onAddToCart, getModifierList, getItemI
       quantity,
       modifiers: selectedModifiers,
       specialInstructions,
+      imageId: item.imageId,
     });
     setQuantity(1);
     setSelectedModifiers([]);

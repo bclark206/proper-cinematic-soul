@@ -211,6 +211,7 @@ describe("ItemModal", () => {
         },
       ],
       specialInstructions: "",
+      imageId: null,
     });
     expect(onClose).toHaveBeenCalled();
   });
