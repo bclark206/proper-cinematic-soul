@@ -1088,12 +1088,12 @@
         {
           "id": "QL37Y2ZSFWPSEGR63NOWUBTO",
           "name": "Regular",
-          "price": 4000
+          "price": 2500
         }
       ],
       "modifierListIds": [],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/0661781d2bab38babdf9d8f12b50b92c771ca8ae/original.jpeg",
-      "price": 4000
+      "price": 2500
     }
   ],
   "modifierLists": [
@@ -1292,5 +1292,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-18T17:04:04.624073Z"
+  "fetchedAt": "2026-02-18T17:34:04.747651Z"
 }
