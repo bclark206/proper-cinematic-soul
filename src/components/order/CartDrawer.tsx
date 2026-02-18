@@ -67,9 +67,20 @@ const CartDrawer = ({ cart, getItemImageUrl, orderType }: CartDrawerProps) => {
               <p className="text-cream/50 font-display text-lg mb-2">
                 Your cart is empty
               </p>
-              <p className="text-cream/25 text-sm leading-relaxed max-w-[200px]">
-                Add some delicious items from our menu to get started
+              <p className="text-cream/25 text-sm leading-relaxed max-w-[220px] mb-6">
+                Explore our menu and add something delicious to get started
               </p>
+              <Button
+                variant="gold"
+                className="rounded-xl gap-2"
+                onClick={() => {
+                  cart.setIsOpen(false);
+                  navigate("/order");
+                }}
+              >
+                <UtensilsCrossed className="w-4 h-4" />
+                Browse Menu
+              </Button>
             </div>
           ) : (
             cart.items.map((item) => {

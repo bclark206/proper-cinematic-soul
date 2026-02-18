@@ -85,8 +85,21 @@ describe("CartDrawer", () => {
     renderDrawer(makeCart());
     expect(screen.getByText("Your cart is empty")).toBeInTheDocument();
     expect(
-      screen.getByText(/Add some delicious items/)
+      screen.getByText(/Explore our menu/)
     ).toBeInTheDocument();
+  });
+
+  it("renders Browse Menu CTA button in empty state", () => {
+    renderDrawer(makeCart());
+    expect(screen.getByText("Browse Menu")).toBeInTheDocument();
+  });
+
+  it("closes drawer and navigates to menu when Browse Menu is clicked", () => {
+    const setIsOpen = vi.fn();
+    renderDrawer(makeCart({ setIsOpen }));
+    fireEvent.click(screen.getByText("Browse Menu"));
+    expect(setIsOpen).toHaveBeenCalledWith(false);
+    expect(mockNavigate).toHaveBeenCalledWith("/order");
   });
 
   it("renders item name", () => {
