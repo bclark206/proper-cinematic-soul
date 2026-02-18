@@ -363,4 +363,30 @@ describe("CartDrawer", () => {
     // total should be $31.80 + $5.00 = $36.80
     expect(screen.getByText("$36.80")).toBeInTheDocument();
   });
+
+  it("shows estimated delivery time for delivery orders", () => {
+    const cart = makeCart({
+      items: [sampleItem],
+      itemCount: 1,
+      subtotal: 3000,
+      tax: 180,
+      total: 3180,
+    });
+    renderDrawer(cart, "delivery");
+    expect(screen.getByText("Est. Delivery")).toBeInTheDocument();
+    expect(screen.getByText("45-60 minutes")).toBeInTheDocument();
+  });
+
+  it("does not show estimated delivery time for pickup orders", () => {
+    const cart = makeCart({
+      items: [sampleItem],
+      itemCount: 1,
+      subtotal: 3000,
+      tax: 180,
+      total: 3180,
+    });
+    renderDrawer(cart, "pickup");
+    expect(screen.queryByText("Est. Delivery")).not.toBeInTheDocument();
+    expect(screen.queryByText("45-60 minutes")).not.toBeInTheDocument();
+  });
 });

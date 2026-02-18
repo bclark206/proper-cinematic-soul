@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useCart, DELIVERY_FEE } from "@/hooks/useCart";
+import { useCart, DELIVERY_FEE, ESTIMATED_DELIVERY_TIME } from "@/hooks/useCart";
 import { useOrderType } from "@/hooks/useOrderType";
 import { formatPrice } from "@/data/menu";
 import {
@@ -790,10 +790,16 @@ const OrderCheckout = () => {
                       <span className="text-cream/60">{formatPrice(cart.tax)}</span>
                     </div>
                     {deliveryFee > 0 && (
-                      <div className="flex justify-between text-cream/40">
-                        <span>Delivery Fee</span>
-                        <span className="text-cream/60">{formatPrice(deliveryFee)}</span>
-                      </div>
+                      <>
+                        <div className="flex justify-between text-cream/40">
+                          <span>Delivery Fee</span>
+                          <span className="text-cream/60">{formatPrice(deliveryFee)}</span>
+                        </div>
+                        <div className="flex justify-between text-cream/40" data-testid="estimated-delivery-time">
+                          <span>Est. Delivery</span>
+                          <span className="text-cream/60">{ESTIMATED_DELIVERY_TIME}</span>
+                        </div>
+                      </>
                     )}
                     {tipAmount > 0 && (
                       <div className="flex justify-between text-cream/40">

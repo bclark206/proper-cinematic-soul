@@ -21,6 +21,7 @@ export interface CartItem {
 }
 
 export const DELIVERY_FEE = 500; // $5.00 flat rate in cents
+export const ESTIMATED_DELIVERY_TIME = "45-60 minutes";
 
 const CART_STORAGE_KEY = "proper-cuisine-cart";
 

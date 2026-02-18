@@ -9,6 +9,7 @@ const mockClearCart = vi.fn();
 
 vi.mock("@/hooks/useCart", () => ({
   DELIVERY_FEE: 500,
+  ESTIMATED_DELIVERY_TIME: "45-60 minutes",
   useCart: () => ({
     items: [
       {
@@ -311,5 +312,19 @@ describe("OrderCheckout - Delivery Fee", () => {
     // subtotal=5200, tax=312, tip=1040 (20% default) => total=6552 => $65.52
     const totalElements = screen.getAllByText("$65.52");
     expect(totalElements.length).toBeGreaterThan(0);
+  });
+
+  it("shows estimated delivery time for delivery orders", () => {
+    mockOrderType = "delivery";
+    renderCheckout();
+    expect(screen.getByText("Est. Delivery")).toBeInTheDocument();
+    expect(screen.getByText("45-60 minutes")).toBeInTheDocument();
+  });
+
+  it("does not show estimated delivery time for pickup orders", () => {
+    mockOrderType = "pickup";
+    renderCheckout();
+    expect(screen.queryByText("Est. Delivery")).not.toBeInTheDocument();
+    expect(screen.queryByText("45-60 minutes")).not.toBeInTheDocument();
   });
 });

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/data/menu";
 import type { CartHook } from "@/hooks/useCart";
-import { DELIVERY_FEE } from "@/hooks/useCart";
+import { DELIVERY_FEE, ESTIMATED_DELIVERY_TIME } from "@/hooks/useCart";
 import type { OrderType } from "@/hooks/useOrderType";
 import { useNavigate } from "react-router-dom";
 
@@ -198,12 +198,20 @@ const CartDrawer = ({ cart, getItemImageUrl, orderType }: CartDrawerProps) => {
                 </span>
               </div>
               {orderType === "delivery" && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-cream/40">Delivery Fee</span>
-                  <span className="text-cream/70 tabular-nums">
-                    {formatPrice(DELIVERY_FEE)}
-                  </span>
-                </div>
+                <>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-cream/40">Delivery Fee</span>
+                    <span className="text-cream/70 tabular-nums">
+                      {formatPrice(DELIVERY_FEE)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm" data-testid="estimated-delivery-time">
+                    <span className="text-cream/40">Est. Delivery</span>
+                    <span className="text-cream/70">
+                      {ESTIMATED_DELIVERY_TIME}
+                    </span>
+                  </div>
+                </>
               )}
               <div className="flex items-center justify-between pt-3 border-t border-gold/8">
                 <span className="text-pure-white font-semibold">Total</span>
