@@ -20,6 +20,8 @@ export interface CartItem {
   imageId: string | null;
 }
 
+export const DELIVERY_FEE = 500; // $5.00 flat rate in cents
+
 const CART_STORAGE_KEY = "proper-cuisine-cart";
 
 function loadCart(): CartItem[] {

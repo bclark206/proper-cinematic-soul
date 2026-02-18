@@ -17,14 +17,17 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/data/menu";
 import type { CartHook } from "@/hooks/useCart";
+import { DELIVERY_FEE } from "@/hooks/useCart";
+import type { OrderType } from "@/hooks/useOrderType";
 import { useNavigate } from "react-router-dom";
 
 interface CartDrawerProps {
   cart: CartHook;
   getItemImageUrl: (imageId: string | null) => string | null;
+  orderType: OrderType;
 }
 
-const CartDrawer = ({ cart, getItemImageUrl }: CartDrawerProps) => {
+const CartDrawer = ({ cart, getItemImageUrl, orderType }: CartDrawerProps) => {
   const navigate = useNavigate();
 
   const handleCheckout = () => {
@@ -194,10 +197,18 @@ const CartDrawer = ({ cart, getItemImageUrl }: CartDrawerProps) => {
                   {formatPrice(cart.tax)}
                 </span>
               </div>
+              {orderType === "delivery" && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-cream/40">Delivery Fee</span>
+                  <span className="text-cream/70 tabular-nums">
+                    {formatPrice(DELIVERY_FEE)}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between pt-3 border-t border-gold/8">
                 <span className="text-pure-white font-semibold">Total</span>
                 <span className="text-gold font-display font-bold text-lg tabular-nums">
-                  {formatPrice(cart.total)}
+                  {formatPrice(cart.total + (orderType === "delivery" ? DELIVERY_FEE : 0))}
                 </span>
               </div>
             </div>

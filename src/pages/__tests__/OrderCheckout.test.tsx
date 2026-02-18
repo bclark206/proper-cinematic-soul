@@ -8,6 +8,7 @@ const mockUpdateQuantity = vi.fn();
 const mockClearCart = vi.fn();
 
 vi.mock("@/hooks/useCart", () => ({
+  DELIVERY_FEE: 500,
   useCart: () => ({
     items: [
       {
@@ -55,6 +56,16 @@ vi.mock("@/hooks/useCart", () => ({
   }),
 }));
 
+// Mock useOrderType — default to pickup
+const mockSetOrderType = vi.fn();
+let mockOrderType: "pickup" | "delivery" = "pickup";
+vi.mock("@/hooks/useOrderType", () => ({
+  useOrderType: () => ({
+    orderType: mockOrderType,
+    setOrderType: mockSetOrderType,
+  }),
+}));
+
 // Mock useToast
 vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({
@@ -72,6 +83,7 @@ const renderCheckout = () =>
 describe("OrderCheckout - Layout", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockOrderType = "pickup";
   });
 
   it("renders the checkout heading", () => {
@@ -264,5 +276,40 @@ describe("OrderCheckout - Place Order Button", () => {
     renderCheckout();
     const addresses = screen.getAllByText("Pickup at 206 E Redwood St, Baltimore");
     expect(addresses.length).toBeGreaterThan(0);
+  });
+});
+
+describe("OrderCheckout - Delivery Fee", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("does not show delivery fee for pickup orders", () => {
+    mockOrderType = "pickup";
+    renderCheckout();
+    expect(screen.queryByText("Delivery Fee")).not.toBeInTheDocument();
+  });
+
+  it("shows delivery fee for delivery orders", () => {
+    mockOrderType = "delivery";
+    renderCheckout();
+    expect(screen.getByText("Delivery Fee")).toBeInTheDocument();
+    expect(screen.getByText("$5.00")).toBeInTheDocument();
+  });
+
+  it("includes delivery fee in order total for delivery orders", () => {
+    mockOrderType = "delivery";
+    renderCheckout();
+    // subtotal=5200, tax=312, tip=1040 (20% default), delivery=500 => total=7052 => $70.52
+    const totalElements = screen.getAllByText("$70.52");
+    expect(totalElements.length).toBeGreaterThan(0);
+  });
+
+  it("does not include delivery fee in order total for pickup orders", () => {
+    mockOrderType = "pickup";
+    renderCheckout();
+    // subtotal=5200, tax=312, tip=1040 (20% default) => total=6552 => $65.52
+    const totalElements = screen.getAllByText("$65.52");
+    expect(totalElements.length).toBeGreaterThan(0);
   });
 });

@@ -24,6 +24,7 @@ interface OrderData {
   }>;
   subtotal: number;
   tax: number;
+  deliveryFee?: number;
   tip: number;
   total: number;
   customer: { name: string; phone: string; email: string };
@@ -193,6 +194,12 @@ const OrderConfirmation = () => {
                 <span>Tax</span>
                 <span className="text-cream/60">{formatPrice(order.tax)}</span>
               </div>
+              {order.deliveryFee != null && order.deliveryFee > 0 && (
+                <div className="flex justify-between text-cream/40">
+                  <span>Delivery Fee</span>
+                  <span className="text-cream/60">{formatPrice(order.deliveryFee)}</span>
+                </div>
+              )}
               <div className="flex justify-between text-cream/40">
                 <span>Tip</span>
                 <span className="text-cream/60">{formatPrice(order.tip)}</span>

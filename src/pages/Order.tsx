@@ -198,7 +198,7 @@ const Order = () => {
       />
 
       {/* Cart Drawer */}
-      <CartDrawer cart={cart} getItemImageUrl={getItemImageUrl} />
+      <CartDrawer cart={cart} getItemImageUrl={getItemImageUrl} orderType={orderType} />
 
       {/* Floating Cart Button */}
       <FloatingCart

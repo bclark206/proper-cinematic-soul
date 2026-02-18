@@ -68,10 +68,10 @@ const getItemImageUrl = vi.fn((imageId: string | null) =>
   imageId === "img-123" ? "https://example.com/salmon.jpg" : null
 );
 
-function renderDrawer(cart: CartHook) {
+function renderDrawer(cart: CartHook, orderType: "pickup" | "delivery" = "pickup") {
   return render(
     <MemoryRouter>
-      <CartDrawer cart={cart} getItemImageUrl={getItemImageUrl} />
+      <CartDrawer cart={cart} getItemImageUrl={getItemImageUrl} orderType={orderType} />
     </MemoryRouter>
   );
 }
@@ -324,5 +324,43 @@ describe("CartDrawer", () => {
     expect(
       screen.queryByText("Proceed to Checkout")
     ).not.toBeInTheDocument();
+  });
+
+  it("does not show delivery fee for pickup orders", () => {
+    const cart = makeCart({
+      items: [sampleItem],
+      itemCount: 1,
+      subtotal: 3000,
+      tax: 180,
+      total: 3180,
+    });
+    renderDrawer(cart, "pickup");
+    expect(screen.queryByText("Delivery Fee")).not.toBeInTheDocument();
+  });
+
+  it("shows delivery fee for delivery orders", () => {
+    const cart = makeCart({
+      items: [sampleItem],
+      itemCount: 1,
+      subtotal: 3000,
+      tax: 180,
+      total: 3180,
+    });
+    renderDrawer(cart, "delivery");
+    expect(screen.getByText("Delivery Fee")).toBeInTheDocument();
+    expect(screen.getByText("$5.00")).toBeInTheDocument();
+  });
+
+  it("includes delivery fee in displayed total for delivery orders", () => {
+    const cart = makeCart({
+      items: [sampleItem],
+      itemCount: 1,
+      subtotal: 3000,
+      tax: 180,
+      total: 3180,
+    });
+    renderDrawer(cart, "delivery");
+    // total should be $31.80 + $5.00 = $36.80
+    expect(screen.getByText("$36.80")).toBeInTheDocument();
   });
 });

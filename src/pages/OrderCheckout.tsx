@@ -5,7 +5,8 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useCart } from "@/hooks/useCart";
+import { useCart, DELIVERY_FEE } from "@/hooks/useCart";
+import { useOrderType } from "@/hooks/useOrderType";
 import { formatPrice } from "@/data/menu";
 import {
   ArrowLeft,
@@ -73,6 +74,7 @@ type PaymentMethod = "card" | "apple-pay" | "cashapp";
 
 const OrderCheckout = () => {
   const cart = useCart();
+  const { orderType } = useOrderType();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -113,7 +115,8 @@ const OrderCheckout = () => {
     return isNaN(custom) ? 0 : Math.round(custom * 100);
   }, [tipPercent, customTip, cart.subtotal]);
 
-  const orderTotal = cart.subtotal + cart.tax + tipAmount;
+  const deliveryFee = orderType === "delivery" ? DELIVERY_FEE : 0;
+  const orderTotal = cart.subtotal + cart.tax + tipAmount + deliveryFee;
 
   // Keep form data saved for Cash App Pay redirect return (mobile)
   useEffect(() => {
@@ -280,6 +283,8 @@ const OrderCheckout = () => {
           items: apiItems,
           customer: { name, phone, email },
           tip: tipAmount,
+          deliveryFee,
+          orderType,
           sourceId: nonce,
           pickupTime: pickupTime === "asap" ? "asap" : pickupTime,
         }),
@@ -298,6 +303,7 @@ const OrderCheckout = () => {
         items: cart.items,
         subtotal: cart.subtotal,
         tax: cart.tax,
+        deliveryFee,
         tip: tipAmount,
         total: orderTotal,
         customer: { name, phone, email },
@@ -783,6 +789,12 @@ const OrderCheckout = () => {
                       <span>Tax</span>
                       <span className="text-cream/60">{formatPrice(cart.tax)}</span>
                     </div>
+                    {deliveryFee > 0 && (
+                      <div className="flex justify-between text-cream/40">
+                        <span>Delivery Fee</span>
+                        <span className="text-cream/60">{formatPrice(deliveryFee)}</span>
+                      </div>
+                    )}
                     {tipAmount > 0 && (
                       <div className="flex justify-between text-cream/40">
                         <span>Tip</span>
