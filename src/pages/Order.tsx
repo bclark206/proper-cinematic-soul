@@ -158,7 +158,7 @@ const Order = () => {
                 <div className="w-12 h-[2px] bg-gradient-to-r from-gold to-transparent rounded-full mt-3" />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
                 {items.map((item) => (
                   <MenuCard
                     key={item.id}
