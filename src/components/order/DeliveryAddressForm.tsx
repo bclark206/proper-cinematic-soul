@@ -22,10 +22,14 @@ const DeliveryAddressForm = ({
       className="max-w-xl mx-auto mt-2 mb-4 rounded-2xl bg-[#111111] border border-[#1e1e1e] p-4 sm:p-6"
       data-testid="delivery-address-form"
     >
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-3">
         <MapPin className="w-4 h-4 text-gold" />
         <h3 className="text-cream text-sm font-medium">Delivery Address</h3>
       </div>
+
+      <p className="text-cream/40 text-xs mb-4" data-testid="delivery-radius-note">
+        We deliver within 5 miles of 206 E Redwood St
+      </p>
 
       <div className="space-y-3">
         <div>

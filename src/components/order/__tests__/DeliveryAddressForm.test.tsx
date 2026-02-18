@@ -48,6 +48,16 @@ describe("DeliveryAddressForm", () => {
     expect(screen.getByText("Delivery Address")).toBeInTheDocument();
   });
 
+  it("displays the delivery radius note", () => {
+    render(
+      <DeliveryAddressForm address={emptyAddress} onFieldChange={() => {}} />
+    );
+    expect(screen.getByTestId("delivery-radius-note")).toBeInTheDocument();
+    expect(
+      screen.getByText("We deliver within 5 miles of 206 E Redwood St")
+    ).toBeInTheDocument();
+  });
+
   it("displays current address values", () => {
     const address: DeliveryAddress = {
       street: "123 Main St",
