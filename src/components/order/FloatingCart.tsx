@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -7,6 +8,25 @@ interface FloatingCartProps {
 }
 
 const FloatingCart = ({ itemCount, onClick }: FloatingCartProps) => {
+  const prevCount = useRef(itemCount);
+  const [pulsing, setPulsing] = useState(false);
+
+  useEffect(() => {
+    if (itemCount > prevCount.current) {
+      setPulsing(true);
+      const timer = setTimeout(() => setPulsing(false), 600);
+      return () => clearTimeout(timer);
+    }
+    prevCount.current = itemCount;
+  }, [itemCount]);
+
+  // Update ref after pulse starts so subsequent adds still trigger
+  useEffect(() => {
+    if (!pulsing) {
+      prevCount.current = itemCount;
+    }
+  }, [pulsing, itemCount]);
+
   if (itemCount === 0) return null;
 
   return (
@@ -19,7 +39,8 @@ const FloatingCart = ({ itemCount, onClick }: FloatingCartProps) => {
         "shadow-[0_4px_24px_rgba(197,168,106,0.35)]",
         "flex items-center justify-center",
         "hover:scale-105 active:scale-95 transition-all duration-300",
-        "animate-in fade-in slide-in-from-bottom-4"
+        "animate-in fade-in slide-in-from-bottom-4",
+        pulsing && "cart-pulse"
       )}
     >
       <ShoppingBag className="w-6 h-6 text-jet-black" />
