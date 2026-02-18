@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import CategoryNav from "@/components/order/CategoryNav";
@@ -39,30 +39,50 @@ const Order = () => {
     setModalOpen(true);
   };
 
-  const handleCategorySelect = (slug: string) => {
+  // Prevent scroll-spy from overriding during programmatic scroll
+  const isScrollingTo = useRef(false);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleCategorySelect = useCallback((slug: string) => {
     setActiveCategory(slug);
+    isScrollingTo.current = true;
+    clearTimeout(scrollTimeoutRef.current);
+
     const el = sectionRefs.current[slug];
     if (el) {
       const offset = 160;
       const top = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: "smooth" });
     }
-  };
 
+    // Re-enable scroll-spy after scroll animation finishes
+    scrollTimeoutRef.current = setTimeout(() => {
+      isScrollingTo.current = false;
+    }, 800);
+  }, []);
+
+  // Scroll-spy: update active category based on scroll position
   useEffect(() => {
     if (categories.length === 0) return;
+
+    let ticking = false;
     const handleScroll = () => {
-      const offset = 200;
-      for (const cat of [...categories].reverse()) {
-        const el = sectionRefs.current[cat.slug];
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= offset) {
-            setActiveCategory(cat.slug);
-            break;
+      if (ticking || isScrollingTo.current) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const offset = 200;
+        for (const cat of [...categories].reverse()) {
+          const el = sectionRefs.current[cat.slug];
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (rect.top <= offset) {
+              setActiveCategory(cat.slug);
+              break;
+            }
           }
         }
-      }
+        ticking = false;
+      });
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
