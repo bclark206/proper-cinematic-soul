@@ -46,6 +46,7 @@ interface CreateOrderRequest {
   tip: number;
   sourceId: string;
   pickupTime?: string;
+  orderType?: string;
 }
 
 // Generic handler — adapt exports for your platform (Netlify, Vercel, etc.)
@@ -70,7 +71,7 @@ export async function handler(event: { body: string }) {
     };
   }
 
-  const { items, customer, tip, sourceId, pickupTime } = body;
+  const { items, customer, tip, sourceId, pickupTime, orderType } = body;
 
   if (!items?.length || !customer?.name || !sourceId) {
     return {
@@ -112,17 +113,24 @@ export async function handler(event: { body: string }) {
           },
         },
       ],
-      ...(tip > 0
-        ? {
-            service_charges: [
-              {
-                name: "Tip",
-                amount_money: { amount: tip, currency: "USD" },
-                calculation_phase: "SUBTOTAL_PHASE",
-              },
-            ],
-          }
-        : {}),
+      ...(() => {
+        const charges: { name: string; amount_money: { amount: number; currency: string }; calculation_phase: string }[] = [];
+        if (orderType === "DELIVERY") {
+          charges.push({
+            name: "Delivery Fee",
+            amount_money: { amount: 500, currency: "USD" },
+            calculation_phase: "SUBTOTAL_PHASE",
+          });
+        }
+        if (tip > 0) {
+          charges.push({
+            name: "Tip",
+            amount_money: { amount: tip, currency: "USD" },
+            calculation_phase: "SUBTOTAL_PHASE",
+          });
+        }
+        return charges.length > 0 ? { service_charges: charges } : {};
+      })(),
     },
   };
 
