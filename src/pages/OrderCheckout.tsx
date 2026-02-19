@@ -272,7 +272,7 @@ const OrderCheckout = () => {
     setIsSubmitting(true);
 
     try {
-      const ORDER_API_URL = "https://examining-fit-finally-controlled.trycloudflare.com";
+      const ORDER_API_URL = "https://certainly-split-cowboy-differential.trycloudflare.com";
 
       const apiItems = cart.items.map((item) => ({
         variationId: item.variationId,
