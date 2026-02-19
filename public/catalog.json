@@ -305,7 +305,7 @@
     {
       "id": "V6TOWYINJHJMBILSHV4RML6M",
       "name": "Cheesesteak Egg Rolls",
-      "description": null,
+      "description": "",
       "category": "small-plates",
       "variations": [
         {
@@ -597,7 +597,7 @@
     {
       "id": "MCNXBDADU7RTSMXVWOBO4SYY",
       "name": "Caesar Salad",
-      "description": null,
+      "description": "",
       "category": "salads",
       "variations": [
         {
@@ -1308,5 +1308,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-19T22:24:46.479297Z"
+  "fetchedAt": "2026-02-19T22:54:48.934811Z"
 }
