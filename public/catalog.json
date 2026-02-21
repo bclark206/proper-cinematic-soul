@@ -455,14 +455,14 @@
         {
           "id": "4QKBLKBCGEPJIHQRBEYZZA6B",
           "name": "Regular",
-          "price": 4000
+          "price": 3000
         }
       ],
       "modifierListIds": [
         "R36X2UV64QOYY4K2H7OHLA4K"
       ],
       "imageUrl": null,
-      "price": 4000
+      "price": 3000
     },
     {
       "id": "YAGKLAZAS3UJWNZ5MUBZJ3JJ",
@@ -1324,5 +1324,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-20T23:56:29.857983Z"
+  "fetchedAt": "2026-02-21T00:26:31.877579Z"
 }
