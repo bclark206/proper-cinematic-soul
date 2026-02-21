@@ -1126,6 +1126,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 3000
+    },
+    {
+      "id": "DTZ4M3QHTTNUUPY63DELD4X6",
+      "name": "Onions And Peppers",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "GL7JSXXQ3WTJBXZPFFXTJQMV",
+          "name": "Regular",
+          "price": 400
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 400
     }
   ],
   "modifierLists": [
@@ -1324,5 +1340,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-21T03:26:43.494633Z"
+  "fetchedAt": "2026-02-21T03:56:45.317012Z"
 }
