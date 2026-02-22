@@ -1158,6 +1158,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 1000
+    },
+    {
+      "id": "N3N4WMYGJRZ6LBECPG7QF23N",
+      "name": "Apple Turn Over",
+      "description": null,
+      "category": "desserts",
+      "variations": [
+        {
+          "id": "RFGHR6GELEMZ4ZLYFF7OXJQE",
+          "name": "Regular",
+          "price": 1500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1500
     }
   ],
   "modifierLists": [
@@ -1356,5 +1372,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-22T21:59:31.853257Z"
+  "fetchedAt": "2026-02-22T22:29:34.075595Z"
 }
