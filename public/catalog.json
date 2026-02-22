@@ -1142,6 +1142,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 400
+    },
+    {
+      "id": "IFP6WKU3RGSDY3KFZUSA7GIP",
+      "name": "Crabmeat",
+      "description": null,
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "SEEUGCKOG36XB4VNKWXP3CI4",
+          "name": "Regular",
+          "price": 1000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1000
     }
   ],
   "modifierLists": [
@@ -1340,5 +1356,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-22T03:58:16.728493Z"
+  "fetchedAt": "2026-02-22T04:28:18.722351Z"
 }
