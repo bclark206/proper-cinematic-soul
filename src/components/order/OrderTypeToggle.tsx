@@ -6,45 +6,23 @@ interface OrderTypeToggleProps {
   onOrderTypeChange: (type: OrderType) => void;
 }
 
+// DELIVERY DISABLED — pickup only until DoorDash Drive is integrated
 const OrderTypeToggle = ({ orderType, onOrderTypeChange }: OrderTypeToggleProps) => {
+  // Force pickup mode
+  if (orderType !== "pickup") {
+    onOrderTypeChange("pickup");
+  }
+
   return (
     <div className="flex justify-center py-4 sm:py-6" data-testid="order-type-toggle">
       <div className="inline-flex rounded-full bg-[#141414] border border-[#222222] p-1">
         <button
-          onClick={() => onOrderTypeChange("pickup")}
-          className={`
-            inline-flex items-center gap-2 rounded-full px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-medium
-            transition-all duration-200
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414]
-            ${
-              orderType === "pickup"
-                ? "bg-gold text-jet-black shadow-gold"
-                : "text-cream/50 hover:text-cream/80"
-            }
-          `}
-          aria-pressed={orderType === "pickup"}
+          className="inline-flex items-center gap-2 rounded-full px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-medium bg-gold text-jet-black shadow-gold"
+          aria-pressed={true}
           data-testid="toggle-pickup"
         >
           <MapPin className="w-4 h-4" />
           Pickup
-        </button>
-        <button
-          onClick={() => onOrderTypeChange("delivery")}
-          className={`
-            inline-flex items-center gap-2 rounded-full px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-medium
-            transition-all duration-200
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414]
-            ${
-              orderType === "delivery"
-                ? "bg-gold text-jet-black shadow-gold"
-                : "text-cream/50 hover:text-cream/80"
-            }
-          `}
-          aria-pressed={orderType === "delivery"}
-          data-testid="toggle-delivery"
-        >
-          <Truck className="w-4 h-4" />
-          Delivery
         </button>
       </div>
     </div>
