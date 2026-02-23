@@ -1098,7 +1098,7 @@
     {
       "id": "RTMYZ46ONK5T7CI77CVOQC77",
       "name": "$1 Wing",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -1372,5 +1372,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-23T18:31:31.008975Z"
+  "fetchedAt": "2026-02-23T19:01:33.316121Z"
 }
