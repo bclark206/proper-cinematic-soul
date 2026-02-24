@@ -770,7 +770,7 @@
     {
       "id": "J3YUZVJR7EF3WJFQFEVZHX5R",
       "name": "Asparagus's",
-      "description": "",
+      "description": null,
       "category": "sides",
       "variations": [
         {
@@ -1372,5 +1372,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-24T21:25:39.413850Z"
+  "fetchedAt": "2026-02-24T21:55:41.661396Z"
 }
