@@ -700,7 +700,7 @@
     {
       "id": "ZKGEY4QANOI5GONI7TJGC6ES",
       "name": "Cajun Fried Lobster Tail",
-      "description": null,
+      "description": "",
       "category": "entrees-sea",
       "variations": [
         {
@@ -1064,7 +1064,7 @@
     {
       "id": "GKGRXCPACY7LEXQE2CLUM6RR",
       "name": "Cajun Butter Lobster",
-      "description": null,
+      "description": "",
       "category": "entrees-sea",
       "variations": [
         {
@@ -1094,6 +1094,25 @@
       "modifierListIds": [],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/0661781d2bab38babdf9d8f12b50b92c771ca8ae/original.jpeg",
       "price": 4000
+    },
+    {
+      "id": "ZMAVBKG76A5NML62OKQZMZPC",
+      "name": "Jumbo Stuffed Crab Lobster",
+      "description": null,
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "SVHV4QQ3FY4HGHTEKPMLXGPI",
+          "name": "Regular",
+          "price": 5000
+        }
+      ],
+      "modifierListIds": [
+        "EAOE3UPUWX5JQE67P4RVBI3L",
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
+      "imageUrl": null,
+      "price": 5000
     },
     {
       "id": "RTMYZ46ONK5T7CI77CVOQC77",
@@ -1372,5 +1391,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-26T21:03:01.428202Z"
+  "fetchedAt": "2026-02-26T21:33:18.177367Z"
 }
