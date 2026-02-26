@@ -104,6 +104,12 @@ const OrderCheckout = () => {
   const [cashAppPayAvailable, setCashAppPayAvailable] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<PaymentMethod>("card");
 
+  // Promo code
+  const [promoInput, setPromoInput] = useState(savedForm?.promoInput || "");
+  const [promoApplied, setPromoApplied] = useState<{ code: string; discount: number; description: string } | null>(savedForm?.promoApplied || null);
+  const [promoError, setPromoError] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
+
   const cardRef = useRef<any>(null);
   const paymentsRef = useRef<any>(null);
   const applePayRef = useRef<any>(null);
@@ -111,6 +117,36 @@ const OrderCheckout = () => {
   const processOrderRef = useRef<(nonce: string | null) => Promise<void>>();
 
   const pickupTimes = useMemo(() => generatePickupTimes(), []);
+
+  const ORDER_API_URL = "https://certainly-split-cowboy-differential.trycloudflare.com";
+
+  const applyPromoCode = async () => {
+    const code = promoInput.trim().toUpperCase();
+    if (!code) return;
+    setPromoLoading(true);
+    setPromoError("");
+    try {
+      const res = await fetch(`${ORDER_API_URL}/validate-promo?code=${encodeURIComponent(code)}&subtotal=${cart.subtotal}`);
+      const data = await res.json();
+      if (!res.ok) {
+        setPromoError(data.error || "Invalid promo code");
+        setPromoApplied(null);
+      } else {
+        setPromoApplied({ code: data.code, discount: data.discount, description: data.description });
+        setPromoError("");
+      }
+    } catch {
+      setPromoError("Could not validate code. Try again.");
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const removePromo = () => {
+    setPromoApplied(null);
+    setPromoInput("");
+    setPromoError("");
+  };
 
   const tipAmount = useMemo(() => {
     if (tipPercent !== null) {
@@ -121,13 +157,14 @@ const OrderCheckout = () => {
   }, [tipPercent, customTip, cart.subtotal]);
 
   const deliveryFee = orderType === "delivery" ? DELIVERY_FEE : 0;
-  const orderTotal = cart.subtotal + cart.tax + tipAmount + deliveryFee;
+  const promoDiscount = promoApplied?.discount || 0;
+  const orderTotal = cart.subtotal + cart.tax + tipAmount + deliveryFee - promoDiscount;
 
   // Keep form data saved for Cash App Pay redirect return (mobile)
   useEffect(() => {
     if (cashAppPayAvailable) {
       sessionStorage.setItem("proper_cashapp_form", JSON.stringify({
-        name, phone, email, pickupTime, tipPercent, customTip, deliveryNotes
+        name, phone, email, pickupTime, tipPercent, customTip, deliveryNotes, promoInput, promoApplied
       }));
     }
   }, [name, phone, email, pickupTime, tipPercent, customTip, deliveryNotes, cashAppPayAvailable]);
@@ -272,8 +309,6 @@ const OrderCheckout = () => {
     setIsSubmitting(true);
 
     try {
-      const ORDER_API_URL = "https://certainly-split-cowboy-differential.trycloudflare.com";
-
       const apiItems = cart.items.map((item) => ({
         variationId: item.variationId,
         quantity: item.quantity,
@@ -292,6 +327,7 @@ const OrderCheckout = () => {
           orderType: orderType.toUpperCase(),
           sourceId: nonce,
           pickupTime: pickupTime === "asap" ? "asap" : pickupTime,
+          ...(promoApplied ? { promoCode: promoApplied.code } : {}),
           ...(orderType === "delivery" && {
             deliveryAddress,
             deliveryNotes: deliveryNotes.trim() || undefined,
@@ -818,6 +854,50 @@ const OrderCheckout = () => {
                     Add more items
                   </Link>
 
+                  {/* Promo Code */}
+                  <div className="border-t border-[#1e1e1e] pt-4 mb-4">
+                    {promoApplied ? (
+                      <div className="flex items-center justify-between bg-gold/5 border border-gold/20 rounded-xl px-3 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-400" />
+                          <div>
+                            <p className="text-cream text-sm font-medium">{promoApplied.code}</p>
+                            <p className="text-cream/40 text-xs">{promoApplied.description}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={removePromo}
+                          className="text-cream/30 hover:text-red-400 text-xs transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Promo code"
+                            value={promoInput}
+                            onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                            onKeyDown={(e) => e.key === "Enter" && applyPromoCode()}
+                            className="flex-1 bg-[#1a1a1a] border-[#2a2a2a] text-cream text-sm h-9 uppercase tracking-wider"
+                          />
+                          <Button
+                            onClick={applyPromoCode}
+                            disabled={promoLoading || !promoInput.trim()}
+                            variant="outline"
+                            className="h-9 px-4 text-sm border-gold/30 text-gold hover:bg-gold/10"
+                          >
+                            {promoLoading ? "..." : "Apply"}
+                          </Button>
+                        </div>
+                        {promoError && (
+                          <p className="text-red-400 text-xs mt-1.5">{promoError}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   {/* Totals */}
                   <div className="border-t border-[#1e1e1e] pt-4 space-y-2.5 text-sm">
                     <div className="flex justify-between text-cream/40">
@@ -844,6 +924,12 @@ const OrderCheckout = () => {
                       <div className="flex justify-between text-cream/40">
                         <span>Tip</span>
                         <span className="text-cream/60">{formatPrice(tipAmount)}</span>
+                      </div>
+                    )}
+                    {promoDiscount > 0 && (
+                      <div className="flex justify-between text-green-400/80">
+                        <span>Discount</span>
+                        <span>-{formatPrice(promoDiscount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between items-center pt-3 mt-1 border-t border-[#1e1e1e]">
