@@ -305,7 +305,7 @@
     {
       "id": "V6TOWYINJHJMBILSHV4RML6M",
       "name": "Cheesesteak Egg Rolls",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -391,12 +391,12 @@
         {
           "id": "J3BPSTZGABYWVLSJIPYH2Y4I",
           "name": "Regular",
-          "price": 1200
+          "price": 1500
         }
       ],
       "modifierListIds": [],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/45d76f0465f1b336f9e1970b9bfb0ae61eecc7df/original.jpeg",
-      "price": 1200
+      "price": 1500
     },
     {
       "id": "4RSTJXILEXYRMAE5G7HBH33U",
@@ -1013,7 +1013,7 @@
     },
     {
       "id": "U7FOLK6MSNBQPS63HWLJL4T7",
-      "name": "Sweet Potato Pound Cake With Ice Cream",
+      "name": "Sweet Potato Pound Cake",
       "description": null,
       "category": "desserts",
       "variations": [
@@ -1115,6 +1115,22 @@
       "price": 5000
     },
     {
+      "id": "76ZE42KR227SPUMH34DDNY6W",
+      "name": "Bread Pudding",
+      "description": null,
+      "category": "desserts",
+      "variations": [
+        {
+          "id": "R5SA2JYY4HV4KNNC2MTK7NM3",
+          "name": "Regular",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
       "id": "RTMYZ46ONK5T7CI77CVOQC77",
       "name": "$1 Wing",
       "description": null,
@@ -1193,6 +1209,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 1500
+    },
+    {
+      "id": "DLG6F2U4R6AKKAYPEPDUUKCX",
+      "name": "Red Snapper Ettoufe",
+      "description": null,
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "U4SCTHESQBDHNWZWKROD34RJ",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 4000
     }
   ],
   "modifierLists": [
@@ -1391,5 +1423,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-27T01:34:26.159577Z"
+  "fetchedAt": "2026-02-27T02:04:28.515461Z"
 }
