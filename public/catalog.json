@@ -1225,6 +1225,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 4000
+    },
+    {
+      "id": "XOUKPWVD3UCBO2BA6XVD43AT",
+      "name": "Cajun Fried Lobsterr",
+      "description": null,
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "7AUAAFGX5764WSFZYTEUFCM5",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 4000
     }
   ],
   "modifierLists": [
@@ -1423,5 +1439,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-27T03:04:40.551932Z"
+  "fetchedAt": "2026-02-27T03:34:55.414566Z"
 }
