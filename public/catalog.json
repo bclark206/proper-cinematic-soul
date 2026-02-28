@@ -1149,7 +1149,7 @@
     {
       "id": "OC4C5NC5GKBCFGXD6JSB5RWA",
       "name": "Waygu Burger",
-      "description": null,
+      "description": "",
       "category": "sandwiches",
       "variations": [
         {
@@ -1439,5 +1439,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-02-28T01:10:26.357022Z"
+  "fetchedAt": "2026-02-28T01:40:28.592096Z"
 }
