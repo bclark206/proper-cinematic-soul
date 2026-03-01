@@ -1241,6 +1241,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 4000
+    },
+    {
+      "id": "HEI4RLQ3XJA7QUT22IBPG5KT",
+      "name": "Banapudding",
+      "description": null,
+      "category": "desserts",
+      "variations": [
+        {
+          "id": "7I5ZLBJPYPFWKCS3OPXJJIVO",
+          "name": "Regular",
+          "price": 1000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1000
     }
   ],
   "modifierLists": [
@@ -1439,5 +1455,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-01T00:15:35.088537Z"
+  "fetchedAt": "2026-03-01T00:45:56.562180Z"
 }
