@@ -1257,6 +1257,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 1000
+    },
+    {
+      "id": "3FS7MAPSBRKXDHY2DBQ5OAS7",
+      "name": "Oxtail Add On",
+      "description": null,
+      "category": "entrees-land",
+      "variations": [
+        {
+          "id": "SAUHN3VGQJCIMMI6WCRPBJWC",
+          "name": "Regular",
+          "price": 3000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 3000
     }
   ],
   "modifierLists": [
@@ -1455,5 +1471,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-04T02:34:31.946832Z"
+  "fetchedAt": "2026-03-04T03:04:44.360495Z"
 }
