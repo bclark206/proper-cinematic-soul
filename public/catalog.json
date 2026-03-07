@@ -597,7 +597,7 @@
     {
       "id": "MCNXBDADU7RTSMXVWOBO4SYY",
       "name": "Caesar Salad",
-      "description": "",
+      "description": null,
       "category": "salads",
       "variations": [
         {
@@ -1503,5 +1503,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-07T18:24:30.118551Z"
+  "fetchedAt": "2026-03-07T18:54:33.527018Z"
 }
