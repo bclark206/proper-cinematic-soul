@@ -1289,6 +1289,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 3500
+    },
+    {
+      "id": "SCXS7DMJH3PUV2WLP27RKRMY",
+      "name": "Side Lobster",
+      "description": null,
+      "category": "protein",
+      "variations": [
+        {
+          "id": "IUKDHWWKORYYCUSUJQNOMUHM",
+          "name": "Regular",
+          "price": 2500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2500
     }
   ],
   "modifierLists": [
@@ -1487,5 +1503,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-07T01:22:59.724977Z"
+  "fetchedAt": "2026-03-07T01:53:02.050953Z"
 }
