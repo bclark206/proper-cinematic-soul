@@ -1179,22 +1179,6 @@
       "price": 400
     },
     {
-      "id": "IFP6WKU3RGSDY3KFZUSA7GIP",
-      "name": "Crabmeat",
-      "description": null,
-      "category": "entrees-sea",
-      "variations": [
-        {
-          "id": "SEEUGCKOG36XB4VNKWXP3CI4",
-          "name": "Regular",
-          "price": 1000
-        }
-      ],
-      "modifierListIds": [],
-      "imageUrl": null,
-      "price": 1000
-    },
-    {
       "id": "N3N4WMYGJRZ6LBECPG7QF23N",
       "name": "Apple Turn Over",
       "description": null,
@@ -1273,22 +1257,6 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 3000
-    },
-    {
-      "id": "I4M6Q7ZVGOJ2DLJZB767V7ZF",
-      "name": "Crabcake",
-      "description": null,
-      "category": "entrees-sea",
-      "variations": [
-        {
-          "id": "E5LGNV42UYXBEPVMUYESE5AU",
-          "name": "Regular",
-          "price": 3500
-        }
-      ],
-      "modifierListIds": [],
-      "imageUrl": null,
-      "price": 3500
     },
     {
       "id": "SCXS7DMJH3PUV2WLP27RKRMY",
@@ -1503,5 +1471,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-08T13:27:13.020083Z"
+  "fetchedAt": "2026-03-08T13:57:17.804512Z"
 }
