@@ -1273,6 +1273,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 2500
+    },
+    {
+      "id": "D3UGLLX6RC2IILQ5AMDFWQ3U",
+      "name": "Shrimp Add On",
+      "description": null,
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "JBC7BEM7G5L2BAUOVZPOPFZ3",
+          "name": "Regular",
+          "price": 1200
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1200
     }
   ],
   "modifierLists": [
@@ -1471,5 +1487,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-12T01:04:17.228659Z"
+  "fetchedAt": "2026-03-12T01:34:19.417783Z"
 }
