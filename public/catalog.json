@@ -1096,6 +1096,22 @@
       "price": 4000
     },
     {
+      "id": "VRMSMYW2K4WOIRMRDJT4AGXV",
+      "name": "Sweet And Spicy Brussels",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "OGDLRCTEGCEBJUWHBUICC4VP",
+          "name": "Regular",
+          "price": 1200
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1200
+    },
+    {
       "id": "ZMAVBKG76A5NML62OKQZMZPC",
       "name": "Jumbo Stuffed Crab Lobster",
       "description": null,
@@ -1113,6 +1129,22 @@
       ],
       "imageUrl": null,
       "price": 5000
+    },
+    {
+      "id": "XJ5DG4NFFH6VWOVEJ62FJ6O3",
+      "name": "Brussels",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "5EGKV2FSX6EJYZEK342J7TQ2",
+          "name": "Regular",
+          "price": 700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 700
     },
     {
       "id": "76ZE42KR227SPUMH34DDNY6W",
@@ -1193,6 +1225,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 1500
+    },
+    {
+      "id": "ZQTEBXU7RRLTZQ5WY4VZ4CZ3",
+      "name": "Lobstercrab Stuffed",
+      "description": null,
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "IN2JMYMZ2ZKO6HRTHHKMEA5Q",
+          "name": "Regular",
+          "price": 5500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 5500
     },
     {
       "id": "DLG6F2U4R6AKKAYPEPDUUKCX",
@@ -1487,5 +1535,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-13T17:07:19.402382Z"
+  "fetchedAt": "2026-03-13T17:37:21.839429Z"
 }
