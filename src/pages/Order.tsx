@@ -40,7 +40,30 @@ function useStoreOpen() {
   return { isOpen, hours };
 }
 
+const ONLINE_ORDERING_ENABLED = false; // Toggle to re-enable ordering
+
 const Order = () => {
+  if (!ONLINE_ORDERING_ENABLED) {
+    return (
+      <div className="min-h-screen bg-dark-900 flex flex-col">
+        <Navigation />
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="text-center max-w-md">
+            <Clock className="w-16 h-16 text-gold-400 mx-auto mb-6" />
+            <h1 className="text-3xl font-bold text-white mb-4">Online Ordering Paused</h1>
+            <p className="text-gray-400 text-lg mb-6">
+              Online ordering is temporarily unavailable. Please call us to place an order or make a reservation.
+            </p>
+            <a href="tel:+14104001234" className="inline-block bg-gold-500 text-dark-900 font-semibold px-8 py-3 rounded-lg hover:bg-gold-400 transition-colors">
+              Call Us
+            </a>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   const cart = useCart();
   const { orderType, setOrderType } = useOrderType();
   const { isOpen: storeIsOpen, hours: storeHours } = useStoreOpen();
