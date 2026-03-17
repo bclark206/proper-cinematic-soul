@@ -200,7 +200,9 @@
           "price": 2500
         }
       ],
-      "modifierListIds": [],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
       "imageUrl": null,
       "price": 2500
     },
@@ -1266,7 +1268,12 @@
         },
         {
           "id": "P5AGHGCZNHBHB7WMGA44EZZJ",
-          "name": "Well Done",
+          "name": "Medium well",
+          "price": 0
+        },
+        {
+          "id": "P55OWIWFHY2UFM5XFQSYCRSM",
+          "name": "well done",
           "price": 0
         }
       ]
@@ -1471,5 +1478,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-17T22:44:41.395147Z"
+  "fetchedAt": "2026-03-17T23:14:43.636382Z"
 }
