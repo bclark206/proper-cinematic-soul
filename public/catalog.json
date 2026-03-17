@@ -107,22 +107,6 @@
       "price": 700
     },
     {
-      "id": "R5YSXCSSOEWABLO7VJUFTUB2",
-      "name": "Bottomless Brunch (1 Salmon 5 Wings Bacon Eggs French Toast)",
-      "description": null,
-      "category": "brunch",
-      "variations": [
-        {
-          "id": "PIYCUEPW2MEKKORZZ72EUNSH",
-          "name": "Regular",
-          "price": 6000
-        }
-      ],
-      "modifierListIds": [],
-      "imageUrl": null,
-      "price": 6000
-    },
-    {
       "id": "RYP4VHNLLYGJ7Z346YQ3PH5V",
       "name": "Roasted Potatoes",
       "description": null,
@@ -281,7 +265,8 @@
         }
       ],
       "modifierListIds": [
-        "R36X2UV64QOYY4K2H7OHLA4K"
+        "R36X2UV64QOYY4K2H7OHLA4K",
+        "C43X3WPKYDK3ONUKHUIUTKQ2"
       ],
       "imageUrl": null,
       "price": 7000
@@ -362,7 +347,9 @@
           "price": 1700
         }
       ],
-      "modifierListIds": [],
+      "modifierListIds": [
+        "EAOE3UPUWX5JQE67P4RVBI3L"
+      ],
       "imageUrl": null,
       "price": 1700
     },
@@ -442,7 +429,9 @@
           "price": 2000
         }
       ],
-      "modifierListIds": [],
+      "modifierListIds": [
+        "C43X3WPKYDK3ONUKHUIUTKQ2"
+      ],
       "imageUrl": null,
       "price": 2000
     },
@@ -563,22 +552,6 @@
       "price": 700
     },
     {
-      "id": "IEUDGLDXY46SZXTK5ZRIU2BL",
-      "name": "Stuffed Salmon",
-      "description": null,
-      "category": "protein",
-      "variations": [
-        {
-          "id": "7VLZLPNJS73J2Q7VFLTGVL7G",
-          "name": "Regular",
-          "price": 4000
-        }
-      ],
-      "modifierListIds": [],
-      "imageUrl": null,
-      "price": 4000
-    },
-    {
       "id": "Y7KWXZ5B4TE6L37SO4HML7O7",
       "name": "Turkey Bacon",
       "description": null,
@@ -606,7 +579,9 @@
           "price": 1700
         }
       ],
-      "modifierListIds": [],
+      "modifierListIds": [
+        "EAOE3UPUWX5JQE67P4RVBI3L"
+      ],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/a14c7e7f487606bdb5429761983ff04b8404dc16/original.png",
       "price": 1700
     },
@@ -617,11 +592,6 @@
       "category": "entrees-sea",
       "variations": [
         {
-          "id": "SG5AYP7YMD5GPL5CTGJWIBWZ",
-          "name": "Regular",
-          "price": 3000
-        },
-        {
           "id": "QXFLO6LTSK3OU6SDP3RRM4JJ",
           "name": "Regular",
           "price": 2500
@@ -631,7 +601,7 @@
         "R36X2UV64QOYY4K2H7OHLA4K"
       ],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/2eb3c07a8c9e774e17b7f8ae975d13363b96c357/original.png",
-      "price": 3000
+      "price": 2500
     },
     {
       "id": "NZBOM3PROELEHFSQZXEYNYCQ",
@@ -698,24 +668,6 @@
       "price": 3000
     },
     {
-      "id": "ZKGEY4QANOI5GONI7TJGC6ES",
-      "name": "Cajun Fried Lobster Tail",
-      "description": "",
-      "category": "entrees-sea",
-      "variations": [
-        {
-          "id": "JVC2YDSFQNJXHS4EU2WZHEL3",
-          "name": "Regular",
-          "price": 3000
-        }
-      ],
-      "modifierListIds": [
-        "R36X2UV64QOYY4K2H7OHLA4K"
-      ],
-      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/2db5511efee9a40e17aff7821e26bfa2463a6fc7/original.png",
-      "price": 3000
-    },
-    {
       "id": "M5A6T44SU2TEVYJJCUKSFUU7",
       "name": "Colossal Fried Shrimp",
       "description": null,
@@ -762,7 +714,8 @@
         }
       ],
       "modifierListIds": [
-        "R36X2UV64QOYY4K2H7OHLA4K"
+        "R36X2UV64QOYY4K2H7OHLA4K",
+        "EAOE3UPUWX5JQE67P4RVBI3L"
       ],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/b11f22b78e9944bb7c66bfe53b0d71aa956e933b/original.png",
       "price": 4000
@@ -812,7 +765,9 @@
         }
       ],
       "modifierListIds": [
-        "R36X2UV64QOYY4K2H7OHLA4K"
+        "R36X2UV64QOYY4K2H7OHLA4K",
+        "EAOE3UPUWX5JQE67P4RVBI3L",
+        "C43X3WPKYDK3ONUKHUIUTKQ2"
       ],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/9462024edfe36a4bc2378a2c8a6a94a3f4aba833/original.png",
       "price": 3500
@@ -832,22 +787,6 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 1800
-    },
-    {
-      "id": "LFG2ZLRSCM6KZYU47DEOM7MG",
-      "name": "Lava Cake",
-      "description": null,
-      "category": "desserts",
-      "variations": [
-        {
-          "id": "T5EFB3ALRTS4JOYRZ4P22HHP",
-          "name": "Regular",
-          "price": 1350
-        }
-      ],
-      "modifierListIds": [],
-      "imageUrl": null,
-      "price": 1350
     },
     {
       "id": "XQHTXYJ2VVYM7MTZSXNKFQKT",
@@ -1056,28 +995,11 @@
         }
       ],
       "modifierListIds": [
-        "R36X2UV64QOYY4K2H7OHLA4K"
+        "R36X2UV64QOYY4K2H7OHLA4K",
+        "C43X3WPKYDK3ONUKHUIUTKQ2"
       ],
       "imageUrl": null,
       "price": 7000
-    },
-    {
-      "id": "GKGRXCPACY7LEXQE2CLUM6RR",
-      "name": "Cajun Butter Lobster",
-      "description": "",
-      "category": "entrees-sea",
-      "variations": [
-        {
-          "id": "L2YAQ3FDPYNBDVDR2CEFTIZA",
-          "name": "Regular",
-          "price": 3000
-        }
-      ],
-      "modifierListIds": [
-        "R36X2UV64QOYY4K2H7OHLA4K"
-      ],
-      "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/d4a6ad48350693f204f1628e7f6a3a26b0c6f73d/original.png",
-      "price": 3000
     },
     {
       "id": "XQ2VYFX2PGBV3ZGDX5TQ3VQF",
@@ -1110,25 +1032,6 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 1200
-    },
-    {
-      "id": "ZMAVBKG76A5NML62OKQZMZPC",
-      "name": "Jumbo Stuffed Crab Lobster",
-      "description": null,
-      "category": "entrees-sea",
-      "variations": [
-        {
-          "id": "SVHV4QQ3FY4HGHTEKPMLXGPI",
-          "name": "Regular",
-          "price": 5000
-        }
-      ],
-      "modifierListIds": [
-        "EAOE3UPUWX5JQE67P4RVBI3L",
-        "R36X2UV64QOYY4K2H7OHLA4K"
-      ],
-      "imageUrl": null,
-      "price": 5000
     },
     {
       "id": "XJ5DG4NFFH6VWOVEJ62FJ6O3",
@@ -1270,7 +1173,9 @@
           "price": 4000
         }
       ],
-      "modifierListIds": [],
+      "modifierListIds": [
+        "EAOE3UPUWX5JQE67P4RVBI3L"
+      ],
       "imageUrl": null,
       "price": 4000
     },
@@ -1533,7 +1438,38 @@
           "price": 4500
         }
       ]
+    },
+    {
+      "id": "J54MABSHKG6SGTJGWQJH2SRG",
+      "name": "flavors",
+      "modifiers": [
+        {
+          "id": "GNN4VWUZ6G5PF3WFQSOARDUU",
+          "name": "strawberry",
+          "price": 100
+        },
+        {
+          "id": "3RGMDSFNDDLNL2YYIHU7KKAT",
+          "name": "mango",
+          "price": 100
+        },
+        {
+          "id": "RHCDGOUSMUMWQO3TFNVI7UXH",
+          "name": "pomegrante",
+          "price": 100
+        },
+        {
+          "id": "PQNWWKW7RBMLBS7RDYG2G4SB",
+          "name": "passionfruit",
+          "price": 100
+        },
+        {
+          "id": "XFC6P4TIYRP64RT7DOPIIKA2",
+          "name": "no flavor",
+          "price": 0
+        }
+      ]
     }
   ],
-  "fetchedAt": "2026-03-17T20:14:29.208468Z"
+  "fetchedAt": "2026-03-17T20:44:31.486910Z"
 }
