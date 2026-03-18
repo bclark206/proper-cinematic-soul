@@ -118,7 +118,7 @@ const OrderCheckout = () => {
 
   const pickupTimes = useMemo(() => generatePickupTimes(), []);
 
-  const ORDER_API_URL = "https://certainly-split-cowboy-differential.trycloudflare.com";
+  const ORDER_API_URL = "https://casinos-mixture-hearings-rear.trycloudflare.com";
 
   const applyPromoCode = async () => {
     const code = promoInput.trim().toUpperCase();
