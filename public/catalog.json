@@ -350,7 +350,8 @@
         }
       ],
       "modifierListIds": [
-        "EAOE3UPUWX5JQE67P4RVBI3L"
+        "EAOE3UPUWX5JQE67P4RVBI3L",
+        "JBDW5EISOAAZ6UVHKXEW34UX"
       ],
       "imageUrl": null,
       "price": 1700
@@ -582,7 +583,8 @@
         }
       ],
       "modifierListIds": [
-        "EAOE3UPUWX5JQE67P4RVBI3L"
+        "EAOE3UPUWX5JQE67P4RVBI3L",
+        "JBDW5EISOAAZ6UVHKXEW34UX"
       ],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/a14c7e7f487606bdb5429761983ff04b8404dc16/original.png",
       "price": 1700
@@ -633,7 +635,9 @@
           "price": 700
         }
       ],
-      "modifierListIds": [],
+      "modifierListIds": [
+        "JBDW5EISOAAZ6UVHKXEW34UX"
+      ],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/5acd9ac1ab3e5d394350c53de8164b4fd01122d8/original.png",
       "price": 700
     },
@@ -649,7 +653,10 @@
           "price": 1300
         }
       ],
-      "modifierListIds": [],
+      "modifierListIds": [
+        "JBDW5EISOAAZ6UVHKXEW34UX",
+        "KEXWWOX4HQ5ERPD2WLK62NTB"
+      ],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/b6646ff38f3f97cdb8882de90bbf39cd949182c6/original.png",
       "price": 1300
     },
@@ -1102,7 +1109,7 @@
     {
       "id": "N3N4WMYGJRZ6LBECPG7QF23N",
       "name": "Apple Turn Over",
-      "description": null,
+      "description": "",
       "category": "desserts",
       "variations": [
         {
@@ -1168,7 +1175,7 @@
     {
       "id": "HEI4RLQ3XJA7QUT22IBPG5KT",
       "name": "Banapudding",
-      "description": null,
+      "description": "",
       "category": "desserts",
       "variations": [
         {
@@ -1479,9 +1486,80 @@
           "id": "V64NIEBS2ARSQ6AH5SFF4VND",
           "name": "ketchup",
           "price": 0
+        },
+        {
+          "id": "7X7WN3ZSOVIJGKYCJTWMGE5B",
+          "name": "ceasar",
+          "price": 0
+        },
+        {
+          "id": "3X7NFDKLV6WSWRESJEYU4VOW",
+          "name": "strawberry vinergrette",
+          "price": 0
+        },
+        {
+          "id": "NWYR7YOKTAYF7T36ABT6TT55",
+          "name": "hotsauce",
+          "price": 0
+        }
+      ]
+    },
+    {
+      "id": "KEXWWOX4HQ5ERPD2WLK62NTB",
+      "name": "wing flavor",
+      "modifiers": [
+        {
+          "id": "445TQPW5K2BK36TAZ26VYR24",
+          "name": "plain",
+          "price": 0
+        },
+        {
+          "id": "2VJPAZ2UJDI37QALWALFRYRQ",
+          "name": "dry rub oldbay",
+          "price": 0
+        },
+        {
+          "id": "G5DQQMGPS7IFPJ4T5CVB6QXS",
+          "name": "hot honey with garlic",
+          "price": 0
+        },
+        {
+          "id": "UMWPBCZMFQOVEIG5HB54XPGC",
+          "name": "hothoney",
+          "price": 0
+        },
+        {
+          "id": "ZXNDVUEQC43AU5WGFGDAPCQ5",
+          "name": "korean bbq",
+          "price": 0
+        },
+        {
+          "id": "3WAERWKUW7WLVMKZHXK7IWX4",
+          "name": "buffalou",
+          "price": 0
+        },
+        {
+          "id": "3D6YDCNLI3YXJ37TJXKAHCBN",
+          "name": "honey old bay",
+          "price": 0
+        },
+        {
+          "id": "QRUQEQZINHKE5DTF4OKRFZEB",
+          "name": "lemon pepper",
+          "price": 0
+        },
+        {
+          "id": "EQMTSK2D43YPNPPSY5ACDG5Q",
+          "name": "honey jerk",
+          "price": 0
+        },
+        {
+          "id": "P7FSDQCKZ74RWDNKXVAP7ROC",
+          "name": "grilled",
+          "price": 0
         }
       ]
     }
   ],
-  "fetchedAt": "2026-03-17T23:44:45.754619Z"
+  "fetchedAt": "2026-03-18T00:14:47.834659Z"
 }
