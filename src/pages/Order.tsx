@@ -40,7 +40,7 @@ function useStoreOpen() {
   return { isOpen, hours };
 }
 
-const ONLINE_ORDERING_ENABLED = false; // Toggle to re-enable ordering
+const ONLINE_ORDERING_ENABLED = true; // Toggle to re-enable ordering
 
 const Order = () => {
   if (!ONLINE_ORDERING_ENABLED) {
