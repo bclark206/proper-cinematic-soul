@@ -39,6 +39,10 @@
     {
       "slug": "desserts",
       "name": "Desserts"
+    },
+    {
+      "slug": "valet-parking",
+      "name": "Valet Parking"
     }
   ],
   "menuItems": [
@@ -1139,6 +1143,22 @@
       "price": 5500
     },
     {
+      "id": "5XVTSP77KO4AUWU6FEIGYTGZ",
+      "name": "Valet Parking",
+      "description": "Valet parking at Proper Cuisine",
+      "category": "valet-parking",
+      "variations": [
+        {
+          "id": "XAO23JRGGJXWIJ4BQYBITRDK",
+          "name": "Valet Parking",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
       "id": "DLG6F2U4R6AKKAYPEPDUUKCX",
       "name": "Red Snapper Ettoufe",
       "description": null,
@@ -1561,5 +1581,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-24T16:01:51.284618Z"
+  "fetchedAt": "2026-03-24T16:10:54.725272Z"
 }
