@@ -68,6 +68,11 @@ const CATEGORY_DISPLAY: Record<string, { slug: string; name: string; order: numb
   "desserts": { slug: "desserts", name: "Desserts", order: 9 },
 };
 
+const ITEM_CATEGORY_OVERRIDES: Record<string, { slug: string; name: string; order: number }> = {
+  // Square item: Valet Parking
+  "5XVTSP77KO4AUWU6FEIGYTGZ": { slug: "valet-parking", name: "Valet Parking", order: 10 },
+};
+
 function titleCase(str: string): string {
   return str
     .toLowerCase()
@@ -186,6 +191,9 @@ export async function handler(_event: { body?: string; httpMethod?: string }) {
         const info = categorySlugMap.get(cid);
         if (info) { catInfo = info; break; }
       }
+      if (!catInfo) {
+        catInfo = ITEM_CATEGORY_OVERRIDES[item.id];
+      }
       if (!catInfo) continue; // Skip non-food items
 
       const variations = (d.variations || []).map((v) => ({
@@ -216,7 +224,11 @@ export async function handler(_event: { body?: string; httpMethod?: string }) {
     // Build categories list (only those that have items), deduplicated by slug
     const usedSlugs = new Set(menuItems.map((i) => i.category));
     const seenSlugs = new Set<string>();
-    const categories = Array.from(categorySlugMap.values())
+    const categoryInfoBySlug = new Map<string, { slug: string; name: string; order: number }>();
+    for (const info of categorySlugMap.values()) categoryInfoBySlug.set(info.slug, info);
+    for (const info of Object.values(ITEM_CATEGORY_OVERRIDES)) categoryInfoBySlug.set(info.slug, info);
+
+    const categories = Array.from(categoryInfoBySlug.values())
       .filter((c) => usedSlugs.has(c.slug))
       .sort((a, b) => a.order - b.order)
       .filter((c) => { if (seenSlugs.has(c.slug)) return false; seenSlugs.add(c.slug); return true; })

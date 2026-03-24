@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # Sync Square catalog to static JSON for the ordering page
 REPO="/Users/oscarclark/.openclaw/workspace/proper-cinematic-soul"
 OUT="$REPO/public/catalog.json"
@@ -44,6 +45,11 @@ CAT = {"apps": ("small-plates", "Small Plates & Apps", 0), "small plates": ("sma
        "protein": ("protein", "Proteins & Add-Ons", 7), "sides": ("sides", "Sides", 8),
        "desserts": ("desserts", "Desserts", 9)}
 
+ITEM_CATEGORY_OVERRIDES = {
+    # Square item: Valet Parking
+    "5XVTSP77KO4AUWU6FEIGYTGZ": {"slug": "valet-parking", "name": "Valet Parking", "order": 10}
+}
+
 csm = {}
 for cid, cat in categories.items():
     n = (cat.get("category_data", {}).get("name") or "").lower().strip()
@@ -58,6 +64,7 @@ for item in items:
     cids = [c["id"] for c in d.get("categories", [])]
     if d.get("category_id"): cids.append(d["category_id"])
     ci = next((csm[c] for c in cids if c in csm), None)
+    if not ci: ci = ITEM_CATEGORY_OVERRIDES.get(item["id"])
     if not ci: continue
     vs = [{"id": v["id"], "name": (v.get("item_variation_data") or {}).get("name", "Regular"), "price": ((v.get("item_variation_data") or {}).get("price_money") or {}).get("amount", 0)} for v in d.get("variations", [])]
     iid = (d.get("image_ids") or [None])[0]
@@ -71,7 +78,9 @@ mls = [{"id": mid, "name": (ml.get("modifier_list_data") or {}).get("name", ""),
 
 used = set(i["category"] for i in menu_items)
 seen, cats_out = set(), []
-for info in sorted(csm.values(), key=lambda x: x["order"]):
+category_defs = {info["slug"]: info for info in csm.values()}
+category_defs.update({info["slug"]: info for info in ITEM_CATEGORY_OVERRIDES.values()})
+for info in sorted(category_defs.values(), key=lambda x: x["order"]):
     if info["slug"] in used and info["slug"] not in seen:
         seen.add(info["slug"]); cats_out.append({"slug": info["slug"], "name": info["name"]})
 
