@@ -1238,6 +1238,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 1200
+    },
+    {
+      "id": "PQQCMLWMORUOWL64VOYUKBZL",
+      "name": "Chicken & Waffless",
+      "description": null,
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "LJF33IV5JSRT36ZKNJ2WIHJI",
+          "name": "Regular",
+          "price": 1700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1700
     }
   ],
   "modifierLists": [
@@ -1564,5 +1580,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-29T21:12:40.915956Z"
+  "fetchedAt": "2026-03-29T21:42:43.002736Z"
 }
