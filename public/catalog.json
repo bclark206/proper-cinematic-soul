@@ -1254,6 +1254,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 1700
+    },
+    {
+      "id": "YYADT4I6ZYX4ERBBPB735PIR",
+      "name": "Icecream",
+      "description": null,
+      "category": "desserts",
+      "variations": [
+        {
+          "id": "EF3RXZNINSOPMJ3EKJAPQIMT",
+          "name": "Regular",
+          "price": 500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 500
     }
   ],
   "modifierLists": [
@@ -1580,5 +1596,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-03-31T23:16:34.330476Z"
+  "fetchedAt": "2026-03-31T23:46:36.475460Z"
 }
