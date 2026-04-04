@@ -603,14 +603,14 @@
         {
           "id": "QXFLO6LTSK3OU6SDP3RRM4JJ",
           "name": "Regular",
-          "price": 2500
+          "price": 3000
         }
       ],
       "modifierListIds": [
         "R36X2UV64QOYY4K2H7OHLA4K"
       ],
       "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/2eb3c07a8c9e774e17b7f8ae975d13363b96c357/original.png",
-      "price": 2500
+      "price": 3000
     },
     {
       "id": "NZBOM3PROELEHFSQZXEYNYCQ",
@@ -1596,5 +1596,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-04-04T21:53:35.890403Z"
+  "fetchedAt": "2026-04-04T22:23:37.999669Z"
 }
