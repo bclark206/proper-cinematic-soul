@@ -1243,6 +1243,25 @@
       "price": 1200
     },
     {
+      "id": "N2QB74NHY7HVPIORRLIBYANS",
+      "name": "Cajun Butter Lobster",
+      "description": null,
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "FFVCYCWF5CKUVV3RUKE6P34F",
+          "name": "Regular",
+          "price": 4000
+        }
+      ],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K",
+        "EAOE3UPUWX5JQE67P4RVBI3L"
+      ],
+      "imageUrl": null,
+      "price": 4000
+    },
+    {
       "id": "PQQCMLWMORUOWL64VOYUKBZL",
       "name": "Chicken & Waffless",
       "description": null,
@@ -1599,5 +1618,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-04-10T22:04:25.942023Z"
+  "fetchedAt": "2026-04-10T22:34:28.572509Z"
 }
