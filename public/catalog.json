@@ -1292,6 +1292,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 500
+    },
+    {
+      "id": "VIAG2ALXETACCXFMW3SZRRF4",
+      "name": "Oxtails",
+      "description": null,
+      "category": "protein",
+      "variations": [
+        {
+          "id": "HA6OTUSTT5PPF2U6MJXLXCY2",
+          "name": "Regular",
+          "price": 3000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 3000
     }
   ],
   "modifierLists": [
@@ -1618,5 +1634,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-04-11T00:04:36.037202Z"
+  "fetchedAt": "2026-04-11T00:34:38.372855Z"
 }
