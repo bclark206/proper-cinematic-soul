@@ -121,7 +121,7 @@ const OrderCheckout = () => {
   const ORDER_API_URL =
     (window as any).__ORDER_API_URL__ ||
     import.meta.env.VITE_ORDER_API_URL ||
-    "https://minus-airfare-peace-throughout.trycloudflare.com";
+    "https://momentum-rss-gauge-lower.trycloudflare.com";
 
   const applyPromoCode = async () => {
     const code = promoInput.trim().toUpperCase();
