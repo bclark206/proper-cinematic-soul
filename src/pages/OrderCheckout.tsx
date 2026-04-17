@@ -121,7 +121,7 @@ const OrderCheckout = () => {
   const ORDER_API_URL =
     (window as any).__ORDER_API_URL__ ||
     import.meta.env.VITE_ORDER_API_URL ||
-    "https://moore-consulting-heater-orders.trycloudflare.com";
+    "https://defence-campus-mileage-bands.trycloudflare.com";
 
   const applyPromoCode = async () => {
     const code = promoInput.trim().toUpperCase();
