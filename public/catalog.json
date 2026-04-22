@@ -311,22 +311,6 @@
       "price": 1500
     },
     {
-      "id": "FNLFMIKGH4JZBRFR6ZJHSYWI",
-      "name": "Proper Garden",
-      "description": null,
-      "category": "salads",
-      "variations": [
-        {
-          "id": "CPQYGDGKUARPAL22AIYICD2J",
-          "name": "Regular",
-          "price": 1400
-        }
-      ],
-      "modifierListIds": [],
-      "imageUrl": null,
-      "price": 1400
-    },
-    {
       "id": "Q62ZSLOMMMMKHUQF33RU755D",
       "name": "Ultimate Surf And Turf Grits",
       "description": null,
@@ -1211,6 +1195,22 @@
       "price": 3000
     },
     {
+      "id": "ABQCBUBFPMMLNBRTPKMHZ57N",
+      "name": "Oyster Flight",
+      "description": "",
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "PFQYICQPXXDVNAFETZL6UFUK",
+          "name": "",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
       "id": "SCXS7DMJH3PUV2WLP27RKRMY",
       "name": "Side Lobster",
       "description": null,
@@ -1241,6 +1241,38 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 1200
+    },
+    {
+      "id": "MEXFKJI4AYWWGF7X7RT3EVLF",
+      "name": "Happy Hour Egg Rolls",
+      "description": null,
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "GIQ2XUAYJDKLL64X2JOLKOPX",
+          "name": "Regular",
+          "price": 1000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1000
+    },
+    {
+      "id": "BK3SCGHVZSFNTCAF23YV7SVA",
+      "name": "Salmon Filet Entre",
+      "description": "",
+      "category": "entrees-sea",
+      "variations": [
+        {
+          "id": "NXLSZ465H355RLYA2SXQB2O2",
+          "name": "Regular",
+          "price": 3000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 3000
     },
     {
       "id": "3IUP2EMX77V6CRXR7W526K5C",
@@ -1276,6 +1308,22 @@
       ],
       "imageUrl": null,
       "price": 4000
+    },
+    {
+      "id": "SQIW24DFVGRCYSKJA6QUCCZV",
+      "name": "Crabmeat",
+      "description": "",
+      "category": "protein",
+      "variations": [
+        {
+          "id": "QDY4WH6HR2RYZQ6DUUF26UK2",
+          "name": "Regular",
+          "price": 700
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 700
     },
     {
       "id": "PQQCMLWMORUOWL64VOYUKBZL",
@@ -1317,6 +1365,22 @@
       "variations": [
         {
           "id": "HA6OTUSTT5PPF2U6MJXLXCY2",
+          "name": "Regular",
+          "price": 3000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 3000
+    },
+    {
+      "id": "57KLPJV5KHW3YN7644ECUWWZ",
+      "name": "Gumboo",
+      "description": "",
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "IBE557TSE2O34WO7PDWKCDGP",
           "name": "Regular",
           "price": 3000
         }
@@ -1650,5 +1714,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-04-22T21:28:34.881999Z"
+  "fetchedAt": "2026-04-22T21:58:37.316395Z"
 }
