@@ -1243,6 +1243,22 @@
       "price": 1200
     },
     {
+      "id": "3IUP2EMX77V6CRXR7W526K5C",
+      "name": "Cajun Oyster",
+      "description": null,
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "ML3OYHSTSIAUKRTMQLHQLWCK",
+          "name": "",
+          "price": 200
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 200
+    },
+    {
       "id": "N2QB74NHY7HVPIORRLIBYANS",
       "name": "Cajun Butter Lobster",
       "description": null,
@@ -1634,5 +1650,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-04-22T20:58:32.360232Z"
+  "fetchedAt": "2026-04-22T21:28:34.881999Z"
 }
