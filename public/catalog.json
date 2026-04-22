@@ -39,10 +39,6 @@
     {
       "slug": "desserts",
       "name": "Desserts"
-    },
-    {
-      "slug": "valet-parking",
-      "name": "Valet Parking"
     }
   ],
   "menuItems": [
@@ -1032,6 +1028,22 @@
       "price": 1200
     },
     {
+      "id": "ZTFEZUCVFTSINVCFF4C4UFCL",
+      "name": "Wagyu Sliders",
+      "description": "",
+      "category": "small-plates",
+      "variations": [
+        {
+          "id": "FCYIO45DJHDMU6SI26BMMEPH",
+          "name": "Regular",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
       "id": "XJ5DG4NFFH6VWOVEJ62FJ6O3",
       "name": "Brussels",
       "description": null,
@@ -1082,6 +1094,22 @@
       "price": 700
     },
     {
+      "id": "T2LCHEYZD53LFY3L4LV6GNLD",
+      "name": "Veggie Omelette",
+      "description": "",
+      "category": "brunch",
+      "variations": [
+        {
+          "id": "BN54MQFLHUJ42SMU5I62HTJJ",
+          "name": "Regular",
+          "price": 1800
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 1800
+    },
+    {
       "id": "ZOLXPV7GLXGAQYFJNNEVS2OP",
       "name": "Side Of Bbq Jerk Lamb",
       "description": "",
@@ -1107,6 +1135,22 @@
       "variations": [
         {
           "id": "R5SA2JYY4HV4KNNC2MTK7NM3",
+          "name": "Regular",
+          "price": 2000
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 2000
+    },
+    {
+      "id": "3HKAJH7KHGHCSZQFB4R2IDY2",
+      "name": "Wayu Burger",
+      "description": "",
+      "category": "sandwiches",
+      "variations": [
+        {
+          "id": "3DUIUIAB5K2BVCWVLBXXRTBM",
           "name": "Regular",
           "price": 2000
         }
@@ -1183,22 +1227,6 @@
       "price": 5500
     },
     {
-      "id": "5XVTSP77KO4AUWU6FEIGYTGZ",
-      "name": "Valet Parking",
-      "description": "Valet parking at Proper Cuisine",
-      "category": "valet-parking",
-      "variations": [
-        {
-          "id": "XAO23JRGGJXWIJ4BQYBITRDK",
-          "name": "Valet Parking",
-          "price": 2000
-        }
-      ],
-      "modifierListIds": [],
-      "imageUrl": null,
-      "price": 2000
-    },
-    {
       "id": "DLG6F2U4R6AKKAYPEPDUUKCX",
       "name": "Red Snapper Ettoufe",
       "description": null,
@@ -1213,6 +1241,22 @@
       "modifierListIds": [],
       "imageUrl": null,
       "price": 4000
+    },
+    {
+      "id": "K523ZFEG7Y4F4NYVMKDHRITL",
+      "name": "Sweet Spicy Brussels Upcharge",
+      "description": null,
+      "category": "sides",
+      "variations": [
+        {
+          "id": "ARYVVHBX3YP5RQXKW7NAWKUG",
+          "name": "Regular",
+          "price": 500
+        }
+      ],
+      "modifierListIds": [],
+      "imageUrl": null,
+      "price": 500
     },
     {
       "id": "HEI4RLQ3XJA7QUT22IBPG5KT",
@@ -1322,7 +1366,9 @@
           "price": 3000
         }
       ],
-      "modifierListIds": [],
+      "modifierListIds": [
+        "R36X2UV64QOYY4K2H7OHLA4K"
+      ],
       "imageUrl": null,
       "price": 3000
     },
@@ -1782,5 +1828,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-04-22T22:06:44.187307Z"
+  "fetchedAt": "2026-04-22T22:28:39.827817Z"
 }
