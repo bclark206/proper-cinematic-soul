@@ -293,7 +293,7 @@
     {
       "id": "V6TOWYINJHJMBILSHV4RML6M",
       "name": "Cheesesteak Egg Rolls",
-      "description": "",
+      "description": null,
       "category": "small-plates",
       "variations": [
         {
@@ -1828,5 +1828,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-04-25T19:05:43.285974Z"
+  "fetchedAt": "2026-04-25T19:35:45.735807Z"
 }
