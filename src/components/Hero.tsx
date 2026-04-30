@@ -10,14 +10,18 @@ const Hero = () => {
       
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+        <p className="font-display text-sm sm:text-base text-gold/80 tracking-[0.35em] uppercase mb-4 sm:mb-6 fade-in-up">
+          Where Soul Meets Elegance
+        </p>
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-pure-white mb-6 fade-in-up">
-          Where Soul Meets{" "}
-          <span className="hover-gold text-[#9f7d2a]">Elegance</span>
+          Baltimore's Premier{" "}
+          <span className="hover-gold text-[#9f7d2a]">Soul Food</span>{" "}
+          Restaurant
         </h1>
 
         <p className="text-lg sm:text-xl md:text-2xl text-cream/90 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed fade-in-slow font-light">
-          Proper Cuisine is a modern tribute to timeless hospitality — luxe interiors, 
-          soulful flavors, and elevated vibes in the heart of Baltimore.
+          A Black-owned modern tribute to timeless hospitality — luxe interiors,
+          bold Southern flavors, and elevated vibes in the heart of downtown Baltimore.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center fade-in-slow">

@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from "lucide-react";
+import { MapPin, Phone, Mail, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -17,14 +17,8 @@ const Footer = () => {
             </p>
             
             <div className="flex space-x-4">
-              <a href="https://instagram.com/thepropercuisine" className="text-cream hover:text-gold transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
+              <a href="https://instagram.com/thepropercuisine" target="_blank" rel="noopener noreferrer" aria-label="Proper Cuisine on Instagram" className="text-cream hover:text-gold transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
                 <Instagram className="w-6 h-6" />
-              </a>
-              <a href="#" className="text-cream hover:text-gold transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
-                <Facebook className="w-6 h-6" />
-              </a>
-              <a href="#" className="text-cream hover:text-gold transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-jet-black">
-                <Twitter className="w-6 h-6" />
               </a>
             </div>
           </div>

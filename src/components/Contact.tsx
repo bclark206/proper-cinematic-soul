@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Twitter } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Instagram } from "lucide-react";
 const Contact = () => {
   const contactInfo = [{
     icon: MapPin,
@@ -27,14 +27,6 @@ const Contact = () => {
     icon: Instagram,
     label: "@TheProperCuisine",
     href: "https://instagram.com/TheProperCuisine"
-  }, {
-    icon: Facebook,
-    label: "Proper Cuisine",
-    href: "#"
-  }, {
-    icon: Twitter,
-    label: "@propercuisine",
-    href: "#"
   }];
   return <section id="contact" className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 bg-jet-black">
       <div className="max-w-7xl mx-auto">
@@ -140,7 +132,7 @@ const Contact = () => {
                 </p>
                 
                 <div className="space-y-3">
-                  {socialLinks.map(social => <a key={social.label} href={social.href} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gold/10 transition-colors duration-300 group">
+                  {socialLinks.map(social => <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gold/10 transition-colors duration-300 group">
                       <social.icon className="w-5 h-5 text-gold group-hover:scale-110 transition-transform" />
                       <span className="text-jet-black group-hover:text-gold transition-colors">
                         {social.label}
