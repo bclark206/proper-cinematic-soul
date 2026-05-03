@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/api/catalog", "destination": "/api/catalog" },
     { "source": "/api/create-order", "destination": "/api/create-order" },
+    { "source": "/api/validate-promo", "destination": "/api/validate-promo" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
