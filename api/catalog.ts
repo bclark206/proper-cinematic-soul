@@ -63,10 +63,11 @@ const CATEGORY_DISPLAY: Record<string, { slug: string; name: string; order: numb
   "pasta": { slug: "pasta", name: "Pasta", order: 4 },
   "brunch": { slug: "brunch", name: "Brunch", order: 5 },
   "sandwiches": { slug: "sandwiches", name: "Sandwiches", order: 6 },
-  "protein": { slug: "protein", name: "Proteins & Add-Ons", order: 7 },
   "sides": { slug: "sides", name: "Sides", order: 8 },
   "desserts": { slug: "desserts", name: "Desserts", order: 9 },
 };
+
+const HIDDEN_CATEGORY_NAMES = new Set(["protein", "proteins & add-ons"]);
 
 const ITEM_CATEGORY_OVERRIDES: Record<string, { slug: string; name: string; order: number }> = {
   // Square item: Valet Parking
@@ -152,6 +153,7 @@ export async function handler(_event: { body?: string; httpMethod?: string }) {
     const categorySlugMap = new Map<string, { slug: string; name: string; order: number }>();
     for (const [id, cat] of categoriesById) {
       const catName = (cat.category_data?.name || "").toLowerCase().trim();
+      if (HIDDEN_CATEGORY_NAMES.has(catName)) continue;
       const display = CATEGORY_DISPLAY[catName];
       if (display) {
         categorySlugMap.set(id, display);

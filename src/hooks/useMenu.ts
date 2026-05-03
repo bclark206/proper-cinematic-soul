@@ -55,25 +55,11 @@ export function useMenu() {
     let cancelled = false;
 
     const load = async () => {
-      // Try cache first
-      const cached = getCached();
-      if (cached) {
-        applyData(cached);
-        setLoading(false);
-        // Still refresh in background
-        fetchFresh(false);
-        return;
-      }
-
-      await fetchFresh(true);
-    };
-
-    const fetchFresh = async (showLoading: boolean) => {
-      if (showLoading) setLoading(true);
+      setLoading(true);
       setError(null);
 
       try {
-        const res = await fetch("https://raw.githubusercontent.com/bclark206/proper-cinematic-soul/main/public/catalog.json");
+        const res = await fetch("/api/catalog", { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: CatalogResponse = await res.json();
 
@@ -83,6 +69,13 @@ export function useMenu() {
           setLoading(false);
         }
       } catch (err) {
+        const cached = getCached();
+        if (!cancelled && cached) {
+          applyData(cached);
+          setLoading(false);
+          return;
+        }
+
         if (!cancelled) {
           console.error("Failed to fetch catalog:", err);
           setError("Unable to load menu. Please try again.");

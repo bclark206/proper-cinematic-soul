@@ -11,6 +11,30 @@ function squareCatalogResponse(objects: unknown[]) {
   };
 }
 
+const category = (id: string, name: string) => ({
+  type: "CATEGORY",
+  id,
+  category_data: { name },
+});
+
+const item = (id: string, name: string, categoryId: string) => ({
+  type: "ITEM",
+  id,
+  item_data: {
+    name,
+    categories: [{ id: categoryId }],
+    variations: [
+      {
+        id: `${id}-var`,
+        item_variation_data: {
+          name: "Regular",
+          price_money: { amount: 1000, currency: "USD" },
+        },
+      },
+    ],
+  },
+});
+
 describe("catalog sync transform", () => {
   beforeEach(() => {
     vi.stubEnv("SQUARE_ACCESS_TOKEN", "test-token");
@@ -75,5 +99,22 @@ describe("catalog sync transform", () => {
       ])
     );
   });
-});
 
+  it("does not expose the Proteins & Add-Ons Square category on the public ordering site", async () => {
+    mockFetch.mockResolvedValueOnce(
+      squareCatalogResponse([
+        category("cat-protein", "Protein"),
+        category("cat-sides", "Sides"),
+        item("item-shrimp", "Shrimp", "cat-protein"),
+        item("item-fries", "Fries", "cat-sides"),
+      ])
+    );
+
+    const result = await handler({ httpMethod: "GET" });
+    const body = JSON.parse(result.body);
+
+    expect(result.statusCode).toBe(200);
+    expect(body.categories).toEqual([{ slug: "sides", name: "Sides" }]);
+    expect(body.menuItems.map((menuItem: { name: string }) => menuItem.name)).toEqual(["Fries"]);
+  });
+});
