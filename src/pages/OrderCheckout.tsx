@@ -84,8 +84,11 @@ const OrderCheckout = () => {
   const cardRef = useRef<any>(null);
   const paymentsRef = useRef<any>(null);
   const applePayRef = useRef<any>(null);
+  const applePayRequestRef = useRef<any>(null);
   const cashAppPayRef = useRef<any>(null);
+  const cashAppRequestRef = useRef<any>(null);
   const processOrderRef = useRef<(nonce: string | null) => Promise<void>>();
+  const [mobileSummaryOpen, setMobileSummaryOpen] = useState(false);
 
   const ORDER_API_URL =
     (window as any).__ORDER_API_URL__ ||
@@ -162,6 +165,7 @@ const OrderCheckout = () => {
           currencyCode: "USD",
           total: { amount: (orderTotal / 100).toFixed(2), label: "Proper Cuisine" },
         });
+        applePayRequestRef.current = applePayRequest;
         const applePay = await payments.applePay(applePayRequest);
         if (applePay) {
           applePayRef.current = applePay;
@@ -178,6 +182,7 @@ const OrderCheckout = () => {
           currencyCode: "USD",
           total: { amount: (orderTotal / 100).toFixed(2), label: "Proper Cuisine" },
         });
+        cashAppRequestRef.current = cashAppRequest;
         const cashAppPay = await payments.cashAppPay(cashAppRequest, {
           redirectURL: window.location.href,
           referenceId: "proper-" + Date.now(),
@@ -353,6 +358,27 @@ const OrderCheckout = () => {
   // Keep ref updated so Cash App callback uses latest closure
   processOrderRef.current = processOrder;
 
+  // Sync Apple Pay & Cash App payment-request totals when cart total changes.
+  // Square SDK rejects tokenization with stale totals — this fixes Cash App Pay
+  // failing silently after tip / promo / delivery-fee adjustments.
+  useEffect(() => {
+    const amount = (orderTotal / 100).toFixed(2);
+    if (applePayRequestRef.current) {
+      try {
+        applePayRequestRef.current.update({
+          total: { amount, label: "Proper Cuisine" },
+        });
+      } catch {}
+    }
+    if (cashAppRequestRef.current) {
+      try {
+        cashAppRequestRef.current.update({
+          total: { amount, label: "Proper Cuisine" },
+        });
+      } catch {}
+    }
+  }, [orderTotal]);
+
   const handleSubmit = async () => {
     if (!name.trim() || !phone.trim() || !email.trim()) {
       toast({
@@ -408,6 +434,84 @@ const OrderCheckout = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       <Navigation />
+
+      {/* ─── STICKY MOBILE CART PEEK (collapsible) ─── */}
+      <div className="lg:hidden sticky top-[64px] sm:top-[72px] z-40 bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-[#1e1e1e]">
+        <button
+          onClick={() => setMobileSummaryOpen((v) => !v)}
+          className="w-full px-4 py-2.5 flex items-center justify-between gap-3 text-left active:bg-white/5 transition-colors"
+          aria-expanded={mobileSummaryOpen}
+          aria-controls="mobile-cart-peek-details"
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <ShoppingBag className="w-4 h-4 text-gold shrink-0" />
+            <span className="text-cream/70 text-sm font-medium truncate">
+              {cart.items.reduce((s, i) => s + i.quantity, 0)} item
+              {cart.items.reduce((s, i) => s + i.quantity, 0) === 1 ? "" : "s"}
+            </span>
+            <span className="text-cream/20 text-xs">•</span>
+            <span className="text-gold font-display font-semibold text-sm">
+              {formatPrice(orderTotal)}
+            </span>
+          </div>
+          <span className={`text-cream/40 text-xs transition-transform shrink-0 ${mobileSummaryOpen ? "rotate-180" : ""}`}>
+            ▾
+          </span>
+        </button>
+        {mobileSummaryOpen && (
+          <div
+            id="mobile-cart-peek-details"
+            className="px-4 pb-3 max-h-[55vh] overflow-y-auto border-t border-[#1e1e1e]/60"
+          >
+            <div className="py-2 space-y-1.5">
+              {cart.items.map((item) => {
+                const modTotal = item.modifiers.reduce((s, m) => s + m.price, 0);
+                const lineTotal = (item.basePrice + modTotal) * item.quantity;
+                return (
+                  <div key={item.cartItemId} className="flex justify-between gap-2 text-xs">
+                    <span className="text-cream/60 truncate">
+                      {item.quantity}× {item.name}
+                    </span>
+                    <span className="text-cream/50 whitespace-nowrap">{formatPrice(lineTotal)}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="border-t border-[#1e1e1e] pt-2 space-y-1 text-xs">
+              <div className="flex justify-between text-cream/40">
+                <span>Subtotal</span>
+                <span>{formatPrice(cart.subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-cream/40">
+                <span>Tax</span>
+                <span>{formatPrice(cart.tax)}</span>
+              </div>
+              {deliveryFee > 0 && (
+                <div className="flex justify-between text-cream/40">
+                  <span>Delivery</span>
+                  <span>{formatPrice(deliveryFee)}</span>
+                </div>
+              )}
+              {tipAmount > 0 && (
+                <div className="flex justify-between text-cream/40">
+                  <span>Tip</span>
+                  <span>{formatPrice(tipAmount)}</span>
+                </div>
+              )}
+              {promoDiscount > 0 && (
+                <div className="flex justify-between text-green-400/80">
+                  <span>Discount</span>
+                  <span>-{formatPrice(promoDiscount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between pt-1.5 mt-1 border-t border-[#1e1e1e] text-sm">
+                <span className="text-pure-white font-medium">Total</span>
+                <span className="text-gold font-semibold">{formatPrice(orderTotal)}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       <main className="pt-24 sm:pt-28 pb-32 sm:pb-40 px-3 sm:px-6">
         <div className="max-w-5xl mx-auto">
@@ -672,27 +776,27 @@ const OrderCheckout = () => {
                   {applePayAvailable && (
                     <button
                       onClick={() => setSelectedPayment("apple-pay")}
-                      className={`flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left ${
+                      className={`flex items-center gap-3 p-4 sm:p-4 min-h-[64px] rounded-xl border transition-all duration-200 text-left active:scale-[0.99] ${
                         selectedPayment === "apple-pay"
                           ? "border-gold bg-gold/5 ring-1 ring-gold/20"
                           : "border-[#2a2a2a] bg-[#141414] hover:border-[#3a3a3a]"
                       }`}
                     >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                      <div className={`w-12 h-12 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 ${
                         selectedPayment === "apple-pay" ? "bg-gold/15" : "bg-[#1e1e1e]"
                       }`}>
-                        <Apple className={`w-5 h-5 ${selectedPayment === "apple-pay" ? "text-gold" : "text-cream/40"}`} />
+                        <Apple className={`w-6 h-6 sm:w-5 sm:h-5 ${selectedPayment === "apple-pay" ? "text-gold" : "text-cream/40"}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium ${selectedPayment === "apple-pay" ? "text-pure-white" : "text-cream/70"}`}>
+                        <p className={`text-base sm:text-sm font-medium ${selectedPayment === "apple-pay" ? "text-pure-white" : "text-cream/70"}`}>
                           Apple Pay
                         </p>
                         <p className="text-xs text-cream/30">Pay with Face ID or Touch ID</p>
                       </div>
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                      <div className={`w-6 h-6 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
                         selectedPayment === "apple-pay" ? "border-gold bg-gold" : "border-[#3a3a3a]"
                       }`}>
-                        {selectedPayment === "apple-pay" && <Check className="w-3 h-3 text-jet-black" />}
+                        {selectedPayment === "apple-pay" && <Check className="w-3.5 h-3.5 sm:w-3 sm:h-3 text-jet-black" />}
                       </div>
                     </button>
                   )}
@@ -701,27 +805,27 @@ const OrderCheckout = () => {
                   {cashAppPayAvailable && (
                     <button
                       onClick={() => setSelectedPayment("cashapp")}
-                      className={`flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left ${
+                      className={`flex items-center gap-3 p-4 sm:p-4 min-h-[64px] rounded-xl border transition-all duration-200 text-left active:scale-[0.99] ${
                         selectedPayment === "cashapp"
                           ? "border-gold bg-gold/5 ring-1 ring-gold/20"
                           : "border-[#2a2a2a] bg-[#141414] hover:border-[#3a3a3a]"
                       }`}
                     >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                      <div className={`w-12 h-12 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 ${
                         selectedPayment === "cashapp" ? "bg-gold/15" : "bg-[#1e1e1e]"
                       }`}>
-                        <Banknote className={`w-5 h-5 ${selectedPayment === "cashapp" ? "text-gold" : "text-cream/40"}`} />
+                        <Banknote className={`w-6 h-6 sm:w-5 sm:h-5 ${selectedPayment === "cashapp" ? "text-gold" : "text-cream/40"}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium ${selectedPayment === "cashapp" ? "text-pure-white" : "text-cream/70"}`}>
+                        <p className={`text-base sm:text-sm font-medium ${selectedPayment === "cashapp" ? "text-pure-white" : "text-cream/70"}`}>
                           Cash App Pay
                         </p>
                         <p className="text-xs text-cream/30">Pay with your Cash App balance</p>
                       </div>
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                      <div className={`w-6 h-6 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
                         selectedPayment === "cashapp" ? "border-gold bg-gold" : "border-[#3a3a3a]"
                       }`}>
-                        {selectedPayment === "cashapp" && <Check className="w-3 h-3 text-jet-black" />}
+                        {selectedPayment === "cashapp" && <Check className="w-3.5 h-3.5 sm:w-3 sm:h-3 text-jet-black" />}
                       </div>
                     </button>
                   )}

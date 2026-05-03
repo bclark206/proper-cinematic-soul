@@ -246,7 +246,7 @@ describe("OrderCheckout - Order Summary Sidebar", () => {
 
   it("renders item count", () => {
     renderCheckout();
-    expect(screen.getByText("3 items")).toBeInTheDocument();
+    expect(screen.getAllByText("3 items").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders all cart items", () => {
