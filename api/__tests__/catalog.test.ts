@@ -117,4 +117,24 @@ describe("catalog sync transform", () => {
     expect(body.categories).toEqual([{ slug: "sides", name: "Sides" }]);
     expect(body.menuItems.map((menuItem: { name: string }) => menuItem.name)).toEqual(["Fries"]);
   });
+
+  it("keeps legacy item photos when Square catalog omits image_ids", async () => {
+    mockFetch.mockResolvedValueOnce(
+      squareCatalogResponse([
+        category("cat-apps", "Apps"),
+        item("5XEQ6FV62RZ7VECDKR2KH67B", "Surf And Turf Fries", "cat-apps"),
+      ])
+    );
+
+    const result = await handler({ httpMethod: "GET" });
+    const body = JSON.parse(result.body);
+
+    expect(result.statusCode).toBe(200);
+    expect(body.menuItems[0]).toEqual(
+      expect.objectContaining({
+        name: "Surf And Turf Fries",
+        imageUrl: "https://items-images-production.s3.us-west-2.amazonaws.com/files/60c49dcec579f040824c376451c336233b502d13/original.png",
+      })
+    );
+  });
 });

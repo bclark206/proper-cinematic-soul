@@ -74,6 +74,39 @@ const ITEM_CATEGORY_OVERRIDES: Record<string, { slug: string; name: string; orde
   "5XVTSP77KO4AUWU6FEIGYTGZ": { slug: "valet-parking", name: "Valet Parking", order: 10 },
 };
 
+interface LegacyCatalogItemImage {
+  id: string;
+  name: string;
+  imageUrl: string;
+}
+
+const LEGACY_IMAGE_FALLBACKS: LegacyCatalogItemImage[] = [
+  { "id": "5XEQ6FV62RZ7VECDKR2KH67B", "name": "Surf And Turf Fries", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/60c49dcec579f040824c376451c336233b502d13/original.png" },
+  { "id": "DFN63PAAP5USEYHSQHD5LRT3", "name": "Crab Cake Egg Rolls", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/45d76f0465f1b336f9e1970b9bfb0ae61eecc7df/original.jpeg" },
+  { "id": "4RSTJXILEXYRMAE5G7HBH33U", "name": "Salmon Bites", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/44f40a8bd1cfdba977dc13a54b34c6889a0fb51a/original.jpeg" },
+  { "id": "UZWT6B5OPU36WCKZ53J7YBKK", "name": "Build Your Own Pasta", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/1cd5fc61d25bcced5709d9b82799796553c853b4/original.jpeg" },
+  { "id": "MCNXBDADU7RTSMXVWOBO4SYY", "name": "Caesar Salad", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/a14c7e7f487606bdb5429761983ff04b8404dc16/original.png" },
+  { "id": "GR6CUML6RVECFMFCAFPZTTUL", "name": "Salmon Filet", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/2eb3c07a8c9e774e17b7f8ae975d13363b96c357/original.png" },
+  { "id": "S5EUWB2OOSACXSG2MHEJ6CSH", "name": "Side Salad", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/5acd9ac1ab3e5d394350c53de8164b4fd01122d8/original.png" },
+  { "id": "PKLRMJJ53HALFC2A5PJ3JVRP", "name": "Wings", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/b6646ff38f3f97cdb8882de90bbf39cd949182c6/original.png" },
+  { "id": "AEZI3H23MEVHSBE6SB5LXSO4", "name": "Single Jumbo Lump Crab Cake", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/b11f22b78e9944bb7c66bfe53b0d71aa956e933b/original.png" },
+  { "id": "HPL26HWWYNI3PL7AA6BBALYD", "name": "Honey Jerk Lamb Chops", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/9462024edfe36a4bc2378a2c8a6a94a3f4aba833/original.png" },
+  { "id": "7KEHP5RHHCU557JI7Q34JGAG", "name": "Ultimate Seafood Pasta", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/05bad1e1f47d3059e219257286a8beab647c0914/original.png" },
+  { "id": "NSZRQOVDN4723IUEJN46FS6E", "name": "Double Lump Crab Cake", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/e5ea8067d31f40bbae345824305a483245879c7c/original.png" },
+  { "id": "XQ2VYFX2PGBV3ZGDX5TQ3VQF", "name": "Crab Cake Fries", "imageUrl": "https://items-images-production.s3.us-west-2.amazonaws.com/files/0661781d2bab38babdf9d8f12b50b92c771ca8ae/original.jpeg" },
+];
+
+const legacyImageFallbackByItemId = new Map(LEGACY_IMAGE_FALLBACKS.map((item) => [item.id, item.imageUrl]));
+const legacyImageFallbackByName = new Map(LEGACY_IMAGE_FALLBACKS.map((item) => [normalizedItemName(item.name), item.imageUrl]));
+
+function normalizedItemName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function getLegacyImageUrl(itemId: string, itemName: string): string | null {
+  return legacyImageFallbackByItemId.get(itemId) || legacyImageFallbackByName.get(normalizedItemName(itemName)) || null;
+}
+
 function titleCase(str: string): string {
   return str
     .toLowerCase()
@@ -204,15 +237,16 @@ export async function handler(_event: { body?: string; httpMethod?: string }) {
         price: v.item_variation_data?.price_money?.amount || 0,
       }));
 
+      const itemName = d.name || "";
       const firstPrice = variations.length > 0 ? variations[0].price : 0;
       const imageId = d.image_ids?.[0] || null;
-      const imageUrl = imageId ? imagesById.get(imageId) || null : null;
+      const imageUrl = imageId ? imagesById.get(imageId) || getLegacyImageUrl(item.id, itemName) : getLegacyImageUrl(item.id, itemName);
 
       const modListIds = (d.modifier_list_info || []).map((m) => m.modifier_list_id);
 
       menuItems.push({
         id: item.id,
-        name: titleCase(d.name || ""),
+        name: titleCase(itemName),
         description: d.description || null,
         category: catInfo.slug,
         variations,
