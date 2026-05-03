@@ -98,7 +98,7 @@ const OrderCheckout = () => {
     setPromoLoading(true);
     setPromoError("");
     try {
-      const res = await fetch(`${ORDER_API_URL}/validate-promo?code=${encodeURIComponent(code)}&subtotal=${cart.subtotal}`);
+      const res = await fetch(`/api/validate-promo?code=${encodeURIComponent(code)}&subtotal=${cart.subtotal}`);
       const data = await res.json();
       if (!res.ok) {
         setPromoError(data.error || "Invalid promo code");

@@ -47,6 +47,7 @@ interface CreateOrderRequest {
   sourceId: string;
   pickupTime?: string;
   orderType?: string;
+  promoCode?: string;
 }
 
 // Generic handler — adapt exports for your platform (Netlify, Vercel, etc.)
@@ -71,7 +72,7 @@ export async function handler(event: { body: string }) {
     };
   }
 
-  const { items, customer, tip, sourceId, pickupTime, orderType } = body;
+  const { items, customer, tip, sourceId, pickupTime, orderType, promoCode } = body;
 
   if (!items?.length || !customer?.name || !sourceId) {
     return {
@@ -81,6 +82,39 @@ export async function handler(event: { body: string }) {
   }
 
   const idempotencyKey = crypto.randomUUID();
+
+  // Resolve promo code → Square catalog DISCOUNT id (case-insensitive name match).
+  let resolvedDiscountId: string | null = null;
+  if (promoCode && promoCode.trim()) {
+    try {
+      const code = promoCode.trim().toUpperCase();
+      let cursor: string | undefined;
+      const allDiscounts: { id: string; is_deleted?: boolean; discount_data?: { name?: string } }[] = [];
+      do {
+        const url = new URL("https://connect.squareup.com/v2/catalog/list");
+        url.searchParams.set("types", "DISCOUNT");
+        if (cursor) url.searchParams.set("cursor", cursor);
+        const r = await fetch(url.toString(), {
+          headers: {
+            "Square-Version": "2024-01-18",
+            Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (!r.ok) break;
+        const j = await r.json();
+        if (j.objects) allDiscounts.push(...j.objects);
+        cursor = j.cursor;
+      } while (cursor);
+
+      const match = allDiscounts.find(
+        (d) => !d.is_deleted && (d.discount_data?.name || "").trim().toUpperCase() === code
+      );
+      if (match) resolvedDiscountId = match.id;
+    } catch (err) {
+      console.error("Promo lookup failed:", err);
+    }
+  }
 
   // Step 1: Create Order via Square Orders API
   const lineItems = items.map((item) => ({
@@ -97,6 +131,9 @@ export async function handler(event: { body: string }) {
     order: {
       location_id: SQUARE_LOCATION_ID,
       line_items: lineItems,
+      ...(resolvedDiscountId
+        ? { discounts: [{ catalog_object_id: resolvedDiscountId, scope: "ORDER" }] }
+        : {}),
       fulfillments: [
         {
           type: "PICKUP",
