@@ -137,4 +137,58 @@ describe("catalog sync transform", () => {
       })
     );
   });
+
+  it("hides items marked HIDDEN or UNAVAILABLE in Square (ecom_visibility)", async () => {
+    mockFetch.mockResolvedValueOnce(
+      squareCatalogResponse([
+        category("cat-apps", "Apps"),
+        {
+          type: "ITEM",
+          id: "ITEM-VISIBLE",
+          item_data: {
+            name: "Visible Item",
+            categories: [{ id: "cat-apps" }],
+            ecom_visibility: "VISIBLE",
+            variations: [{ id: "v1", item_variation_data: { name: "Regular", price_money: { amount: 1000 } } }],
+          },
+        },
+        {
+          type: "ITEM",
+          id: "ITEM-HIDDEN",
+          item_data: {
+            name: "Hidden Item",
+            categories: [{ id: "cat-apps" }],
+            ecom_visibility: "HIDDEN",
+            variations: [{ id: "v2", item_variation_data: { name: "Regular", price_money: { amount: 1000 } } }],
+          },
+        },
+        {
+          type: "ITEM",
+          id: "ITEM-UNAVAILABLE",
+          item_data: {
+            name: "Unavailable Item",
+            categories: [{ id: "cat-apps" }],
+            ecom_visibility: "UNAVAILABLE",
+            variations: [{ id: "v3", item_variation_data: { name: "Regular", price_money: { amount: 1000 } } }],
+          },
+        },
+        {
+          type: "ITEM",
+          id: "ITEM-OFFLINE",
+          item_data: {
+            name: "Offline Item",
+            categories: [{ id: "cat-apps" }],
+            available_online: false,
+            variations: [{ id: "v4", item_variation_data: { name: "Regular", price_money: { amount: 1000 } } }],
+          },
+        },
+      ])
+    );
+
+    const result = await handler({ httpMethod: "GET" });
+    const body = JSON.parse(result.body);
+
+    expect(result.statusCode).toBe(200);
+    expect(body.menuItems.map((m: { name: string }) => m.name)).toEqual(["Visible Item"]);
+  });
 });

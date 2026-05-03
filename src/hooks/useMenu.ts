@@ -10,7 +10,7 @@ interface CatalogResponse {
 }
 
 const CACHE_KEY = "proper_catalog_cache";
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL_MS = 30 * 1000; // 30 seconds — only used as fallback if /api/catalog fails
 
 function getCached(): CatalogResponse | null {
   try {

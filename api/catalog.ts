@@ -31,6 +31,10 @@ interface SquareCatalogObject {
     image_ids?: string[];
     is_archived?: boolean;
     ecom_visibility?: string;
+    available_online?: boolean;
+    present_at_all_locations?: boolean;
+    absent_at_location_ids?: string[];
+    present_at_location_ids?: string[];
   };
   category_data?: {
     name?: string;
@@ -217,6 +221,12 @@ export async function handler(_event: { body?: string; httpMethod?: string }) {
       // Skip archived items
       if (d.is_archived) continue;
 
+      // Real-time sync: respect Square ecom visibility and online availability.
+      // ecom_visibility values: "VISIBLE", "HIDDEN", "UNAVAILABLE", "UNINDEXED".
+      // Anything other than VISIBLE/UNINDEXED hides the item online.
+      if (d.ecom_visibility && d.ecom_visibility !== "VISIBLE" && d.ecom_visibility !== "UNINDEXED") continue;
+      if (d.available_online === false) continue;
+
       // Find the matching food category from the item's categories array
       const itemCatIds = (d.categories || []).map((c) => c.id);
       if (d.category_id) itemCatIds.push(d.category_id);
@@ -275,7 +285,7 @@ export async function handler(_event: { body?: string; httpMethod?: string }) {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-        "Cache-Control": "public, max-age=300", // 5 min CDN cache
+        "Cache-Control": "public, max-age=0, s-maxage=30, stale-while-revalidate=60",
       },
       body: JSON.stringify({
         categories,
