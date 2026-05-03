@@ -91,6 +91,15 @@ vi.mock("@/hooks/use-toast", () => ({
   }),
 }));
 
+beforeEach(() => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  vi.setSystemTime(new Date("2026-05-04T16:00:00-04:00"));
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 const renderCheckout = () =>
   render(
     <BrowserRouter>
@@ -166,6 +175,17 @@ describe("OrderCheckout - Pickup Time", () => {
     renderCheckout();
     const asapButton = screen.getByText("ASAP").closest("button");
     expect(asapButton?.className).toContain("border-gold");
+  });
+
+  it("defaults to scheduled pickup times when the restaurant is closed", () => {
+    vi.setSystemTime(new Date("2026-05-04T13:00:00-04:00"));
+
+    renderCheckout();
+
+    expect(screen.queryByText("ASAP")).not.toBeInTheDocument();
+    expect(screen.getByText(/choose a scheduled pickup time/i)).toBeInTheDocument();
+    const firstScheduledTime = screen.getByText("Today 3:00 PM").closest("button");
+    expect(firstScheduledTime?.className).toContain("border-gold");
   });
 });
 

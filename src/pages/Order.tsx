@@ -15,29 +15,20 @@ import { useOrderType } from "@/hooks/useOrderType";
 import { useDeliveryAddress } from "@/hooks/useDeliveryAddress";
 import DeliveryAddressForm from "@/components/order/DeliveryAddressForm";
 import type { MenuItem } from "@/data/menu";
+import { getStoreStatus } from "@/lib/storeHours";
 import { AlertCircle, Clock } from "lucide-react";
 
 function useStoreOpen() {
-  const [isOpen, setIsOpen] = useState(true);
-  const [hours, setHours] = useState("");
+  const [status, setStatus] = useState(() => getStoreStatus());
 
   useEffect(() => {
-    const check = () => {
-      const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
-      const day = now.getDay();
-      const t = now.getHours() * 60 + now.getMinutes();
-      const weekend = day === 0 || day === 6;
-      const open = weekend ? 12 * 60 : 15 * 60;
-      const close = 22 * 60 + 30;
-      setIsOpen(t >= open && t <= close);
-      setHours(weekend ? "12:00 PM – 11:00 PM" : "3:00 PM – 11:00 PM");
-    };
+    const check = () => setStatus(getStoreStatus());
     check();
     const interval = setInterval(check, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  return { isOpen, hours };
+  return status;
 }
 
 const ONLINE_ORDERING_ENABLED = true; // Toggle to re-enable ordering
@@ -66,7 +57,7 @@ const Order = () => {
 
   const cart = useCart();
   const { orderType, setOrderType } = useOrderType();
-  const { isOpen: storeIsOpen, hours: storeHours } = useStoreOpen();
+  const { isOpen: storeIsOpen, hours: storeHours, nextOrderingLabel } = useStoreOpen();
   const { address, updateField } = useDeliveryAddress();
   const {
     categories,
@@ -158,13 +149,13 @@ const Order = () => {
               We're Currently Closed
             </h3>
             <p className="text-cream/70 text-sm sm:text-base mb-1">
-              Online ordering is available during business hours
+              You can still order now and schedule pickup for {nextOrderingLabel}
             </p>
             <p className="text-gold font-semibold text-base sm:text-lg">
               Today's Hours: {storeHours}
             </p>
             <p className="text-cream/40 text-xs mt-3">
-              Mon–Fri: 3 PM – 11 PM &nbsp;|&nbsp; Sat–Sun: 12 PM – 11 PM
+              Choose your scheduled pickup time at checkout.
             </p>
           </div>
         </div>
@@ -258,25 +249,21 @@ const Order = () => {
       {/* Item Modal */}
       <ItemModal
         item={selectedItem}
-        open={modalOpen && storeIsOpen}
+        open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onAddToCart={storeIsOpen ? cart.addItem : () => {}}
+        onAddToCart={cart.addItem}
         getModifierList={getModifierList}
         getItemImageUrl={getItemImageUrl}
       />
 
-      {/* Cart Drawer - only when open */}
-      {storeIsOpen && (
-        <CartDrawer cart={cart} getItemImageUrl={getItemImageUrl} orderType={orderType} />
-      )}
+      {/* Cart Drawer */}
+      <CartDrawer cart={cart} getItemImageUrl={getItemImageUrl} orderType={orderType} />
 
-      {/* Floating Cart Button - only when open */}
-      {storeIsOpen && (
-        <FloatingCart
-          itemCount={cart.itemCount}
-          onClick={() => cart.setIsOpen(true)}
-        />
-      )}
+      {/* Floating Cart Button */}
+      <FloatingCart
+        itemCount={cart.itemCount}
+        onClick={() => cart.setIsOpen(true)}
+      />
 
       <Footer />
     </div>

@@ -9,6 +9,7 @@ import { useCart, DELIVERY_FEE, ESTIMATED_DELIVERY_TIME } from "@/hooks/useCart"
 import { useOrderType } from "@/hooks/useOrderType";
 import { useDeliveryAddress } from "@/hooks/useDeliveryAddress";
 import { formatPrice } from "@/data/menu";
+import { generatePickupTimes, getStoreStatus } from "@/lib/storeHours";
 import { Textarea } from "@/components/ui/textarea";
 import {
   ArrowLeft,
@@ -39,40 +40,6 @@ const TIP_OPTIONS = [
   { label: "25%", value: 0.25 },
 ];
 
-// Store hours: Mon-Fri 3PM-11PM, Sat-Sun 12PM-11PM
-const STORE_HOURS: Record<number, [number, number]> = {
-  0: [12, 23], // Sunday
-  1: [15, 23], // Monday
-  2: [15, 23], // Tuesday
-  3: [15, 23], // Wednesday
-  4: [15, 23], // Thursday
-  5: [15, 23], // Friday
-  6: [12, 23], // Saturday
-};
-
-function generatePickupTimes(): { label: string; value: string }[] {
-  const now = new Date();
-  const day = now.getDay();
-  const [openHour, closeHour] = STORE_HOURS[day];
-  const times: { label: string; value: string }[] = [];
-  const startMin = 25; // minimum prep time
-
-  for (let i = 0; i < 8; i++) {
-    const d = new Date(now.getTime() + (startMin + i * 15) * 60000);
-    const dHour = d.getHours() + d.getMinutes() / 60;
-    // Only show times within store hours
-    if (dHour < openHour || dHour >= closeHour) continue;
-    const hours = d.getHours();
-    const minutes = d.getMinutes();
-    const ampm = hours >= 12 ? "PM" : "AM";
-    const h = hours % 12 || 12;
-    const m = minutes.toString().padStart(2, "0");
-    const label = `${h}:${m} ${ampm}`;
-    times.push({ label, value: d.toISOString() });
-  }
-  return times;
-}
-
 type PaymentMethod = "card" | "apple-pay" | "cashapp";
 
 const OrderCheckout = () => {
@@ -91,10 +58,14 @@ const OrderCheckout = () => {
     return null;
   }, []);
 
+  const pickupTimes = useMemo(() => generatePickupTimes(), []);
+  const storeStatus = useMemo(() => getStoreStatus(), []);
+  const initialPickupTime = savedForm?.pickupTime || (storeStatus.isOpen ? "asap" : pickupTimes[0]?.value || "asap");
+
   const [name, setName] = useState(savedForm?.name || "");
   const [phone, setPhone] = useState(savedForm?.phone || "");
   const [email, setEmail] = useState(savedForm?.email || "");
-  const [pickupTime, setPickupTime] = useState(savedForm?.pickupTime || "asap");
+  const [pickupTime, setPickupTime] = useState(initialPickupTime);
   const [tipPercent, setTipPercent] = useState<number | null>(savedForm?.tipPercent ?? 0.20);
   const [customTip, setCustomTip] = useState(savedForm?.customTip || "");
   const [deliveryNotes, setDeliveryNotes] = useState(savedForm?.deliveryNotes || "");
@@ -115,8 +86,6 @@ const OrderCheckout = () => {
   const applePayRef = useRef<any>(null);
   const cashAppPayRef = useRef<any>(null);
   const processOrderRef = useRef<(nonce: string | null) => Promise<void>>();
-
-  const pickupTimes = useMemo(() => generatePickupTimes(), []);
 
   const ORDER_API_URL =
     (window as any).__ORDER_API_URL__ ||
@@ -555,17 +524,24 @@ const OrderCheckout = () => {
                   </h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setPickupTime("asap")}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border ${
-                      pickupTime === "asap"
-                        ? "border-gold bg-gold/10 text-gold"
-                        : "border-[#2a2a2a] bg-[#141414] text-cream/50 hover:border-gold/25"
-                    }`}
-                  >
-                    ASAP
-                    <span className="text-[11px] ml-1.5 opacity-60">20–30 min</span>
-                  </button>
+                  {storeStatus.isOpen && (
+                    <button
+                      onClick={() => setPickupTime("asap")}
+                      className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border ${
+                        pickupTime === "asap"
+                          ? "border-gold bg-gold/10 text-gold"
+                          : "border-[#2a2a2a] bg-[#141414] text-cream/50 hover:border-gold/25"
+                      }`}
+                    >
+                      ASAP
+                      <span className="text-[11px] ml-1.5 opacity-60">20–30 min</span>
+                    </button>
+                  )}
+                  {!storeStatus.isOpen && (
+                    <p className="w-full text-cream/40 text-xs mb-1">
+                      We're closed right now — choose a scheduled pickup time below.
+                    </p>
+                  )}
                   {pickupTimes.slice(0, 5).map((t) => (
                     <button
                       key={t.value}
