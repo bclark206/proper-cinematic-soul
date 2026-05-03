@@ -191,4 +191,61 @@ describe("catalog sync transform", () => {
     expect(result.statusCode).toBe(200);
     expect(body.menuItems.map((m: { name: string }) => m.name)).toEqual(["Visible Item"]);
   });
+
+  it("hides items deleted in Square (is_deleted=true) and items absent at our location", async () => {
+    vi.stubEnv("SQUARE_LOCATION_ID", "LOC1");
+    mockFetch.mockResolvedValueOnce(
+      squareCatalogResponse([
+        category("cat-apps", "Apps"),
+        {
+          type: "ITEM",
+          id: "ITEM-DELETED",
+          is_deleted: true,
+          item_data: {
+            name: "Deleted Item",
+            categories: [{ id: "cat-apps" }],
+            variations: [{ id: "vd", item_variation_data: { name: "Regular", price_money: { amount: 1000 } } }],
+          },
+        },
+        {
+          type: "ITEM",
+          id: "ITEM-ABSENT",
+          present_at_all_locations: true,
+          absent_at_location_ids: ["LOC1"],
+          item_data: {
+            name: "Absent Item",
+            categories: [{ id: "cat-apps" }],
+            variations: [{ id: "va", item_variation_data: { name: "Regular", price_money: { amount: 1000 } } }],
+          },
+        },
+        {
+          type: "ITEM",
+          id: "ITEM-OTHER-LOC",
+          present_at_all_locations: false,
+          present_at_location_ids: ["LOC2"],
+          item_data: {
+            name: "Other Location Item",
+            categories: [{ id: "cat-apps" }],
+            variations: [{ id: "vo", item_variation_data: { name: "Regular", price_money: { amount: 1000 } } }],
+          },
+        },
+        {
+          type: "ITEM",
+          id: "ITEM-OK",
+          present_at_all_locations: true,
+          item_data: {
+            name: "Ok Item",
+            categories: [{ id: "cat-apps" }],
+            variations: [{ id: "vk", item_variation_data: { name: "Regular", price_money: { amount: 1000 } } }],
+          },
+        },
+      ])
+    );
+
+    const result = await handler({ httpMethod: "GET" });
+    const body = JSON.parse(result.body);
+
+    expect(result.statusCode).toBe(200);
+    expect(body.menuItems.map((m: { name: string }) => m.name)).toEqual(["Ok Item"]);
+  });
 });

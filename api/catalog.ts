@@ -12,6 +12,10 @@
 interface SquareCatalogObject {
   type: string;
   id: string;
+  is_deleted?: boolean;
+  present_at_all_locations?: boolean;
+  absent_at_location_ids?: string[];
+  present_at_location_ids?: string[];
   item_data?: {
     name?: string;
     description?: string;
@@ -161,6 +165,21 @@ export async function handler(_event: { body?: string; httpMethod?: string }) {
       if (data.objects) allObjects = allObjects.concat(data.objects);
       cursor = data.cursor;
     } while (cursor);
+
+    // Filter out deleted objects and items not present at our location.
+    // /v2/catalog/list returns deleted=true rows (via include_deleted_objects state) and
+    // items can be marked absent at specific locations. We must respect both.
+    const SQUARE_LOCATION_ID = process.env.SQUARE_LOCATION_ID;
+    const presentAtLocation = (obj: SquareCatalogObject): boolean => {
+      if (obj.is_deleted) return false;
+      if (!SQUARE_LOCATION_ID) return true;
+      if (obj.absent_at_location_ids?.includes(SQUARE_LOCATION_ID)) return false;
+      if (obj.present_at_all_locations === false) {
+        if (!obj.present_at_location_ids?.includes(SQUARE_LOCATION_ID)) return false;
+      }
+      return true;
+    };
+    allObjects = allObjects.filter(presentAtLocation);
 
     // Build lookup maps
     const categoriesById = new Map<string, SquareCatalogObject>();
