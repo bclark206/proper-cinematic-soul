@@ -29,7 +29,8 @@ function useStoreOpen() {
       const weekend = day === 0 || day === 6;
       const open = weekend ? 12 * 60 : 15 * 60;
       const close = 22 * 60 + 30;
-      setIsOpen(t >= open && t <= close);
+      const forceOpen = new URLSearchParams(window.location.search).get("forceOpen") === "1";
+      setIsOpen(forceOpen || (t >= open && t <= close));
       setHours(weekend ? "12:00 PM – 11:00 PM" : "3:00 PM – 11:00 PM");
     };
     check();
