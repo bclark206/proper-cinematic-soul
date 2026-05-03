@@ -205,3 +205,18 @@ export async function handler(event: { body: string }) {
     };
   }
 }
+
+// Vercel adapter — wraps Netlify-style handler above for Vercel serverless runtime
+export default async function vercelHandler(
+  req: { method?: string; body?: unknown },
+  res: {
+    status: (code: number) => { send: (body: string) => void };
+    setHeader: (k: string, v: string) => void;
+  }
+) {
+  const event = {
+    body: typeof req.body === "string" ? req.body : JSON.stringify(req.body || {}),
+  };
+  const result = await handler(event);
+  res.status(result.statusCode).send(result.body);
+}
