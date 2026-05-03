@@ -108,8 +108,8 @@ export async function handler(event: { body: string }) {
               email_address: customer.email,
             },
             ...(pickupTime && pickupTime !== "asap"
-              ? { pickup_at: pickupTime }
-              : { prep_time_duration: "P0DT0H30M0S" }),
+              ? { schedule_type: "SCHEDULED", pickup_at: pickupTime }
+              : { schedule_type: "ASAP", prep_time_duration: "P0DT0H30M0S" }),
           },
         },
       ],
