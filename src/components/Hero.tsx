@@ -15,7 +15,7 @@ const Hero = () => {
         </p>
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-pure-white mb-6 fade-in-up">
           Baltimore's Premier{" "}
-          <span className="hover-gold text-[#9f7d2a]">Soul Food</span>{" "}
+          <span className="hover-gold text-[#9f7d2a]">Comfort Food</span>{" "}
           Restaurant
         </h1>
 
