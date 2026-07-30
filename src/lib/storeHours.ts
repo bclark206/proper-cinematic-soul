@@ -1,14 +1,14 @@
 const TIME_ZONE = "America/New_York";
 
-// Store hours: Mon-Fri 3PM-11PM, Sat-Sun 12PM-11PM
+// Store hours: Sun 11AM-11PM, Mon-Thu 5PM-midnight, Fri-Sat noon-midnight
 const STORE_HOURS: Record<number, [number, number]> = {
-  0: [12 * 60, 23 * 60], // Sunday
-  1: [15 * 60, 23 * 60], // Monday
-  2: [15 * 60, 23 * 60], // Tuesday
-  3: [15 * 60, 23 * 60], // Wednesday
-  4: [15 * 60, 23 * 60], // Thursday
-  5: [15 * 60, 23 * 60], // Friday
-  6: [12 * 60, 23 * 60], // Saturday
+  0: [11 * 60, 23 * 60], // Sunday
+  1: [17 * 60, 24 * 60], // Monday
+  2: [17 * 60, 24 * 60], // Tuesday
+  3: [17 * 60, 24 * 60], // Wednesday
+  4: [17 * 60, 24 * 60], // Thursday
+  5: [12 * 60, 24 * 60], // Friday
+  6: [12 * 60, 24 * 60], // Saturday
 };
 
 type ZonedParts = {
@@ -76,8 +76,9 @@ function addDaysInNewYork(parts: ZonedParts, days: number): ZonedParts {
 }
 
 function formatTime(minutesAfterMidnight: number): string {
-  const hours = Math.floor(minutesAfterMidnight / 60);
-  const minutes = minutesAfterMidnight % 60;
+  const normalizedMinutes = minutesAfterMidnight % (24 * 60);
+  const hours = Math.floor(normalizedMinutes / 60);
+  const minutes = normalizedMinutes % 60;
   const ampm = hours >= 12 ? "PM" : "AM";
   const h = hours % 12 || 12;
   const m = minutes.toString().padStart(2, "0");

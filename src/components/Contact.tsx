@@ -20,7 +20,7 @@ const Contact = () => {
   }, {
     icon: Clock,
     title: "Hours",
-    details: ["Sunday 11am-11pm", "Mon-Thu 12pm-11pm", "Fri-Sat 12pm-12am"],
+    details: ["Sunday 11am-11pm", "Mon-Thu 5pm-12am", "Fri-Sat 12pm-12am"],
     action: "View Calendar"
   }];
   const socialLinks = [{

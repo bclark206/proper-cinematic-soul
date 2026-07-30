@@ -62,7 +62,7 @@ const Footer = () => {
               
               <div>
                 <p className="font-medium text-pure-white">Monday-Thursday</p>
-                <p>12pm-11pm</p>
+                <p>5pm-12am</p>
               </div>
               
               <div>

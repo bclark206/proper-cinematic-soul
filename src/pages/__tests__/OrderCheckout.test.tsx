@@ -93,7 +93,7 @@ vi.mock("@/hooks/use-toast", () => ({
 
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
-  vi.setSystemTime(new Date("2026-05-04T16:00:00-04:00"));
+  vi.setSystemTime(new Date("2026-05-04T18:00:00-04:00"));
 });
 
 afterEach(() => {
@@ -184,7 +184,7 @@ describe("OrderCheckout - Pickup Time", () => {
 
     expect(screen.queryByText("ASAP")).not.toBeInTheDocument();
     expect(screen.getByText(/choose a scheduled pickup time/i)).toBeInTheDocument();
-    const firstScheduledTime = screen.getByText("Today 3:00 PM").closest("button");
+    const firstScheduledTime = screen.getByText("Today 5:00 PM").closest("button");
     expect(firstScheduledTime?.className).toContain("border-gold");
   });
 });
