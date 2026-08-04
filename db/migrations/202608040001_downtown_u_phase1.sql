@@ -11,6 +11,7 @@ EXCEPTION
       SELECT 1 FROM pg_catalog.pg_roles
       WHERE rolname = 'downtown_u_runtime' AND NOT rolcanlogin
         AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole
+        AND NOT rolreplication AND NOT rolbypassrls
     ) THEN
       RAISE EXCEPTION 'Existing downtown_u_runtime role is not the required least-privilege NOLOGIN role';
     END IF;

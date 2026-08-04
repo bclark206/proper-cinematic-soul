@@ -1,4 +1,7 @@
 import { isUint8Array } from "node:util/types";
+import { Pool } from "pg";
+import { PostgresWebhookEventStore } from "../../server/downtown-u/postgres-webhook-event-store";
+import type { WebhookEventStore } from "../../server/downtown-u/webhook-event-store";
 import {
   createSquareWebhookHandler,
   SQUARE_WEBHOOK_MAX_RAW_BODY_BYTES,
@@ -87,10 +90,67 @@ export function createNodeSquareWebhookHandler(dependencies: SquareWebhookDepend
   };
 }
 
-async function unavailableProcessor(): Promise<never> {
-  // Phase 2 A1 establishes only the verified boundary. Retry supported events
-  // until the durable event processor is added in a later task.
-  throw new Error("Square webhook processor is not configured");
+export function createClaimingProcessor(
+  store: WebhookEventStore,
+  processClaim?: (
+    claim: Parameters<SquareWebhookDependencies["processEvent"]>[0] & {
+      claimToken: string;
+      attemptCount: number;
+    },
+    acknowledgment: {
+      complete(): Promise<void>;
+      fail(failureCode: string, failureDetail: string): Promise<void>;
+    },
+  ) => Promise<void>,
+): SquareWebhookDependencies["processEvent"] {
+  return async (claim) => {
+    const result = await store.claim(claim.eventId, claim.eventType, claim.bodyHash);
+    if (result.outcome === "claimed") {
+      if (processClaim) {
+        let disposition: "processing" | "completed" | "failed" = "processing";
+        const ensureProcessing = () => {
+          if (disposition !== "processing") throw new Error("Webhook claim was already acknowledged");
+        };
+        await processClaim(
+          { ...claim, claimToken: result.claimToken, attemptCount: result.attemptCount },
+          {
+            complete: async () => {
+              ensureProcessing();
+              await store.complete(claim.eventId, result.claimToken);
+              disposition = "completed";
+            },
+            fail: async (failureCode, failureDetail) => {
+              ensureProcessing();
+              await store.fail(claim.eventId, result.claimToken, failureCode, failureDetail);
+              disposition = "failed";
+            },
+          },
+        );
+        if ((disposition as string) === "completed") return { outcome: "accepted" };
+        throw new Error("Webhook claim was not completed");
+      }
+      try {
+        await store.fail(claim.eventId, result.claimToken, "processor_unavailable", "Webhook processor unavailable");
+      } catch {
+        // Still return a retryable response if acknowledgment recovery fails.
+      }
+      throw new Error("Webhook processor unavailable");
+    }
+    if (result.outcome === "duplicate") return { outcome: "duplicate" };
+    throw new Error("Webhook event is not currently processable");
+  };
+}
+
+let webhookPool: Pool | undefined;
+function getWebhookPool(connectionString: string): Pool {
+  webhookPool ??= new Pool({
+    connectionString,
+    max: 5,
+    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 5_000,
+    allowExitOnIdle: true,
+  });
+  return webhookPool;
 }
 
 export default async function squareWebhook(
@@ -99,14 +159,17 @@ export default async function squareWebhook(
 ): Promise<void> {
   const signatureKey = process.env.SQUARE_WEBHOOK_SIGNATURE_KEY;
   const notificationUrl = process.env.DOWNTOWN_U_SQUARE_WEBHOOK_URL;
-  if (!signatureKey || !notificationUrl) {
-    send(response, { status: 500, body: { error: "server_error" } });
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!signatureKey || !notificationUrl || !databaseUrl) {
+    send(response, { status: 503, body: { error: "temporarily_unavailable" } });
     return;
   }
 
   return createNodeSquareWebhookHandler({
     signatureKey,
     notificationUrl,
-    processEvent: unavailableProcessor,
+    processEvent: createClaimingProcessor(
+      new PostgresWebhookEventStore(getWebhookPool(databaseUrl)),
+    ),
   })(request, response);
 }

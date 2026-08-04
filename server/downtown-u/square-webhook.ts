@@ -1,4 +1,5 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { WebhookEventConflictError } from "./webhook-event-store";
 
 export const SQUARE_WEBHOOK_MAX_RAW_BODY_BYTES = 256 * 1024;
 
@@ -15,10 +16,14 @@ export interface SquareWebhookClaim {
   bodyHash: string;
 }
 
+export interface SquareWebhookProcessResult {
+  outcome: "accepted" | "duplicate";
+}
+
 export interface SquareWebhookDependencies {
   signatureKey: string;
   notificationUrl: string;
-  processEvent: (claim: SquareWebhookClaim) => Promise<void>;
+  processEvent: (claim: SquareWebhookClaim) => Promise<void | SquareWebhookProcessResult>;
 }
 
 export interface SquareWebhookRequest {
@@ -182,8 +187,17 @@ export function createSquareWebhookHandler(dependencies: SquareWebhookDependenci
     };
 
     try {
-      await dependencies.processEvent(claim);
-    } catch {
+      const result = await dependencies.processEvent(claim);
+      if (result?.outcome === "accepted") {
+        return { status: 202, body: { ok: true, accepted: true } };
+      }
+      if (result?.outcome === "duplicate") {
+        return { status: 200, body: { ok: true, duplicate: true } };
+      }
+    } catch (error) {
+      if (error instanceof WebhookEventConflictError) {
+        return { status: 409, body: { error: "event_conflict" } };
+      }
       return { status: 503, body: { error: "temporarily_unavailable" } };
     }
 
