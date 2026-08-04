@@ -13,6 +13,7 @@ import Valentines from "./pages/Valentines";
 import Order from "./pages/Order";
 import OrderCheckout from "./pages/OrderCheckout";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import DowntownU from "./pages/DowntownU";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/order" element={<Order />} />
           <Route path="/order/checkout" element={<OrderCheckout />} />
           <Route path="/order/confirmation" element={<OrderConfirmation />} />
+          <Route path="/downtown-u" element={<DowntownU />} />
           <Route path="/sms-compliance" element={<SmsCompliance />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
