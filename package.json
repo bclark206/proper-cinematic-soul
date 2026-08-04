@@ -9,7 +9,10 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:postgres": "vitest run server/downtown-u/__tests__/migration.integration.test.ts",
+    "typecheck": "tsc -b --pretty false",
+    "typecheck:server": "tsc -p tsconfig.server.json --pretty false"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -49,6 +52,7 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
+    "pg": "^8.22.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -68,6 +72,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^22.16.5",
+    "@types/pg": "^8.20.4",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^3.11.0",
