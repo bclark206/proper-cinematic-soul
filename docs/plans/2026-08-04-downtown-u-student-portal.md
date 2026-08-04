@@ -69,6 +69,8 @@
 4. GREEN persist event claim, fetch authoritative Square payment/order, map only trusted catalog/link configuration to `getCanonicalPlan`, upsert normalized student/Square linkage, create paid purchase, and grant once in one local transaction. Return 2xx for safely processed duplicates; retry transient failures.
 5. RED/GREEN refund and partial-refund events: derive credits to revoke from trusted purchase/refund policy, append compensation, update purchase state, and record a reconciliation case when spent credits prevent automatic revocation. Eligibility begins `pending`; webhook payment does not self-approve.
 
+**Webhook boundary configuration:** Keep `SQUARE_WEBHOOK_SIGNATURE_KEY`, `DOWNTOWN_U_SQUARE_WEBHOOK_URL`, `SQUARE_API_VERSION`, and `SQUARE_LOCATION_ID` server-only. The notification URL must exactly match the public URL registered with Square. Disable request-body parsing for this route: the Node adapter reads the stream once and rejects pre-parsed bodies. Raw webhook requests are limited to 256 KiB.
+
 **Security/deployment gate:** Configure webhook secret in preview, register exact preview callback, replay signed sandbox fixtures, verify no PII/secrets in logs, and alert on processing failures. Production requires exact production URL/signature key and Square dashboard confirmation. Never test by making a live charge.
 
 **Verification:** Signed sandbox webhook creates one pending student/purchase/grant; ten replays remain one. Invalid signatures and economics create nothing. Refunds are auditable and non-negative. Existing payment links continue to render.
