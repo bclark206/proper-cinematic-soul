@@ -9,11 +9,14 @@ const EVENT_ID_PATTERN = /^[A-Za-z0-9_-]{1,128}$/;
 const EVENT_TYPE_PATTERN = /^[a-z][a-z0-9_-]*(?:\.[a-z][a-z0-9_-]*)+$/;
 const EVENT_TYPE_MAX_LENGTH = 128;
 const VERSION_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+const RESOURCE_ID_PATTERN = /^[A-Za-z0-9_-]{1,192}$/;
+const RESOURCE_TYPE_PATTERN = /^[a-z][a-z0-9_]{0,63}$/;
 
 export interface SquareWebhookClaim {
   eventId: string;
   eventType: "payment.updated" | "refund.updated";
   bodyHash: string;
+  resourceId: string;
 }
 
 export interface SquareWebhookProcessResult {
@@ -84,6 +87,57 @@ interface SquareEventEnvelope {
   event_id: string;
   type: string;
   version: string;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function ownDataValue(value: object, key: string): unknown {
+  const descriptor = Object.getOwnPropertyDescriptor(value, key);
+  return descriptor && "value" in descriptor ? descriptor.value : undefined;
+}
+
+function hasPropertyDescriptor(value: object, key: string): boolean {
+  let current: object | null = value;
+  while (current !== null) {
+    if (Object.getOwnPropertyDescriptor(current, key)) return true;
+    current = Object.getPrototypeOf(current);
+  }
+  return false;
+}
+
+export function extractSquareWebhookResourceId(
+  value: unknown,
+  eventType: SquareWebhookClaim["eventType"],
+): string | null {
+  if (!isPlainObject(value)) return null;
+  const data = ownDataValue(value, "data");
+  if (!isPlainObject(data)) return null;
+  const expectedKey = eventType === "payment.updated" ? "payment" : "refund";
+  const dataType = ownDataValue(data, "type");
+  const dataId = ownDataValue(data, "id");
+  if (
+    typeof dataType !== "string" ||
+    !RESOURCE_TYPE_PATTERN.test(dataType) ||
+    dataType !== expectedKey ||
+    typeof dataId !== "string" ||
+    !RESOURCE_ID_PATTERN.test(dataId)
+  ) return null;
+  const object = ownDataValue(data, "object");
+  if (!isPlainObject(object)) return null;
+  const otherKey = eventType === "payment.updated" ? "refund" : "payment";
+  const resourceDescriptor = Object.getOwnPropertyDescriptor(object, expectedKey);
+  if (
+    !resourceDescriptor ||
+    !("value" in resourceDescriptor) ||
+    !isPlainObject(resourceDescriptor.value) ||
+    hasPropertyDescriptor(object, otherKey)
+  ) return null;
+  const id = ownDataValue(resourceDescriptor.value, "id");
+  return typeof id === "string" && RESOURCE_ID_PATTERN.test(id) && id === dataId ? id : null;
 }
 
 function ownDataString(
@@ -180,10 +234,17 @@ export function createSquareWebhookHandler(dependencies: SquareWebhookDependenci
       return { status: 200, body: { ok: true, ignored: true } };
     }
 
+    const eventType = envelope.type as SquareWebhookClaim["eventType"];
+    const resourceId = extractSquareWebhookResourceId(parsed, eventType);
+    if (!resourceId) {
+      return { status: 400, body: { error: "invalid_request" } };
+    }
+
     const claim: SquareWebhookClaim = {
       eventId: envelope.event_id,
-      eventType: envelope.type as SquareWebhookClaim["eventType"],
+      eventType,
       bodyHash: createHash("sha256").update(request.rawBody).digest("hex"),
+      resourceId,
     };
 
     try {

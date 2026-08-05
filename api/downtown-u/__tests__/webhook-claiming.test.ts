@@ -9,7 +9,7 @@ describe("production webhook claim processor", () => {
   function storeWith(result: Awaited<ReturnType<WebhookEventStore["claim"]>>): WebhookEventStore {
     return { claim: vi.fn().mockResolvedValue(result), complete: vi.fn(), fail: vi.fn() };
   }
-  const claim = { eventId: "evt_1", eventType: "payment.updated", bodyHash: "a".repeat(64) } as const;
+  const claim = { eventId: "evt_1", eventType: "payment.updated", bodyHash: "a".repeat(64), resourceId: "PAY_1" } as const;
 
   it("marks a new claim failed with its exact token and remains retryable", async () => {
     const store = storeWith({ outcome: "claimed", claimToken: "token", attemptCount: 1 });
@@ -62,7 +62,7 @@ describe("production webhook claim processor", () => {
 describe("claim outcome HTTP mapping", () => {
   const key = "test-key";
   const url = "https://example.test/api/downtown-u/square-webhook";
-  const rawBody = Buffer.from('{"event_id":"evt_http","type":"payment.updated","version":"2026-08-04"}');
+  const rawBody = Buffer.from('{"event_id":"evt_http","type":"payment.updated","version":"2026-08-04","data":{"type":"payment","id":"PAY_1","object":{"payment":{"id":"PAY_1"}}}}');
   const signature = createHmac("sha256", key).update(url).update(rawBody).digest("base64");
   const request = {
     method: "POST",

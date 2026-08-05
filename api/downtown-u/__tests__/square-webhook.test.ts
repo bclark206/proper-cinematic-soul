@@ -3,6 +3,7 @@ import { Readable } from "node:stream";
 import { describe, expect, it, vi } from "vitest";
 import {
   createSquareWebhookHandler,
+  extractSquareWebhookResourceId,
   parseSquareEventEnvelope,
   SQUARE_WEBHOOK_MAX_RAW_BODY_BYTES,
   type SquareWebhookClaim,
@@ -13,13 +14,16 @@ const signatureKey = "sandbox-signature-key";
 const notificationUrl = "https://example.com/api/downtown-u/square-webhook";
 
 function eventBody(type = "payment.updated", eventId = "event-123") {
+  const resourceType = type === "refund.updated" ? "refund" : type === "payment.updated" ? "payment" : "customer";
+  const resourceId = `${resourceType}-sensitive`;
+  const resource = { [resourceType]: { id: resourceId } };
   return Buffer.from(
     JSON.stringify({
       merchant_id: "merchant-sensitive",
       type,
       event_id: eventId,
       version: "2026-01-22",
-      data: { object: { payment: { id: "payment-sensitive" } } },
+      data: { type: resourceType, id: resourceId, object: resource },
     }),
   );
 }
@@ -65,18 +69,145 @@ function makeCore() {
   };
 }
 
+type SupportedEventType = SquareWebhookClaim["eventType"];
+type DescriptorLocatorCase = {
+  label: string;
+  arrange: (
+    object: Record<string, unknown>,
+    expectedKey: "payment" | "refund",
+    oppositeKey: "payment" | "refund",
+    resource: Record<string, string>,
+  ) => { getter?: ReturnType<typeof vi.fn>; cleanup?: () => void };
+};
+
+function locatorEnvelope(type: SupportedEventType) {
+  const expectedKey: "payment" | "refund" =
+    type === "payment.updated" ? "payment" : "refund";
+  const resourceId = type === "payment.updated" ? "PAY_1" : "REFUND_1";
+  const resource = { id: resourceId };
+  const oppositeKey: "payment" | "refund" =
+    expectedKey === "payment" ? "refund" : "payment";
+  return {
+    expectedKey,
+    oppositeKey,
+    resource,
+    envelope: {
+      event_id: "event-123",
+      type,
+      version: "2026-01-22",
+      data: {
+        type: expectedKey,
+        id: resourceId,
+        object: { [expectedKey]: resource } as Record<string, unknown>,
+      },
+    },
+  };
+}
+
+const descriptorLocatorCases: DescriptorLocatorCase[] = [
+  {
+    label: "opposite own undefined data property",
+    arrange: (object, _expectedKey, oppositeKey) => {
+      Object.defineProperty(object, oppositeKey, {
+        configurable: true,
+        enumerable: true,
+        value: undefined,
+      });
+      return {};
+    },
+  },
+  {
+    label: "opposite own accessor",
+    arrange: (object, _expectedKey, oppositeKey) => {
+      const getter = vi.fn(() => {
+        throw new Error("opposite accessor must not run");
+      });
+      Object.defineProperty(object, oppositeKey, {
+        configurable: true,
+        enumerable: true,
+        get: getter,
+      });
+      return { getter };
+    },
+  },
+  {
+    label: "opposite inherited data property",
+    arrange: (_object, _expectedKey, oppositeKey, resource) => {
+      Object.defineProperty(Object.prototype, oppositeKey, {
+        configurable: true,
+        value: resource,
+      });
+      return { cleanup: () => { Reflect.deleteProperty(Object.prototype, oppositeKey); } };
+    },
+  },
+  {
+    label: "opposite inherited accessor",
+    arrange: (_object, _expectedKey, oppositeKey) => {
+      const getter = vi.fn(() => {
+        throw new Error("inherited opposite accessor must not run");
+      });
+      Object.defineProperty(Object.prototype, oppositeKey, {
+        configurable: true,
+        get: getter,
+      });
+      return {
+        getter,
+        cleanup: () => { Reflect.deleteProperty(Object.prototype, oppositeKey); },
+      };
+    },
+  },
+  {
+    label: "expected own accessor",
+    arrange: (object, expectedKey) => {
+      const getter = vi.fn(() => {
+        throw new Error("expected accessor must not run");
+      });
+      Object.defineProperty(object, expectedKey, {
+        configurable: true,
+        enumerable: true,
+        get: getter,
+      });
+      return { getter };
+    },
+  },
+  {
+    label: "inherited expected resource",
+    arrange: (object, expectedKey, _oppositeKey, resource) => {
+      delete object[expectedKey];
+      Object.setPrototypeOf(object, { [expectedKey]: resource });
+      return {};
+    },
+  },
+  {
+    label: "inherited expected accessor",
+    arrange: (object, expectedKey) => {
+      const getter = vi.fn(() => {
+        throw new Error("inherited expected accessor must not run");
+      });
+      delete object[expectedKey];
+      const prototype = {};
+      Object.defineProperty(prototype, expectedKey, { get: getter });
+      Object.setPrototypeOf(object, prototype);
+      return { getter };
+    },
+  },
+];
+
+const descriptorLocatorMatrix = (["payment.updated", "refund.updated"] as const)
+  .flatMap((type) => descriptorLocatorCases.map((testCase) => ({ type, ...testCase })));
+
 describe("Square webhook boundary", () => {
   it("accepts an independent fixed OpenSSL HMAC-SHA256 vector", async () => {
     const vectorUrl = "https://vector.example/api/downtown-u/square-webhook";
     const vectorKey = "independent-vector-key";
     const rawBody = Buffer.from(
-      '{"event_id":"evt_vector-01","type":"payment.updated","version":"2026-01-22"}',
+      '{"event_id":"evt_vector-01","type":"payment.updated","version":"2026-01-22","data":{"type":"payment","id":"PAY_VECTOR","object":{"payment":{"id":"PAY_VECTOR"}}}}',
     );
     // Generated once outside Node and then hard-coded (URL and raw JSON are
     // concatenated with no separator), so this assertion cannot agree merely
     // because production and test share the same implementation:
-    // printf '%s' 'https://vector.example/api/downtown-u/square-webhook{"event_id":"evt_vector-01","type":"payment.updated","version":"2026-01-22"}' | openssl dgst -sha256 -hmac 'independent-vector-key' -binary | openssl base64 -A
-    const expectedSignature = "PNVgHU94o4LOvjNn04EknNjaEAcuIEE5EGWhwE9AB1o=";
+    // printf '%s' 'https://vector.example/api/downtown-u/square-webhook{"event_id":"evt_vector-01","type":"payment.updated","version":"2026-01-22","data":{"type":"payment","id":"PAY_VECTOR","object":{"payment":{"id":"PAY_VECTOR"}}}}' | openssl dgst -sha256 -hmac 'independent-vector-key' -binary | openssl base64 -A
+    const expectedSignature = "i6DmAW6XATHA2wlD71xh7CNuyVxxI1wpTLL9/t40ydI=";
     const processEvent = vi.fn().mockResolvedValue(undefined);
     const handler = createSquareWebhookHandler({
       signatureKey: vectorKey,
@@ -111,6 +242,7 @@ describe("Square webhook boundary", () => {
       eventId: "event-123",
       eventType: "payment.updated",
       bodyHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+      resourceId: "payment-sensitive",
     });
     expect(processEvent.mock.calls[1][0].bodyHash).toBe(
       processEvent.mock.calls[0][0].bodyHash,
@@ -119,6 +251,7 @@ describe("Square webhook boundary", () => {
       "bodyHash",
       "eventId",
       "eventType",
+      "resourceId",
     ]);
   });
 
@@ -307,7 +440,7 @@ describe("Square webhook boundary", () => {
   ])("validates Square's YYYY-MM-DD version %j", async (version, status) => {
     const { handler, processEvent } = makeCore();
     const rawBody = Buffer.from(
-      JSON.stringify({ event_id: "event-123", type: "payment.updated", version }),
+      JSON.stringify({ event_id: "event-123", type: "payment.updated", version, data: { type: "payment", id: "PAY_1", object: { payment: { id: "PAY_1" } } } }),
     );
 
     const result = await handler(request(rawBody));
@@ -358,6 +491,113 @@ describe("Square webhook boundary", () => {
     expect(result).toEqual({ status: 503, body: { error: "temporarily_unavailable" } });
     expect(JSON.stringify(result)).not.toContain("PII");
     expect(JSON.stringify(result)).not.toContain(signatureKey);
+  });
+});
+
+describe("Square webhook resource locator safety", () => {
+  it.each([
+    ["payment.updated", { data: { type: "payment", id: "PAY_1", object: { payment: { id: "PAY_1" } } } }, "PAY_1"],
+    ["refund.updated", { data: { type: "refund", id: "REFUND_1", object: { refund: { id: "REFUND_1" } } } }, "REFUND_1"],
+  ] as const)("extracts the published %s resource shape", (type, envelope, id) => {
+    expect(extractSquareWebhookResourceId(envelope, type)).toBe(id);
+  });
+
+  it.each(descriptorLocatorMatrix)(
+    "rejects $type with a $label directly without invoking getters",
+    ({ type, arrange }) => {
+      const { expectedKey, oppositeKey, resource, envelope } = locatorEnvelope(type);
+      const { getter, cleanup } = arrange(
+        envelope.data.object,
+        expectedKey,
+        oppositeKey,
+        resource,
+      );
+      try {
+        expect(extractSquareWebhookResourceId(envelope, type)).toBeNull();
+        if (getter) expect(getter).not.toHaveBeenCalled();
+      } finally {
+        cleanup?.();
+      }
+    },
+  );
+
+  it.each(descriptorLocatorMatrix)(
+    "rejects signed $type with a $label before processing",
+    async ({ type, arrange }) => {
+      const { handler, processEvent } = makeCore();
+      const { expectedKey, oppositeKey, resource, envelope } = locatorEnvelope(type);
+      const { getter, cleanup } = arrange(
+        envelope.data.object,
+        expectedKey,
+        oppositeKey,
+        resource,
+      );
+      const parse = vi.spyOn(JSON, "parse").mockReturnValue(envelope);
+      try {
+        const rawBody = eventBody(type);
+        await expect(handler(request(rawBody))).resolves.toEqual({
+          status: 400,
+          body: { error: "invalid_request" },
+        });
+        if (getter) expect(getter).not.toHaveBeenCalled();
+        expect(processEvent).not.toHaveBeenCalled();
+      } finally {
+        parse.mockRestore();
+        cleanup?.();
+      }
+    },
+  );
+
+  it.each([
+    ["missing nested object", { data: { type: "payment", id: "PAY_1", object: {} } }],
+    ["missing data.type", { data: { id: "PAY_1", object: { payment: { id: "PAY_1" } } } }],
+    ["missing data.id", { data: { type: "payment", object: { payment: { id: "PAY_1" } } } }],
+    ["wrong data.type", { data: { type: "refund", id: "PAY_1", object: { payment: { id: "PAY_1" } } } }],
+    ["malformed data.type", { data: { type: 1, id: "PAY_1", object: { payment: { id: "PAY_1" } } } }],
+    ["malformed data.id", { data: { type: "payment", id: "PAY/1", object: { payment: { id: "PAY/1" } } } }],
+    ["conflicting data.id", { data: { type: "payment", id: "PAY_2", object: { payment: { id: "PAY_1" } } } }],
+    ["mismatched", { data: { type: "payment", id: "REFUND_1", object: { refund: { id: "REFUND_1" } } } }],
+    ["ambiguous", { data: { type: "payment", id: "PAY_1", object: { payment: { id: "PAY_1" }, refund: { id: "REFUND_1" } } } }],
+    ["oversized", { data: { type: "payment", id: "x".repeat(193), object: { payment: { id: "x".repeat(193) } } } }],
+  ])("rejects a %s payment locator", (_label, envelope) => {
+    expect(extractSquareWebhookResourceId(envelope, "payment.updated")).toBeNull();
+  });
+
+  it("rejects inherited and accessor containers/IDs without invoking getters", () => {
+    const inherited = { data: { type: "payment", id: "PAY_1", object: Object.create({ payment: { id: "PAY_1" } }) } };
+    expect(extractSquareWebhookResourceId(inherited, "payment.updated")).toBeNull();
+    const getter = vi.fn(() => "PAY_1");
+    const payment = {};
+    Object.defineProperty(payment, "id", { get: getter, enumerable: true });
+    expect(extractSquareWebhookResourceId({ data: { type: "payment", id: "PAY_1", object: { payment } } }, "payment.updated")).toBeNull();
+    expect(getter).not.toHaveBeenCalled();
+  });
+
+  it.each(["type", "id"] as const)("rejects inherited and accessor data.%s metadata without invoking getters", (field) => {
+    const valid = { type: "payment", id: "PAY_1", object: { payment: { id: "PAY_1" } } };
+    const inherited = Object.assign(Object.create({ [field]: valid[field] }), valid) as Record<string, unknown>;
+    delete inherited[field];
+    expect(extractSquareWebhookResourceId({ data: inherited }, "payment.updated")).toBeNull();
+
+    const accessor = { ...valid };
+    const getter = vi.fn(() => valid[field]);
+    Object.defineProperty(accessor, field, { enumerable: true, get: getter });
+    expect(extractSquareWebhookResourceId({ data: accessor }, "payment.updated")).toBeNull();
+    expect(getter).not.toHaveBeenCalled();
+  });
+
+  it("rejects signed supported events with invalid locator metadata before processing", async () => {
+    const { handler, processEvent } = makeCore();
+    const invalidData = [
+      { id: "payment-sensitive", object: { payment: { id: "payment-sensitive" } } },
+      { type: "refund", id: "payment-sensitive", object: { payment: { id: "payment-sensitive" } } },
+      { type: "payment", id: "different", object: { payment: { id: "payment-sensitive" } } },
+    ];
+    for (const data of invalidData) {
+      const rawBody = Buffer.from(JSON.stringify({ event_id: "event-123", type: "payment.updated", version: "2026-01-22", data }));
+      await expect(handler(request(rawBody))).resolves.toEqual({ status: 400, body: { error: "invalid_request" } });
+    }
+    expect(processEvent).not.toHaveBeenCalled();
   });
 });
 
