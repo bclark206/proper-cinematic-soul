@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Cache-Control" content="no-store">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'self'; script-src 'sha256-C1oBHV+xnT9+lpmb9T6VNHESeHcD4MO0QKzDM+vIIJY='; base-uri 'none'; form-action 'none'">
+  <title>Verifying sign-in</title>
+  <script>(function () {
+  "use strict";
+  let fragment = location.hash;
+  history.replaceState(null, "", location.pathname);
+
+  function createRequestBody(value) {
+    const parameters = new URLSearchParams(value.slice(1));
+    if (parameters.size !== 2 || !parameters.has("challengeId") || !parameters.has("verifier")) return null;
+    for (const key of parameters.keys()) {
+      if (key !== "challengeId" && key !== "verifier") return null;
+    }
+    const challengeId = parameters.get("challengeId");
+    const verifier = parameters.get("verifier");
+    if (!/^[A-Za-z0-9_-]{43}$/.test(challengeId || "")) return null;
+    if (!(/^[A-Za-z0-9_-]{43}$/.test(verifier || "") || /^\d{6}$/.test(verifier || ""))) return null;
+    return JSON.stringify({ challengeId: challengeId, verifier: verifier });
+  }
+
+  let requestBody = createRequestBody(fragment);
+  fragment = null;
+  if (requestBody === null) {
+    location.replace("/downtown-u?auth=invalid");
+    return;
+  }
+
+  let verification;
+  try {
+    verification = fetch("/api/downtown-u/verify-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: requestBody,
+      credentials: "same-origin",
+      referrerPolicy: "no-referrer"
+    });
+  } catch (_) {
+    verification = Promise.reject();
+  }
+  requestBody = null;
+  Promise.resolve(verification)
+    .then(function (response) { return response.ok; }, function () { return false; })
+    .then(function (verified) {
+      location.replace(verified ? "/downtown-u?auth=success" : "/downtown-u?auth=invalid");
+    });
+}());</script>
+</head>
+<body>
+  <main aria-live="polite">
+    <h1>Verifying your sign-in</h1>
+    <p>Please wait while we securely verify your link.</p>
+  </main>
+</body>
+</html>

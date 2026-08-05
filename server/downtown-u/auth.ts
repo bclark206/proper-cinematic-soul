@@ -35,6 +35,8 @@ export interface AuthCryptography {
   readonly version: typeof AUTH_VERIFIER_VERSION;
   digestChallenge(verifier: string): Buffer;
   digestSession(token: string): Buffer;
+  /** Domain-separated pseudonym for deployment-wide request admission. */
+  digestRequestActor(actor: string): Buffer;
 }
 
 export function createAuthCryptography(secret: string | undefined): AuthCryptography {
@@ -45,6 +47,7 @@ export function createAuthCryptography(secret: string | undefined): AuthCryptogr
     version: AUTH_VERIFIER_VERSION,
     digestChallenge: (value: string) => digest("challenge-verifier", value),
     digestSession: (value: string) => digest("session-bearer", value),
+    digestRequestActor: (value: string) => digest("request-admission-actor", value),
   });
 }
 

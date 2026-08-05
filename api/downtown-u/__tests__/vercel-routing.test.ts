@@ -6,28 +6,21 @@ interface VercelConfig {
   rewrites: Array<{ source: string; destination: string }>;
 }
 
-describe("Vercel Downtown U webhook routing", () => {
-  it("places the exact webhook API rewrite before the SPA catch-all", () => {
+describe("Vercel Downtown U API routing", () => {
+  it("places exact Downtown U API rewrites before the SPA catch-all", () => {
     const config = JSON.parse(
       readFileSync(resolve(process.cwd(), "vercel.json"), "utf8"),
     ) as VercelConfig;
-    const webhookRoute = {
-      source: "/api/downtown-u/square-webhook",
-      destination: "/api/downtown-u/square-webhook",
-    };
-    const webhookIndex = config.rewrites.findIndex(
-      (rewrite) =>
-        rewrite.source === webhookRoute.source &&
-        rewrite.destination === webhookRoute.destination,
-    );
     const catchAllIndex = config.rewrites.findIndex(
       (rewrite) => rewrite.source === "/(.*)" && rewrite.destination === "/index.html",
     );
 
-    expect(webhookIndex).toBeGreaterThanOrEqual(0);
-    expect(catchAllIndex).toBeGreaterThan(webhookIndex);
-    expect(config.rewrites.filter((rewrite) => rewrite.source === webhookRoute.source)).toEqual([
-      webhookRoute,
-    ]);
+    for (const path of ["square-webhook", "request-link", "send-code", "verify-code"]) {
+      const route = { source: `/api/downtown-u/${path}`, destination: `/api/downtown-u/${path}` };
+      const index = config.rewrites.findIndex((rewrite) => rewrite.source === route.source && rewrite.destination === route.destination);
+      expect(index).toBeGreaterThanOrEqual(0);
+      expect(catchAllIndex).toBeGreaterThan(index);
+      expect(config.rewrites.filter((rewrite) => rewrite.source === route.source)).toEqual([route]);
+    }
   });
 });

@@ -4,6 +4,22 @@
     { "source": "/api/create-order", "destination": "/api/create-order" },
     { "source": "/api/validate-promo", "destination": "/api/validate-promo" },
     { "source": "/api/downtown-u/square-webhook", "destination": "/api/downtown-u/square-webhook" },
+    { "source": "/api/downtown-u/request-link", "destination": "/api/downtown-u/request-link" },
+    { "source": "/api/downtown-u/send-code", "destination": "/api/downtown-u/send-code" },
+    { "source": "/api/downtown-u/verify-code", "destination": "/api/downtown-u/verify-code" },
+    { "source": "/downtown-u/auth/verify", "destination": "/downtown-u-auth-verify.html" },
     { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/downtown-u/auth/verify",
+      "headers": [
+        { "key": "Cache-Control", "value": "private, no-store, max-age=0" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Content-Security-Policy", "value": "default-src 'none'; connect-src 'self'; script-src 'sha256-C1oBHV+xnT9+lpmb9T6VNHESeHcD4MO0QKzDM+vIIJY='; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" }
+      ]
+    }
   ]
 }
