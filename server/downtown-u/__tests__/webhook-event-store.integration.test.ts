@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { assertDowntownURuntimeIdentity } from "../postgres-runtime-identity";
 import { PostgresWebhookEventStore } from "../postgres-webhook-event-store";
 import { WebhookEventConflictError, WebhookEventTransitionError } from "../webhook-event-store";
 
@@ -11,13 +12,24 @@ const run = baseUrl ? describe : describe.skip;
 const databaseName = `downtown_u_webhook_test_${process.pid}_${Date.now()}`;
 const runtimeLogin = `downtown_u_webhook_login_${process.pid}_${Date.now()}`;
 const runtimePassword = randomUUID().replaceAll("-", "");
-const migrations = ["202608040001_downtown_u_phase1.sql", "202608040002_downtown_u_webhook_events.sql"].map((name) => readFileSync(resolve(process.cwd(), "db/migrations", name), "utf8"));
+const migrations = ["202608040001_downtown_u_phase1.sql", "202608040002_downtown_u_webhook_events.sql", "202608040003_downtown_u_payment_activation.sql"].map((name) => readFileSync(resolve(process.cwd(), "db/migrations", name), "utf8"));
 let admin: Pool;
 let owner: Pool;
 let runtime: Pool;
 let runtimeUrl: string;
 function qi(value: string) { return `"${value.replaceAll('"', '""')}"`; }
 function code(error: unknown) { return typeof error === "object" && error !== null && "code" in error ? String(error.code) : undefined; }
+const exactGateTrigger = `CREATE TRIGGER downtown_u_00_purchase_grant_gate
+  BEFORE INSERT ON public.downtown_u_credit_transactions
+  FOR EACH ROW EXECUTE FUNCTION public.downtown_u_require_trusted_purchase_grant()`;
+async function freshPreflight() {
+  const pool = new Pool({ connectionString: runtimeUrl, max: 2 });
+  try {
+    await assertDowntownURuntimeIdentity(pool);
+  } finally {
+    await pool.end();
+  }
+}
 
 run.sequential("durable webhook claims on PostgreSQL 16", () => {
   beforeAll(async () => {
@@ -34,6 +46,7 @@ run.sequential("durable webhook claims on PostgreSQL 16", () => {
     }
     await owner.query(migrations[0]);
     await owner.query(migrations[1]);
+    await owner.query(migrations[2]);
     await owner.query(`CREATE ROLE ${qi(runtimeLogin)} LOGIN PASSWORD '${runtimePassword}'`);
     await owner.query(`GRANT downtown_u_runtime TO ${qi(runtimeLogin)}`);
     const loginUrl = new URL(parsed);
@@ -196,6 +209,141 @@ run.sequential("durable webhook claims on PostgreSQL 16", () => {
     }
   });
 
+  it("accepts only the exact enabled purchase-grant gate topology on fresh pools", async () => {
+    await expect(freshPreflight()).resolves.toBeUndefined();
+    const triggers = (await owner.query<{ tgname: string; tgnargs: number; arguments_hex: string; definition: string }>(`SELECT tgname,tgnargs,
+      encode(tgargs,'hex') AS arguments_hex,pg_get_triggerdef(oid,true) AS definition
+      FROM pg_catalog.pg_trigger
+      WHERE tgrelid='public.downtown_u_credit_transactions'::regclass AND NOT tgisinternal
+      AND tgname IN ('downtown_u_00_purchase_grant_gate','downtown_u_apply_credit_transaction_trigger')
+      ORDER BY tgname`)).rows;
+    expect(triggers.map((row) => row.tgname)).toEqual([
+      "downtown_u_00_purchase_grant_gate",
+      "downtown_u_apply_credit_transaction_trigger",
+    ]);
+    expect(triggers.every((trigger) => trigger.tgnargs === 0 && trigger.arguments_hex === "")).toBe(true);
+    expect((await owner.query<{ definition: string }>(`SELECT pg_get_triggerdef(oid,true) AS definition
+      FROM pg_catalog.pg_trigger WHERE tgname='downtown_u_students_ledger_balance_only'`)).rows[0].definition)
+      .toContain("WHEN (old.credit_balance IS DISTINCT FROM new.credit_balance)");
+
+    try {
+      await owner.query(`ALTER TABLE public.downtown_u_credit_transactions
+        DISABLE TRIGGER downtown_u_00_purchase_grant_gate`);
+      await expect(freshPreflight()).rejects.toThrow(/unsafe/i);
+    } finally {
+      await owner.query(`ALTER TABLE public.downtown_u_credit_transactions
+        ENABLE TRIGGER downtown_u_00_purchase_grant_gate`);
+    }
+    await expect(freshPreflight()).resolves.toBeUndefined();
+
+    for (const driftedGateTrigger of [
+      `CREATE TRIGGER downtown_u_00_purchase_grant_gate
+        BEFORE INSERT ON public.downtown_u_credit_transactions
+        FOR EACH ROW WHEN (false)
+        EXECUTE FUNCTION public.downtown_u_require_trusted_purchase_grant()`,
+      `CREATE TRIGGER downtown_u_00_purchase_grant_gate
+        BEFORE INSERT ON public.downtown_u_credit_transactions
+        FOR EACH ROW EXECUTE FUNCTION public.downtown_u_require_trusted_purchase_grant('drift')`,
+    ]) {
+      try {
+        await owner.query(`DROP TRIGGER downtown_u_00_purchase_grant_gate
+          ON public.downtown_u_credit_transactions`);
+        await owner.query(driftedGateTrigger);
+        await expect(freshPreflight()).rejects.toThrow(/unsafe/i);
+      } finally {
+        await owner.query(`DROP TRIGGER IF EXISTS downtown_u_00_purchase_grant_gate
+          ON public.downtown_u_credit_transactions`);
+        await owner.query(exactGateTrigger);
+      }
+      await expect(freshPreflight()).resolves.toBeUndefined();
+    }
+
+    try {
+      await owner.query(`DROP TRIGGER downtown_u_00_purchase_grant_gate
+        ON public.downtown_u_credit_transactions`);
+      await expect(freshPreflight()).rejects.toThrow(/unsafe/i);
+      for (const wrongGateTrigger of [
+        `CREATE TRIGGER downtown_u_00_purchase_grant_gate
+          AFTER INSERT ON public.downtown_u_credit_transactions
+          FOR EACH ROW EXECUTE FUNCTION public.downtown_u_require_trusted_purchase_grant()`,
+        `CREATE TRIGGER downtown_u_00_purchase_grant_gate
+          BEFORE UPDATE ON public.downtown_u_credit_transactions
+          FOR EACH ROW EXECUTE FUNCTION public.downtown_u_require_trusted_purchase_grant()`,
+        `CREATE TRIGGER downtown_u_00_purchase_grant_gate
+          BEFORE INSERT ON public.downtown_u_credit_transactions
+          FOR EACH ROW EXECUTE FUNCTION public.downtown_u_apply_credit_transaction()`,
+      ]) {
+        await owner.query(wrongGateTrigger);
+        await expect(freshPreflight()).rejects.toThrow(/unsafe/i);
+        await owner.query(`DROP TRIGGER downtown_u_00_purchase_grant_gate
+          ON public.downtown_u_credit_transactions`);
+      }
+    } finally {
+      await owner.query(`DROP TRIGGER IF EXISTS downtown_u_00_purchase_grant_gate
+        ON public.downtown_u_credit_transactions`);
+      await owner.query(exactGateTrigger);
+    }
+    await expect(freshPreflight()).resolves.toBeUndefined();
+
+    try {
+      await owner.query(`CREATE TRIGGER downtown_u_unexpected_topology_trigger
+        BEFORE INSERT ON public.downtown_u_credit_transactions
+        FOR EACH ROW EXECUTE FUNCTION public.downtown_u_require_trusted_purchase_grant()`);
+      await expect(freshPreflight()).rejects.toThrow(/unsafe/i);
+    } finally {
+      await owner.query(`DROP TRIGGER IF EXISTS downtown_u_unexpected_topology_trigger
+        ON public.downtown_u_credit_transactions`);
+    }
+    await expect(freshPreflight()).resolves.toBeUndefined();
+  });
+
+  it("accepts only exact function security, language, config, and trusted ownership", async () => {
+    await expect(freshPreflight()).resolves.toBeUndefined();
+
+    for (const [drift, restore] of [
+      [
+        "ALTER FUNCTION public.downtown_u_require_trusted_purchase_grant() SECURITY DEFINER",
+        "ALTER FUNCTION public.downtown_u_require_trusted_purchase_grant() SECURITY INVOKER",
+      ],
+      [
+        "ALTER FUNCTION public.downtown_u_activate_verified_payment(text,uuid,text,text,text,text,integer,integer,text,text,text,text,text,text) SECURITY INVOKER",
+        "ALTER FUNCTION public.downtown_u_activate_verified_payment(text,uuid,text,text,text,text,integer,integer,text,text,text,text,text,text) SECURITY DEFINER",
+      ],
+      [
+        "ALTER FUNCTION public.downtown_u_upsert_pending_student(text,text,text) SET search_path TO pg_catalog, public",
+        "ALTER FUNCTION public.downtown_u_upsert_pending_student(text,text,text) SET search_path TO pg_catalog",
+      ],
+    ] as const) {
+      try {
+        await owner.query(drift);
+        await expect(freshPreflight()).rejects.toThrow(/unsafe/i);
+      } finally {
+        await owner.query(restore);
+      }
+      await expect(freshPreflight()).resolves.toBeUndefined();
+    }
+
+    const originalOwner = (await owner.query<{ owner_name: string }>(`SELECT pg_get_userbyid(proowner) AS owner_name
+      FROM pg_catalog.pg_proc
+      WHERE oid='public.downtown_u_upsert_pending_student(text,text,text)'::regprocedure`)).rows[0].owner_name;
+    const driftOwner = `downtown_u_drift_owner_${process.pid}_${Date.now()}`;
+    try {
+      await owner.query(`CREATE ROLE ${qi(driftOwner)} NOLOGIN`);
+      await owner.query(`ALTER FUNCTION public.downtown_u_upsert_pending_student(text,text,text)
+        OWNER TO ${qi(driftOwner)}`);
+      await expect(freshPreflight()).rejects.toThrow(/unsafe/i);
+    } finally {
+      await owner.query(`ALTER FUNCTION public.downtown_u_upsert_pending_student(text,text,text)
+        OWNER TO ${qi(originalOwner)}`);
+      await owner.query(`DROP ROLE IF EXISTS ${qi(driftOwner)}`);
+    }
+    await owner.query(`REVOKE ALL ON FUNCTION public.downtown_u_upsert_pending_student(text,text,text)
+      FROM PUBLIC, downtown_u_runtime`);
+    await owner.query(`GRANT EXECUTE ON FUNCTION public.downtown_u_upsert_pending_student(text,text,text)
+      TO downtown_u_runtime`);
+    await expect(freshPreflight()).resolves.toBeUndefined();
+  });
+
   it("denies runtime direct DML, DDL, identity mutation, and function attachment", async () => {
     for (const sql of [
       "INSERT INTO public.downtown_u_webhook_events(square_event_id,event_type,raw_body_sha256,status,attempt_count,received_at) VALUES ('x','payment.updated',repeat('a',64),'processing',1,now())",
@@ -203,6 +351,14 @@ run.sequential("durable webhook claims on PostgreSQL 16", () => {
       "DELETE FROM public.downtown_u_webhook_events",
       "TRUNCATE public.downtown_u_webhook_events",
       "ALTER TABLE public.downtown_u_webhook_events DISABLE TRIGGER ALL",
+      "ALTER TABLE public.downtown_u_credit_transactions DISABLE TRIGGER downtown_u_00_purchase_grant_gate",
+      "DROP TRIGGER downtown_u_00_purchase_grant_gate ON public.downtown_u_credit_transactions",
+      "CREATE TRIGGER downtown_u_runtime_attack BEFORE INSERT ON public.downtown_u_credit_transactions FOR EACH ROW EXECUTE FUNCTION public.downtown_u_require_trusted_purchase_grant()",
+      "SELECT public.downtown_u_require_trusted_purchase_grant()",
+      "ALTER FUNCTION public.downtown_u_require_trusted_purchase_grant() SECURITY DEFINER",
+      "ALTER FUNCTION public.downtown_u_activate_verified_payment(text,uuid,text,text,text,text,integer,integer,text,text,text,text,text,text) SECURITY INVOKER",
+      "ALTER FUNCTION public.downtown_u_upsert_pending_student(text,text,text) SET search_path TO public",
+      "ALTER FUNCTION public.downtown_u_upsert_pending_student(text,text,text) OWNER TO downtown_u_runtime",
     ]) await expect(runtime.query(sql)).rejects.toSatisfy((e: unknown) => code(e) === "42501");
     await runtime.query("CREATE TEMP TABLE attach_target(id int)");
     await expect(runtime.query("CREATE TRIGGER attached BEFORE INSERT ON attach_target FOR EACH ROW EXECUTE FUNCTION public.downtown_u_webhook_events_protect()")) .rejects.toSatisfy((e: unknown) => code(e) === "42501");

@@ -50,6 +50,12 @@ export class PostgresWebhookEventStore implements WebhookEventStore {
     await this.transition("SELECT * FROM public.downtown_u_fail_webhook_event($1, $2, $3, $4)", [eventId, claimToken, failureCode, failureDetail]);
   }
 
+  async reject(eventId: string, claimToken: string, failureCode: string, failureDetail: string): Promise<void> {
+    if (!FAILURE_CODE.test(failureCode)) throw new TypeError("Invalid webhook failure code");
+    if (!FAILURE_DETAIL.test(failureDetail)) throw new TypeError("Invalid webhook failure detail");
+    await this.transition("SELECT * FROM public.downtown_u_reject_webhook_event($1, $2, $3, $4)", [eventId, claimToken, failureCode, failureDetail]);
+  }
+
   private async transition(sql: string, values: string[]): Promise<void> {
     await this.identityPreflight(this.pool);
     await withPostgresTransaction(this.pool, async (client) => {

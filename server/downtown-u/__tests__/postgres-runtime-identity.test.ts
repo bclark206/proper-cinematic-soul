@@ -17,6 +17,17 @@ describe("Downtown U runtime database identity preflight", () => {
     expect(sql).toContain("expected_functions");
     expect(sql).toContain("to_regprocedure");
     expect(sql).toContain("has_function_privilege(CURRENT_USER");
+    expect(sql).toContain("p.prosecdef");
+    expect(sql).toContain("l.lanname");
+    expect(sql).toContain("p.proconfig");
+    expect(sql).toContain("ARRAY['search_path=pg_catalog']::text[]");
+    expect(sql).toContain("d.proowner <> o.oid");
+    expect(sql).toContain("pg_catalog.pg_get_expr(t.tgqual, t.tgrelid, true)");
+    expect(sql).toContain("t.tgnargs AS argument_count");
+    expect(sql).toContain("pg_catalog.encode(t.tgargs, 'hex')");
+    expect(sql).toContain("d.when_expression IS DISTINCT FROM e.when_expression");
+    expect(sql).toContain("d.argument_count <> e.argument_count");
+    expect(sql).toContain("d.arguments_hex <> e.arguments_hex");
     expect(sql).toContain("pg_has_role(CURRENT_USER, d.relowner, 'MEMBER')");
     expect(sql).toContain("pg_has_role(CURRENT_USER, d.proowner, 'MEMBER')");
     expect(sql).toMatch(/NOT rr\.rolcanlogin/i);

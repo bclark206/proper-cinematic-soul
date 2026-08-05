@@ -1,6 +1,10 @@
 import { isUint8Array } from "node:util/types";
 import { Pool } from "pg";
+import { createEnrollmentService, readDowntownUSquareConfig, type EnrollmentServiceConfig } from "../../server/downtown-u/enrollment-service";
+import { createPaymentClaimProcessor, type PaymentActivationStore } from "../../server/downtown-u/payment-activation";
+import { PostgresPaymentActivationStore } from "../../server/downtown-u/postgres-payment-activation-store";
 import { PostgresWebhookEventStore } from "../../server/downtown-u/postgres-webhook-event-store";
+import { createSquareClientFromEnv, type SquareClient } from "../../server/downtown-u/square-client";
 import type { WebhookEventStore } from "../../server/downtown-u/webhook-event-store";
 import {
   createSquareWebhookHandler,
@@ -100,18 +104,19 @@ export function createClaimingProcessor(
     acknowledgment: {
       complete(): Promise<void>;
       fail(failureCode: string, failureDetail: string): Promise<void>;
+      reject(failureCode: string, failureDetail: string): Promise<void>;
     },
-  ) => Promise<void>,
+  ) => Promise<void | { claimCompletedAtomically: true } | { claimRejected: true }>,
 ): SquareWebhookDependencies["processEvent"] {
   return async (claim) => {
     const result = await store.claim(claim.eventId, claim.eventType, claim.bodyHash);
     if (result.outcome === "claimed") {
       if (processClaim) {
-        let disposition: "processing" | "completed" | "failed" = "processing";
+        let disposition: "processing" | "completed" | "failed" | "rejected" = "processing";
         const ensureProcessing = () => {
           if (disposition !== "processing") throw new Error("Webhook claim was already acknowledged");
         };
-        await processClaim(
+        const processResult = await processClaim(
           { ...claim, claimToken: result.claimToken, attemptCount: result.attemptCount },
           {
             complete: async () => {
@@ -124,9 +129,17 @@ export function createClaimingProcessor(
               await store.fail(claim.eventId, result.claimToken, failureCode, failureDetail);
               disposition = "failed";
             },
+            reject: async (failureCode, failureDetail) => {
+              ensureProcessing();
+              await store.reject(claim.eventId, result.claimToken, failureCode, failureDetail);
+              disposition = "rejected";
+            },
           },
         );
+        if (processResult?.claimCompletedAtomically === true) return { outcome: "accepted" };
+        if (processResult?.claimRejected === true) return { outcome: "accepted" };
         if ((disposition as string) === "completed") return { outcome: "accepted" };
+        if ((disposition as string) === "rejected") return { outcome: "accepted" };
         throw new Error("Webhook claim was not completed");
       }
       try {
@@ -153,23 +166,61 @@ function getWebhookPool(connectionString: string): Pool {
   return webhookPool;
 }
 
+const requiredEnvironment = [
+  "DATABASE_URL", "SQUARE_ACCESS_TOKEN", "SQUARE_API_VERSION", "SQUARE_LOCATION_ID",
+  "DOWNTOWN_U_SQUARE_FLEX_5_VARIATION_ID", "DOWNTOWN_U_SQUARE_SCHOLAR_10_VARIATION_ID",
+  "DOWNTOWN_U_SQUARE_RESIDENT_20_VARIATION_ID", "DOWNTOWN_U_SQUARE_SEMESTER_40_VARIATION_ID",
+  "SQUARE_WEBHOOK_SIGNATURE_KEY", "DOWNTOWN_U_SQUARE_WEBHOOK_URL",
+] as const;
+
+export interface ProductionSquareWebhookBoundaries {
+  getPool(connectionString: string): Pool;
+  createSquareClient(env: NodeJS.ProcessEnv): SquareClient;
+  createEnrollment(config: EnrollmentServiceConfig): ReturnType<typeof createEnrollmentService>;
+  createWebhookStore(pool: Pool): WebhookEventStore;
+  createActivationStore(pool: Pool): PaymentActivationStore;
+}
+
+const productionBoundaries: ProductionSquareWebhookBoundaries = {
+  getPool: getWebhookPool,
+  createSquareClient: createSquareClientFromEnv,
+  createEnrollment: createEnrollmentService,
+  createWebhookStore: (pool) => new PostgresWebhookEventStore(pool),
+  createActivationStore: (pool) => new PostgresPaymentActivationStore(pool),
+};
+
+const unavailableHandler = async (_request: NodeWebhookRequest, response: NodeWebhookResponse): Promise<void> => {
+  send(response, { status: 503, body: { error: "temporarily_unavailable" } });
+};
+
+/** Composes the production Square/enrollment/PostgreSQL path once. */
+export function createProductionSquareWebhookHandler(
+  env: NodeJS.ProcessEnv,
+  boundaries: ProductionSquareWebhookBoundaries = productionBoundaries,
+) {
+  try {
+    if (requiredEnvironment.some((name) => !env[name])) return unavailableHandler;
+    const squareConfig = readDowntownUSquareConfig(env);
+    const client = boundaries.createSquareClient(env);
+    const enrollment = boundaries.createEnrollment({ client, ...squareConfig });
+    const pool = boundaries.getPool(env.DATABASE_URL!);
+    return createNodeSquareWebhookHandler({
+      signatureKey: env.SQUARE_WEBHOOK_SIGNATURE_KEY!,
+      notificationUrl: env.DOWNTOWN_U_SQUARE_WEBHOOK_URL!,
+      processEvent: createClaimingProcessor(
+        boundaries.createWebhookStore(pool),
+        createPaymentClaimProcessor({ enrollment, store: boundaries.createActivationStore(pool) }),
+      ),
+    });
+  } catch {
+    // Invalid configuration is rejected before body consumption and never reflected.
+    return unavailableHandler;
+  }
+}
+
 export default async function squareWebhook(
   request: NodeWebhookRequest,
   response: NodeWebhookResponse,
 ): Promise<void> {
-  const signatureKey = process.env.SQUARE_WEBHOOK_SIGNATURE_KEY;
-  const notificationUrl = process.env.DOWNTOWN_U_SQUARE_WEBHOOK_URL;
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!signatureKey || !notificationUrl || !databaseUrl) {
-    send(response, { status: 503, body: { error: "temporarily_unavailable" } });
-    return;
-  }
-
-  return createNodeSquareWebhookHandler({
-    signatureKey,
-    notificationUrl,
-    processEvent: createClaimingProcessor(
-      new PostgresWebhookEventStore(getWebhookPool(databaseUrl)),
-    ),
-  })(request, response);
+  return createProductionSquareWebhookHandler(process.env)(request, response);
 }

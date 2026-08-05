@@ -6,6 +6,7 @@ export interface WebhookEventStore {
   claim(eventId: string, eventType: string, bodyHash: string): Promise<WebhookClaimResult>;
   complete(eventId: string, claimToken: string): Promise<void>;
   fail(eventId: string, claimToken: string, failureCode: string, failureDetail: string): Promise<void>;
+  reject(eventId: string, claimToken: string, failureCode: string, failureDetail: string): Promise<void>;
 }
 
 export class WebhookEventConflictError extends Error {

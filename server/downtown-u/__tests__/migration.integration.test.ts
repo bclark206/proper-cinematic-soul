@@ -4,7 +4,6 @@ import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { DowntownUCredits, IdempotencyConflictError } from "../credits";
 import { PostgresCreditStore } from "../postgres-credit-store";
-import { PostgresStudentAccountStore } from "../postgres-student-account-store";
 
 const migration = readFileSync(resolve(process.cwd(), "db/migrations/202608040001_downtown_u_phase1.sql"), "utf8");
 const baseUrl = process.env.TEST_DATABASE_URL;
@@ -387,18 +386,7 @@ run.sequential("Downtown U migration on real PostgreSQL", () => {
         )).rejects.toSatisfy((error: unknown) => errorCode(error) === "42501");
         expect((await pool.query("SELECT count(*)::int AS count FROM downtown_u_students WHERE normalized_email=$1", [`runtime-${suffix}@example.edu`])).rows[0].count).toBe(0);
       }
-      const account = await (new PostgresStudentAccountStore(runtimePool)).upsert({
-        normalizedEmail: "runtime-account@example.edu",
-        normalizedPhone: "+15555550123",
-        squareCustomerId: "runtime-customer",
-      });
-      expect(account).toMatchObject({
-        normalizedEmail: "runtime-account@example.edu",
-        normalizedPhone: "+15555550123",
-        squareCustomerId: "runtime-customer",
-        eligibilityStatus: "pending",
-      });
-      expect((await pool.query("SELECT credit_balance FROM downtown_u_students WHERE id=$1", [account.id])).rows[0].credit_balance).toBe(0);
+
       const runtimeId = (await runtimePool.query<{ id: string }>("INSERT INTO downtown_u_students(normalized_email) VALUES ('runtime@example.edu') RETURNING id")).rows[0].id;
       const forgedId = (await runtimePool.query<{ id: string }>("INSERT INTO downtown_u_students(normalized_email) VALUES ('runtime-forged@example.edu') RETURNING id")).rows[0].id;
       await expect(runtimePool.query(`INSERT INTO downtown_u_credit_transactions

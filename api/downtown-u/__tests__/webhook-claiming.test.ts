@@ -7,7 +7,7 @@ import { createClaimingProcessor } from "../square-webhook";
 
 describe("production webhook claim processor", () => {
   function storeWith(result: Awaited<ReturnType<WebhookEventStore["claim"]>>): WebhookEventStore {
-    return { claim: vi.fn().mockResolvedValue(result), complete: vi.fn(), fail: vi.fn() };
+    return { claim: vi.fn().mockResolvedValue(result), complete: vi.fn(), fail: vi.fn(), reject: vi.fn() };
   }
   const claim = { eventId: "evt_1", eventType: "payment.updated", bodyHash: "a".repeat(64), resourceId: "PAY_1" } as const;
 
@@ -50,6 +50,15 @@ describe("production webhook claim processor", () => {
     expect(store.complete).toHaveBeenCalledWith(claim.eventId, "owned-token");
   });
 
+  it("accepts an atomic-completion marker without issuing a second completion", async () => {
+    const store = storeWith({ outcome: "claimed", claimToken: "atomic-token", attemptCount: 1 });
+    const processor = vi.fn().mockResolvedValue({ claimCompletedAtomically: true as const });
+    await expect(createClaimingProcessor(store, processor)(claim)).resolves.toEqual({ outcome: "accepted" });
+    expect(processor).toHaveBeenCalledOnce();
+    expect(store.complete).not.toHaveBeenCalled();
+    expect(store.fail).not.toHaveBeenCalled();
+  });
+
   it("preserves conflict and database errors for the boundary to map safely", async () => {
     const conflict = new WebhookEventConflictError();
     const store = storeWith({ outcome: "duplicate", attemptCount: 1 });
@@ -88,13 +97,13 @@ describe("claim outcome HTTP mapping", () => {
     { outcome: "in_progress", attemptCount: 1 } as const,
     { outcome: "exhausted", attemptCount: 1000 } as const,
   ])("returns generic 503 without sensitive detail for $outcome", async (claimResult) => {
-    const store: WebhookEventStore = { claim: vi.fn().mockResolvedValue(claimResult), complete: vi.fn(), fail: vi.fn() };
+    const store: WebhookEventStore = { claim: vi.fn().mockResolvedValue(claimResult), complete: vi.fn(), fail: vi.fn(), reject: vi.fn() };
     const handler = createSquareWebhookHandler({ signatureKey: key, notificationUrl: url, processEvent: createClaimingProcessor(store) });
     await expect(handler(request)).resolves.toEqual({ status: 503, body: { error: "temporarily_unavailable" } });
   });
 
   it("returns completed duplicate as 200 through the production processor", async () => {
-    const store: WebhookEventStore = { claim: vi.fn().mockResolvedValue({ outcome: "duplicate", attemptCount: 2 }), complete: vi.fn(), fail: vi.fn() };
+    const store: WebhookEventStore = { claim: vi.fn().mockResolvedValue({ outcome: "duplicate", attemptCount: 2 }), complete: vi.fn(), fail: vi.fn(), reject: vi.fn() };
     const handler = createSquareWebhookHandler({ signatureKey: key, notificationUrl: url, processEvent: createClaimingProcessor(store) });
     await expect(handler(request)).resolves.toEqual({ status: 200, body: { ok: true, duplicate: true } });
   });
