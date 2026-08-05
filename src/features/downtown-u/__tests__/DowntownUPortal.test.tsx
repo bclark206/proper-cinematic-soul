@@ -25,7 +25,7 @@ function authenticatedFetch(url: RequestInfo | URL) {
   if (path.includes("reservations?")) return json({ items: [reservation], nextCursor: "reservation.next" });
   throw new Error(`unmocked ${path}`);
 }
-const renderPortal = () => render(<MemoryRouter initialEntries={["/downtown-u/portal"]}><DowntownUPortal /></MemoryRouter>);
+const renderPortal = (state?: unknown) => render(<MemoryRouter initialEntries={[{ pathname: "/downtown-u/portal", state }]}><DowntownUPortal /></MemoryRouter>);
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -49,7 +49,7 @@ describe("Downtown U protected portal", () => {
     fireEvent.submit(screen.getByLabelText(/email sign-in/i));
     await waitFor(() => expect(fetch).toHaveBeenLastCalledWith("/api/downtown-u/request-link", expect.objectContaining({ body: '{"email":"nobody@example.test"}' })));
     expect(await screen.findByRole("status")).toHaveTextContent(/if the details match an eligible account/i);
-    fireEvent.click(screen.getByRole("tab", { name: /text a code/i }));
+    fireEvent.click(screen.getByRole("button", { name: /text a code/i }));
     expect(screen.getByLabelText(/mobile number/i)).toBeInTheDocument();
   });
 
@@ -61,7 +61,7 @@ describe("Downtown U protected portal", () => {
     vi.stubGlobal("fetch", fetcher);
     renderPortal();
     await screen.findByRole("heading", { name: /sign in/i });
-    fireEvent.click(screen.getByRole("tab", { name: /text a code/i }));
+    fireEvent.click(screen.getByRole("button", { name: /text a code/i }));
     fireEvent.click(screen.getByRole("button", { name: /already have a code/i }));
     fireEvent.change(screen.getByLabelText(/sign-in reference/i), { target: { value: "A".repeat(43) } });
     fireEvent.change(screen.getByLabelText(/6-digit code/i), { target: { value: "123456" } });
@@ -183,7 +183,7 @@ describe("Downtown U protected portal", () => {
       .mockImplementationOnce(() => json({ accepted: true }, 202));
     vi.stubGlobal("fetch", fetcher); renderPortal();
     await screen.findByRole("heading", { name: /sign in/i });
-    fireEvent.click(screen.getByRole("tab", { name: /text a code/i }));
+    fireEvent.click(screen.getByRole("button", { name: /text a code/i }));
     const phone = screen.getByLabelText(/mobile number/i);
     expect(phone).toHaveAttribute("pattern", "\\+[1-9][0-9]{7,14}");
     fireEvent.change(phone, { target: { value: "+1 (443) 555-0123" } });
@@ -202,7 +202,7 @@ describe("Downtown U protected portal", () => {
       const fetcher = vi.fn().mockImplementationOnce(() => json({ error: "unauthorized" }, 401))
         .mockImplementationOnce(() => json({ authenticated: false }, status));
       vi.stubGlobal("fetch", fetcher); renderPortal(); await screen.findByRole("heading", { name: /sign in/i });
-      fireEvent.click(screen.getByRole("tab", { name: /text a code/i }));
+      fireEvent.click(screen.getByRole("button", { name: /text a code/i }));
       fireEvent.click(screen.getByRole("button", { name: /already have a code/i }));
       fireEvent.change(screen.getByLabelText(/sign-in reference/i), { target: { value: "A".repeat(43) } });
       fireEvent.change(screen.getByLabelText(/6-digit code/i), { target: { value: "123456" } });
@@ -295,6 +295,72 @@ describe("Downtown U protected portal", () => {
     fireEvent.click(screen.getByRole("button", { name: /cancel reservation/i }));
     expect(await screen.findByText(/can no longer be canceled/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /retry cancellation/i })).not.toBeInTheDocument();
+  });
+
+  it("shows only the fixed actionable invalid-link feedback", async () => {
+    vi.stubGlobal("fetch", vi.fn(() => json({ error: "unauthorized" }, 401)));
+    renderPortal({ authFailure: "invalid", arbitrary: "SECRET REFLECTION" });
+    expect(await screen.findByRole("alert")).toHaveTextContent(/expired or is invalid.*request a new link/i);
+    expect(screen.getByRole("button", { name: /send secure link/i })).toBeInTheDocument();
+    expect(document.body).not.toHaveTextContent(/SECRET REFLECTION/);
+  });
+
+  it("reuses stored keys from unchanged primary reserve and cancel controls", async () => {
+    const fetcher = vi.fn(authenticatedFetch); vi.stubGlobal("fetch", fetcher); renderPortal();
+    await screen.findByRole("heading", { name: "Server Meal" }); fireEvent.click(screen.getByRole("button", { name: /choose server meal/i }));
+    fetcher.mockImplementationOnce(() => Promise.reject(new Error("lost"))).mockImplementationOnce(() => json(reservation, 201));
+    fireEvent.click(screen.getByRole("button", { name: /reserve for 2 credits/i })); await screen.findByRole("button", { name: /retry reservation/i });
+    fireEvent.click(screen.getByRole("button", { name: /reserve for 2 credits/i })); await screen.findByRole("heading", { name: /reservation confirmed/i });
+    const reserveKeys = fetcher.mock.calls.filter(([url]) => String(url) === "/api/downtown-u/reservations").map(([, init]) => JSON.parse(String(init?.body)).idempotencyKey);
+    expect(reserveKeys[1]).toBe(reserveKeys[0]);
+
+    fireEvent.click(screen.getByRole("button", { name: /history/i }));
+    fetcher.mockImplementationOnce(() => Promise.reject(new Error("lost"))).mockImplementationOnce(() => json({ ...reservation, status: "reversed", reversedAt: "2026-08-05T12:05:00Z" }));
+    fireEvent.click(screen.getByRole("button", { name: /cancel reservation/i })); await screen.findByRole("button", { name: /retry cancellation/i });
+    fireEvent.click(screen.getByRole("button", { name: /cancel reservation/i })); await screen.findByText(/reservation canceled/i);
+    const cancelKeys = fetcher.mock.calls.filter(([url]) => String(url).includes("/cancel")).map(([, init]) => JSON.parse(String(init?.body)).idempotencyKey);
+    expect(cancelKeys[1]).toBe(cancelKeys[0]);
+  });
+
+  it("dismisses cross-action retries and confirmation on context changes", async () => {
+    const fetcher = vi.fn(authenticatedFetch); vi.stubGlobal("fetch", fetcher); renderPortal(); await screen.findByText(/4 meal credits/i);
+    fireEvent.click(screen.getByRole("button", { name: /history/i })); fetcher.mockImplementationOnce(() => Promise.reject(new Error("lost")));
+    fireEvent.click(screen.getByRole("button", { name: /cancel reservation/i })); await screen.findByRole("button", { name: /retry cancellation/i });
+    fireEvent.click(screen.getByRole("button", { name: /meals/i }));
+    expect(screen.queryByRole("button", { name: /retry cancellation/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /choose server meal/i })); fetcher.mockImplementationOnce(() => Promise.reject(new Error("lost")));
+    fireEvent.click(screen.getByRole("button", { name: /reserve for 2 credits/i })); await screen.findByRole("button", { name: /retry reservation/i });
+    fireEvent.click(screen.getByRole("button", { name: /history/i }));
+    expect(screen.queryByRole("button", { name: /retry reservation|retry cancellation/i })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    [1, -2, -1], [1, -1, 0], [1, 0, 1], [20, 20, 40], [20, 20, 41],
+  ])("enforces authoritative total bounds for base %s and delta %s", async (baseCredits, creditDelta, expected) => {
+    const modifiers = expected === 41
+      ? [{ id: "mod-1", name: "Boundary option", creditDelta }, { id: "mod-2", name: "Another option", creditDelta: 1 }]
+      : [{ id: "mod-1", name: "Boundary option", creditDelta }];
+    const boundedMeals = { items: [{ id: "meal-1", name: "Boundary Meal", baseCredits, modifiers }] };
+    const fetcher = vi.fn((url: RequestInfo | URL) => String(url).endsWith("/meals") ? json(boundedMeals) : authenticatedFetch(url));
+    vi.stubGlobal("fetch", fetcher); renderPortal(); await screen.findByRole("heading", { name: "Boundary Meal" });
+    fireEvent.click(screen.getByRole("button", { name: /choose boundary meal/i })); screen.getAllByRole("checkbox").forEach((box) => fireEvent.click(box));
+    const reserve = screen.getByRole("button", { name: new RegExp(`reserve for ${expected} credits?`, "i") });
+    const valid = expected >= 1 && expected <= 40;
+    expect(reserve).toHaveProperty("disabled", !valid);
+    if (!valid) expect(screen.getByRole("alert")).toHaveTextContent(/between 1 and 40 credits/i);
+    fireEvent.click(reserve);
+    await waitFor(() => expect(fetcher.mock.calls.filter(([url]) => String(url) === "/api/downtown-u/reservations")).toHaveLength(valid ? 1 : 0));
+  });
+
+  it("clears reservation confirmation when leaving meals or changing selection", async () => {
+    const fetcher = vi.fn(authenticatedFetch); vi.stubGlobal("fetch", fetcher); renderPortal();
+    await screen.findByRole("heading", { name: "Server Meal" }); fireEvent.click(screen.getByRole("button", { name: /choose server meal/i }));
+    fetcher.mockImplementationOnce(() => json(reservation, 201)).mockImplementationOnce(() => json(me));
+    fireEvent.click(screen.getByRole("button", { name: /reserve for 2 credits/i })); await screen.findByRole("heading", { name: /reservation confirmed/i });
+    fireEvent.click(screen.getByRole("button", { name: /account/i }));
+    expect(screen.queryByRole("heading", { name: /reservation confirmed/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /meals/i }));
+    expect(screen.queryByRole("heading", { name: /reservation confirmed/i })).not.toBeInTheDocument();
   });
 
   it("clears protected data on authentication loss during cancellation", async () => {

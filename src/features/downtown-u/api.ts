@@ -9,7 +9,7 @@ const cursor = z.string().min(1).max(512).regex(/^[A-Za-z0-9_.-]+$/);
 const key = z.string().min(16).max(96).regex(/^[A-Za-z0-9_-]+$/);
 const planId = z.enum(["flex-5", "scholar-10", "resident-20", "semester-40"]);
 
-const modifierSchema = z.object({ id, name: z.string().min(1).max(120), creditDelta: z.number().int().min(-20).max(20) }).strict();
+const modifierSchema = z.object({ id, name: z.string().min(1).max(120), creditDelta: z.number().int().min(-19).max(20) }).strict();
 const reservationSchema = z.object({
   id: uuid, mealId: id, mealName: z.string().min(1).max(120), modifiers: z.array(modifierSchema).max(10),
   credits: z.number().int().min(1).max(40), status: z.enum(["reserved", "redeemed", "reversed"]),
@@ -50,11 +50,42 @@ const baseInit = (method: "GET" | "POST", signal: AbortSignal): RequestInit => (
 async function boundedJson(response: Response): Promise<unknown> {
   const contentType = response.headers.get("Content-Type") ?? "";
   if (!/^application\/json(?:\s*;|$)/i.test(contentType)) throw new DowntownUApiError("invalid-response");
+  if (!response.body) throw new DowntownUApiError("invalid-response");
+
+  const reader = response.body.getReader();
   const length = response.headers.get("Content-Length");
-  if (length && (!/^\d+$/.test(length) || Number(length) > MAX_RESPONSE_BYTES)) throw new DowntownUApiError("invalid-response");
-  const text = await response.text();
-  if (new TextEncoder().encode(text).byteLength > MAX_RESPONSE_BYTES) throw new DowntownUApiError("invalid-response");
-  try { return JSON.parse(text) as unknown; } catch { throw new DowntownUApiError("invalid-response"); }
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    if (length && (!/^\d+$/.test(length) || Number(length) > MAX_RESPONSE_BYTES)) {
+      await reader.cancel();
+      throw new DowntownUApiError("invalid-response");
+    }
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_RESPONSE_BYTES) {
+        await reader.cancel();
+        throw new DowntownUApiError("invalid-response");
+      }
+      chunks.push(value);
+    }
+  } catch (error) {
+    if (error instanceof DowntownUApiError) throw error;
+    try { await reader.cancel(); } catch { /* the stream may already be errored */ }
+    throw new DowntownUApiError("invalid-response");
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  try {
+    const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    return JSON.parse(text) as unknown;
+  } catch { throw new DowntownUApiError("invalid-response"); }
 }
 
 function retryAfter(response: Response): number | undefined {

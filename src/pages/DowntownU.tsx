@@ -40,7 +40,8 @@ const DowntownU = () => {
 
   useEffect(() => {
     const auth = new URLSearchParams(location.search).get("auth");
-    if (auth === "success" || auth === "invalid") navigate("/downtown-u/portal", { replace: true });
+    if (auth === "success") navigate("/downtown-u/portal", { replace: true, state: null });
+    if (auth === "invalid") navigate("/downtown-u/portal", { replace: true, state: { authFailure: "invalid" } });
   }, [location.search, navigate]);
 
   return (

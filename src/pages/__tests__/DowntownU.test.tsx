@@ -66,12 +66,16 @@ describe("Downtown U student meal plans", () => {
     expect(document.body).not.toHaveTextContent(/60-day|100 students?/i);
   });
 
-  it.each(["success", "invalid"])("safely strips the magic-bridge %s marker and redirects to the portal", async (auth) => {
-    window.history.replaceState(null, "", `/downtown-u?auth=${auth}`);
+  it.each([
+    ["success", null],
+    ["invalid", { authFailure: "invalid" }],
+  ] as const)("safely strips the magic-bridge %s marker and redirects with only safe state", async (auth, expectedState) => {
+    window.history.replaceState(null, "", `/downtown-u?auth=${auth}&unsafe=secret#credential`);
     renderPage();
     await waitFor(() => expect(window.location.pathname).toBe("/downtown-u/portal"));
     expect(window.location.search).toBe("");
     expect(window.location.hash).toBe("");
+    expect(window.history.state.usr).toEqual(expectedState);
     expect(document.body).not.toHaveTextContent(/challengeId|verifier/i);
   });
 });

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ClipboardEvent, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, ChevronRight, GraduationCap, Loader2, LogOut, RefreshCw, Utensils } from "lucide-react";
 import {
   cancelReservation, createIdempotencyKey, DowntownUApiError, getMe, getMeals, getPurchases, getReservations,
@@ -51,7 +51,7 @@ function LoadingPortal() {
   </main>;
 }
 
-function SignIn({ onAuthenticated }: { onAuthenticated: () => Promise<void> }) {
+function SignIn({ onAuthenticated, invalidLink }: { onAuthenticated: () => Promise<void>; invalidLink: boolean }) {
   const [method, setMethod] = useState<"email" | "text">("email");
   const [email, setEmail] = useState(""); const [phone, setPhone] = useState("");
   const [showCode, setShowCode] = useState(false); const [challengeId, setChallengeId] = useState(""); const [code, setCode] = useState("");
@@ -102,9 +102,10 @@ function SignIn({ onAuthenticated }: { onAuthenticated: () => Promise<void> }) {
       <section className="rounded-3xl border border-gold/25 bg-[#11110f] p-5 shadow-elegant sm:p-8" aria-labelledby="signin-title">
         <h2 id="signin-title" className="font-display text-3xl font-bold">Sign in to Downtown U</h2>
         <p className="mt-2 text-sm leading-relaxed text-cream/60">Use the email or mobile number connected to your approved account.</p>
-        <div className="mt-6 grid grid-cols-2 border-b border-white/10" role="tablist" aria-label="Sign-in method">
-          <button type="button" role="tab" aria-selected={method === "email"} onClick={() => { setMethod("email"); setShowCode(false); setNotice(""); }} className={`min-h-12 border-b-2 px-3 font-semibold ${method === "email" ? "border-gold text-gold" : "border-transparent text-cream/55"}`}>Email a link</button>
-          <button type="button" role="tab" aria-selected={method === "text"} onClick={() => { setMethod("text"); setNotice(""); }} className={`min-h-12 border-b-2 px-3 font-semibold ${method === "text" ? "border-gold text-gold" : "border-transparent text-cream/55"}`}>Text a code</button>
+        {invalidLink && <p role="alert" className="mt-5 rounded-xl border border-red-400/25 bg-red-400/10 p-4 text-sm text-red-100">This sign-in link has expired or is invalid. Enter your email below to request a new link.</p>}
+        <div className="mt-6 grid grid-cols-2 border-b border-white/10" role="group" aria-label="Sign-in method">
+          <button type="button" aria-pressed={method === "email"} onClick={() => { setMethod("email"); setShowCode(false); setNotice(""); }} className={`min-h-12 border-b-2 px-3 font-semibold ${method === "email" ? "border-gold text-gold" : "border-transparent text-cream/55"}`}>Email a link</button>
+          <button type="button" aria-pressed={method === "text"} onClick={() => { setMethod("text"); setNotice(""); }} className={`min-h-12 border-b-2 px-3 font-semibold ${method === "text" ? "border-gold text-gold" : "border-transparent text-cream/55"}`}>Text a code</button>
         </div>
         {!showCode ? <form className="mt-6 space-y-5" aria-label={method === "email" ? "Email sign-in" : "Text sign-in"} onSubmit={request}>
           {method === "email" ? <label className="block text-sm font-semibold">Email address<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 min-h-12 w-full rounded-xl border border-white/15 bg-black/30 px-4 text-base text-white outline-none focus:border-gold focus:ring-2 focus:ring-gold/30" /></label>
@@ -143,6 +144,11 @@ function ReservationCard({ item, onCancel, busy }: { item: DowntownUReservation;
 }
 
 export default function DowntownUPortal() {
+  const location = useLocation(); const navigate = useNavigate();
+  const [invalidLink] = useState(() => {
+    const routeState = location.state as { authFailure?: unknown } | null;
+    return routeState?.authFailure === "invalid";
+  });
   const [state, setState] = useState<PortalState>("loading"); const [tab, setTab] = useState<Tab>("meals");
   const [me, setMe] = useState<DowntownUMe | null>(null); const [meals, setMeals] = useState<DowntownUMeal[]>([]);
   const [purchases, setPurchases] = useState<DowntownUPurchase[]>([]); const [reservations, setReservations] = useState<DowntownUReservation[]>([]);
@@ -167,21 +173,29 @@ export default function DowntownUPortal() {
     } catch (error) { if (isAuthLoss(error)) resetProtected(); else setState("unavailable"); }
   }, [resetProtected]);
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    if (invalidLink) navigate(location.pathname, { replace: true, state: null });
+  }, [invalidLink, location.pathname, navigate]);
   useEffect(() => { if (state === "authenticated") headingRef.current?.focus(); }, [state]);
 
   const selectedMeal = meals.find((meal) => meal.id === selectedMealId) ?? null;
   const selectedModifiers = useMemo(() => selectedMeal?.modifiers.filter((modifier) => modifierIds.includes(modifier.id)) ?? [], [selectedMeal, modifierIds]);
   const total = selectedMeal ? selectedMeal.baseCredits + selectedModifiers.reduce((sum, modifier) => sum + modifier.creditDelta, 0) : 0;
-  function selectMeal(meal: DowntownUMeal) { setReservationAttempt(null); setSelectedMealId(meal.id); setModifierIds([]); setConfirmed(null); setBalanceRefreshPending(false); setMessage(""); }
+  const validTotal = total >= 1 && total <= 40;
+  function selectMeal(meal: DowntownUMeal) { setReservationAttempt(null); setCancelAttempt(null); setSelectedMealId(meal.id); setModifierIds([]); setConfirmed(null); setBalanceRefreshPending(false); setMessage(""); }
   function toggleModifier(id: string) {
-    setReservationAttempt(null);
+    setReservationAttempt(null); setCancelAttempt(null); setConfirmed(null); setMessage("");
     setModifierIds((current) => current.includes(id) ? current.filter((item) => item !== id) : current.length < 10 ? [...current, id] : current);
   }
 
   async function runReservation(attempt?: RetryReservation) {
     if (!selectedMeal && !attempt) return;
-    const next = attempt ?? { mealId: selectedMeal!.id, modifierIds: [...modifierIds], idempotencyKey: createIdempotencyKey() };
-    setReservationAttempt(next); setBusy(true); setMessage(""); setBalanceRefreshPending(false);
+    if (!attempt && !validTotal) return;
+    const unchangedAttempt = reservationAttempt?.mealId === selectedMeal?.id
+      && reservationAttempt.modifierIds.length === modifierIds.length
+      && reservationAttempt.modifierIds.every((id, index) => id === modifierIds[index]) ? reservationAttempt : null;
+    const next = attempt ?? unchangedAttempt ?? { mealId: selectedMeal!.id, modifierIds: [...modifierIds], idempotencyKey: createIdempotencyKey() };
+    setCancelAttempt(null); setReservationAttempt(next); setBusy(true); setMessage(""); setBalanceRefreshPending(false);
     try {
       const result = await reserveMeal(next); setConfirmed(result); setReservations((current) => [result, ...current.filter((item) => item.id !== result.id)]);
       setReservationAttempt(null); setModifierIds([]); setSelectedMealId(null);
@@ -196,7 +210,9 @@ export default function DowntownUPortal() {
     } finally { setBusy(false); }
   }
   async function runCancel(reservationId: string, attempt?: CancelAttempt) {
-    const next = attempt ?? { reservationId, idempotencyKey: createIdempotencyKey() }; setCancelAttempt(next); setBusy(true); setMessage("");
+    const next = attempt ?? (cancelAttempt?.reservationId === reservationId ? cancelAttempt : null)
+      ?? { reservationId, idempotencyKey: createIdempotencyKey() };
+    setReservationAttempt(null); setCancelAttempt(next); setConfirmed(null); setBusy(true); setMessage("");
     try {
       const result = await cancelReservation(next.reservationId, next.idempotencyKey);
       setReservations((current) => current.map((item) => item.id === result.id ? result : item)); setCancelAttempt(null); setMessage("Reservation canceled.");
@@ -225,7 +241,7 @@ export default function DowntownUPortal() {
   }
 
   if (state === "loading") return <LoadingPortal />;
-  if (state === "signed-out") return <SignIn onAuthenticated={load} />;
+  if (state === "signed-out") return <SignIn onAuthenticated={load} invalidLink={invalidLink} />;
   if (state === "unavailable") return <StatusPage retry={() => void load()} />;
   if (!me) return null;
 
@@ -240,19 +256,19 @@ export default function DowntownUPortal() {
         <div className="border-l-2 border-gold pl-5"><p className="text-3xl font-bold text-gold">{me.availableCredits} meal credits</p><p className="mt-1 text-sm text-cream/50">available now</p></div>
       </section>
       <nav aria-label="Portal sections" className="-mx-4 flex overflow-x-auto border-b border-white/10 px-4 sm:mx-0 sm:px-0">
-        {(["meals", "account", "history"] as const).map((item) => <button key={item} type="button" aria-current={tab === item ? "page" : undefined} onClick={() => { setTab(item); setMessage(""); }} className={`min-h-14 shrink-0 border-b-2 px-5 text-sm font-bold capitalize ${tab === item ? "border-gold text-gold" : "border-transparent text-cream/55 hover:text-white"}`}>{item}</button>)}
+        {(["meals", "account", "history"] as const).map((item) => <button key={item} type="button" aria-current={tab === item ? "page" : undefined} onClick={() => { setTab(item); setMessage(""); setReservationAttempt(null); setCancelAttempt(null); if (item !== "meals") { setConfirmed(null); setBalanceRefreshPending(false); } }} className={`min-h-14 shrink-0 border-b-2 px-5 text-sm font-bold capitalize ${tab === item ? "border-gold text-gold" : "border-transparent text-cream/55 hover:text-white"}`}>{item}</button>)}
       </nav>
       {message && <div role={message === "Reservation canceled." ? "status" : "alert"} aria-live="polite" className="mt-6 rounded-xl border border-gold/25 bg-gold/[0.08] p-4 text-sm text-cream">{message}
         {reservationAttempt && <button type="button" disabled={busy} onClick={() => void runReservation(reservationAttempt)} className="ml-3 min-h-10 font-bold text-gold underline">Retry reservation</button>}
         {cancelAttempt && <button type="button" disabled={busy} onClick={() => void runCancel(cancelAttempt.reservationId, cancelAttempt)} className="ml-3 min-h-10 font-bold text-gold underline">Retry cancellation</button>}
       </div>}
-      {confirmed && <section className="mt-7 border-l-2 border-gold bg-gold/[0.06] p-5" aria-live="polite"><Check className="h-6 w-6 text-gold" /><h2 className="mt-2 font-display text-2xl font-bold">Reservation confirmed</h2><p className="mt-1 text-cream/60">{confirmed.mealName} · {confirmed.credits} credits</p><p className="mt-2 text-sm text-cream/50">Reserved until {new Date(confirmed.expiresAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</p>{balanceRefreshPending && <p className="mt-3 text-sm text-cream/65">Your reservation is confirmed. The displayed balance has not refreshed yet.</p>}</section>}
+      {tab === "meals" && confirmed && <section className="mt-7 border-l-2 border-gold bg-gold/[0.06] p-5" aria-live="polite"><Check className="h-6 w-6 text-gold" /><h2 className="mt-2 font-display text-2xl font-bold">Reservation confirmed</h2><p className="mt-1 text-cream/60">{confirmed.mealName} · {confirmed.credits} credits</p><p className="mt-2 text-sm text-cream/50">Reserved until {new Date(confirmed.expiresAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</p>{balanceRefreshPending && <p className="mt-3 text-sm text-cream/65">Your reservation is confirmed. The displayed balance has not refreshed yet.</p>}</section>}
       {balanceRefreshPending && !confirmed && <p role="status" className="mt-5 text-sm text-cream/65">Your account change is confirmed. The displayed balance has not refreshed yet.</p>}
 
       {tab === "meals" && <section className="py-9" aria-labelledby="meals-title"><div className="flex items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.2em] text-gold">Available now</p><h2 id="meals-title" className="mt-2 font-display text-3xl font-bold">Choose your meal</h2></div><Utensils className="h-7 w-7 text-gold/50" /></div>
         {meals.length === 0 ? <p className="mt-8 border-l-2 border-white/15 pl-4 text-cream/60">No meals are available right now. Please check back later.</p> : <div className="mt-7 divide-y divide-white/10 border-y border-white/10">{meals.map((meal) => <article key={meal.id} className="grid gap-5 py-6 md:grid-cols-[1fr_auto] md:items-center"><div><h3 className="font-display text-2xl font-bold">{meal.name}</h3><p className="mt-1 text-sm font-semibold text-gold">{meal.baseCredits} {meal.baseCredits === 1 ? "credit" : "credits"}</p></div><button type="button" onClick={() => selectMeal(meal)} disabled={busy} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-gold/40 px-5 font-bold text-gold hover:bg-gold hover:text-jet-black disabled:opacity-50 md:w-auto">Choose {meal.name}<ChevronRight className="h-4 w-4" /></button>
           {selectedMealId === meal.id && <div className="md:col-span-2 border-l-2 border-gold bg-white/[0.03] p-4 sm:p-6"><h4 className="font-display text-xl font-bold">Make it yours</h4>{meal.modifiers.length === 0 ? <p className="mt-2 text-sm text-cream/55">No changes are available for this meal.</p> : <fieldset className="mt-4 grid gap-2 sm:grid-cols-2"><legend className="sr-only">Meal modifiers, choose up to 10</legend>{meal.modifiers.map((modifier) => <label key={modifier.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-white/10 px-4 text-sm hover:border-gold/40"><input type="checkbox" checked={modifierIds.includes(modifier.id)} disabled={busy || (!modifierIds.includes(modifier.id) && modifierIds.length >= 10)} onChange={() => toggleModifier(modifier.id)} className="h-4 w-4 accent-[hsl(var(--gold))]" /><span className="flex-1">{modifier.name}</span><span className="font-bold text-gold">{modifier.creditDelta > 0 ? `+${modifier.creditDelta}` : modifier.creditDelta} {Math.abs(modifier.creditDelta) === 1 ? "credit" : "credits"}</span></label>)}</fieldset>}
-            <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between"><p className="font-bold text-cream">Total: {total} {total === 1 ? "credit" : "credits"}</p><button disabled={busy} onClick={() => void runReservation()} className="min-h-12 rounded-xl bg-gold px-6 font-bold text-jet-black disabled:opacity-50">{busy ? "Reserving…" : `Reserve for ${total} ${total === 1 ? "credit" : "credits"}`}</button></div>
+            <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-bold text-cream">Total: {total} {total === 1 ? "credit" : "credits"}</p>{!validTotal && <p id={`total-error-${meal.id}`} role="alert" className="mt-1 text-sm text-red-200">Reservations must total between 1 and 40 credits. Change your selections to continue.</p>}</div><button disabled={busy || !validTotal} aria-describedby={!validTotal ? `total-error-${meal.id}` : undefined} onClick={() => void runReservation()} className="min-h-12 rounded-xl bg-gold px-6 font-bold text-jet-black disabled:opacity-50">{busy ? "Reserving…" : `Reserve for ${total} ${total === 1 ? "credit" : "credits"}`}</button></div>
           </div>}</article>)}</div>}
         <p className="mt-6 text-sm leading-relaxed text-cream/45">Tell the team about allergies at pickup. Our kitchen handles common allergens, and cross-contact is possible.</p>
       </section>}

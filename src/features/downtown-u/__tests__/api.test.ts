@@ -72,12 +72,12 @@ describe("Downtown U browser request adapters", () => {
     expect(fetcher).toHaveBeenCalledWith("/api/downtown-u/purchases?limit=25&cursor=cursor.part", expect.objectContaining({ method: "GET" }));
   });
 
-  it("uses exact read URLs/options and accepts the backend's -20 modifier boundary", async () => {
+  it("uses exact read URLs/options and enforces the public -19..20 modifier contract", async () => {
     const fetcher = vi.fn<DowntownUFetch>()
       .mockResolvedValueOnce(json({ items: [{ id: "meal-1", name: "Meal", baseCredits: 20,
-        modifiers: [{ id: "credit", name: "Credit", creditDelta: -20 }] }] }))
+        modifiers: [{ id: "credit", name: "Credit", creditDelta: -19 }, { id: "premium", name: "Premium", creditDelta: 20 }] }] }))
       .mockResolvedValueOnce(json({ items: [], nextCursor: null }));
-    await expect(getMeals(fetcher)).resolves.toMatchObject({ items: [{ modifiers: [{ creditDelta: -20 }] }] });
+    await expect(getMeals(fetcher)).resolves.toMatchObject({ items: [{ modifiers: [{ creditDelta: -19 }, { creditDelta: 20 }] }] });
     await getReservations(null, fetcher);
     expect(fetcher.mock.calls.map(([url]) => url)).toEqual([
       "/api/downtown-u/meals", "/api/downtown-u/reservations?limit=25",
@@ -85,6 +85,12 @@ describe("Downtown U browser request adapters", () => {
     for (const [, init] of fetcher.mock.calls) expect(init).toEqual(expect.objectContaining({
       method: "GET", credentials: "same-origin", cache: "no-store", referrerPolicy: "no-referrer",
     }));
+  });
+
+  it("rejects modifier credit deltas below the public -19 boundary", async () => {
+    const fetcher = vi.fn<DowntownUFetch>().mockResolvedValue(json({ items: [{ id: "meal-1", name: "Meal", baseCredits: 20,
+      modifiers: [{ id: "credit", name: "Credit", creditDelta: -20 }] }] }));
+    await expect(getMeals(fetcher)).rejects.toMatchObject({ kind: "invalid-response" });
   });
 
   it("accepts bodyless 204 logout and sends the exact empty object bytes", async () => {
@@ -108,6 +114,46 @@ describe("Downtown U browser request adapters", () => {
       status: 200, headers: { "Content-Type": "text/html" },
     }));
     await expect(getMe(wrongType)).rejects.toMatchObject({ kind: "invalid-response" });
+  });
+
+  it("bounds real response streams by raw bytes and cancels overflow despite a dishonest length", async () => {
+    let canceled = false;
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) { controller.enqueue(new Uint8Array(256 * 1024)); controller.enqueue(new Uint8Array([1])); },
+      cancel() { canceled = true; },
+    });
+    const fetcher = vi.fn<DowntownUFetch>().mockResolvedValue(new Response(stream, {
+      headers: { "Content-Type": "application/json", "Content-Length": "2" },
+    }));
+    await expect(getMe(fetcher)).rejects.toMatchObject({ kind: "invalid-response" });
+    expect(canceled).toBe(true);
+  });
+
+  it("fatally decodes UTF-8 while allowing a multibyte character split across chunks", async () => {
+    const bytes = new TextEncoder().encode(JSON.stringify({ items: [{ id: "meal-1", name: "Café", baseCredits: 1, modifiers: [] }] }));
+    const split = bytes.indexOf(0xc3);
+    const validStream = new ReadableStream<Uint8Array>({
+      start(controller) { controller.enqueue(bytes.slice(0, split + 1)); controller.enqueue(bytes.slice(split + 1)); controller.close(); },
+    });
+    await expect(getMeals(vi.fn<DowntownUFetch>().mockResolvedValue(new Response(validStream, {
+      headers: { "Content-Type": "application/json" },
+    })))).resolves.toMatchObject({ items: [{ name: "Café" }] });
+
+    const invalidStream = new ReadableStream<Uint8Array>({
+      start(controller) { controller.enqueue(new Uint8Array([0x7b, 0x22, 0xc3, 0x22, 0x7d])); controller.close(); },
+    });
+    await expect(getMe(vi.fn<DowntownUFetch>().mockResolvedValue(new Response(invalidStream, {
+      headers: { "Content-Type": "application/json" },
+    })))).rejects.toMatchObject({ kind: "invalid-response" });
+  });
+
+  it("handles a null body safely and clears the request timer", async () => {
+    const clear = vi.spyOn(globalThis, "clearTimeout");
+    const fetcher = vi.fn<DowntownUFetch>().mockResolvedValue({
+      ok: true, status: 200, headers: new Headers({ "Content-Type": "application/json" }), body: null,
+    } as Response);
+    await expect(getMe(fetcher)).rejects.toMatchObject({ kind: "invalid-response" });
+    expect(clear).toHaveBeenCalledOnce();
   });
 
   it("accepts 204 only for bodyless operations and always clears request timeouts", async () => {
