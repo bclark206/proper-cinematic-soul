@@ -19,7 +19,8 @@ describe("Downtown U runtime database identity preflight", () => {
     expect(sql).toContain("has_function_privilege(CURRENT_USER");
     expect(sql).toContain("pg_catalog.aclexplode");
     expect(sql).toContain("pg_catalog.acldefault('f', d.proowner)");
-    expect(sql).toContain("a.grantee<>rr.oid");
+    expect(sql).toContain("CASE WHEN e.proname='downtown_u_reverse_expired_reservations' THEN 1 WHEN e.allow_execute THEN 1 ELSE 0 END");
+    expect(sql).toContain("a.grantee<>CASE WHEN e.proname='downtown_u_reverse_expired_reservations' THEN jr.oid ELSE rr.oid END");
     expect(sql).toContain("a.is_grantable");
     expect(sql).toContain("p.prosecdef");
     expect(sql).toContain("l.lanname");

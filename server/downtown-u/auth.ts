@@ -15,7 +15,8 @@ export class AuthConfigurationError extends Error {
   constructor() { super("Downtown U authentication is not configured"); this.name = "AuthConfigurationError"; }
 }
 
-function validateSecret(secret: string | undefined): Buffer {
+/** Validates the canonical 256-bit base64url secret format used by server capabilities. */
+export function validateStrongSecret(secret: string | undefined): Buffer {
   if (!secret || !/^[A-Za-z0-9_-]{43}$/.test(secret)) {
     throw new AuthConfigurationError();
   }
@@ -40,7 +41,7 @@ export interface AuthCryptography {
 }
 
 export function createAuthCryptography(secret: string | undefined): AuthCryptography {
-  const key = validateSecret(secret);
+  const key = validateStrongSecret(secret);
   const digest = (purpose: string, value: string): Buffer =>
     createHmac("sha256", key).update(`downtown-u-auth\0v1\0${purpose}\0`, "utf8").update(value, "utf8").digest();
   return Object.freeze({

@@ -23,6 +23,7 @@ const migrations = [
   "202608040003_downtown_u_payment_activation.sql",
   "202608040004_downtown_u_refund_activation.sql",
   "202608040005_downtown_u_auth.sql",
+  "202608040006_downtown_u_student_portal.sql",
 ].map((name) => readFileSync(resolve(process.cwd(), "db/migrations", name), "utf8"));
 let admin: Pool;
 let owner: Pool;
@@ -510,7 +511,7 @@ run.sequential("atomic verified payment activation on PostgreSQL 16", () => {
        actor_type,actor_id,source_type,source_id)
       VALUES ($1,$2,5,5,'purchase_grant','forged','forged-grant',
        'square_webhook','EVT_FORGED','square_payment','PAY_FORGED')`, [seededStudent, grantlessPurchase]))
-      .rejects.toSatisfy((error: unknown) => dbCode(error) === "P0001");
+      .rejects.toSatisfy((error: unknown) => dbCode(error) === "42501");
     expect((await owner.query("SELECT count(*)::int count FROM public.downtown_u_credit_transactions WHERE purchase_id=$1", [grantlessPurchase])).rows[0].count).toBe(0);
     for (const sql of [
       "SELECT * FROM public.downtown_u_webhook_events",

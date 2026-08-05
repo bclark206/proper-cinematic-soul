@@ -90,10 +90,12 @@
 
 ## Phase 4 — Server-authoritative meal selection and atomic reservation
 
+> **Active decomposition note (2026-08-05):** Migration `202608040005` was already consumed by Phase 3B authentication work. Phase 4 is backend-only and therefore uses `202608040006`; the meal-selection UI from this source plan is tracked separately as active Phase 5 and is intentionally not part of Phase 4. Active Phase 5 reserves `202608040007` only if its UI needs a schema migration. If it needs no schema change, the UI consumes no migration number and operator audit is the next migration, `202608040007`.
+
 **Files**
-- Create migration `202608040005_downtown_u_meals.sql` for eligible menu snapshots/rules, reservation expiry, and optional outbox jobs.
-- Create `api/downtown-u/meals.ts`, `reservations.ts`, `reservations/[id]/cancel.ts`; `server/downtown-u/meals.ts`, `reservation-service.ts`.
-- Create `src/pages/DowntownUMeals.tsx` and components/tests; extend `vercel.json` only for required routes.
+- Create migration `202608040006_downtown_u_student_portal.sql` for eligible menu snapshots/rules and reservation expiry.
+- Create `server/downtown-u/student-portal.ts` and `postgres-student-portal-store.ts`; create `api/downtown-u/student-portal-handler.ts`, `me.ts`, `meals.ts`, `purchases.ts`, `reservations.ts`, `reservations/[id]/cancel.ts`, and `jobs/expire-reservations.ts`.
+- Extend `vercel.json` only for required backend routes and expiry scheduling. (`DowntownUMeals.tsx` and its components/tests are active Phase 5.)
 
 **TDD steps:** RED/GREEN server-side allowlist from trusted Square catalog IDs, meal-to-credit rules, availability windows, modifiers, eligibility/session checks, and rejection of client price/credit/catalog substitutions. In one transaction lock student, validate trusted menu snapshot, create idempotent reservation, and append debit. Parallel requests and repeated keys must yield at most one reservation and never negative balance. Add expiry/cancel job that locks the reservation and appends exactly one reversal.
 
@@ -101,10 +103,10 @@
 
 **Verification:** Tampered payloads fail; two concurrent last-credit requests produce one success; retries return the same reservation; expiry/cancel restores credits once.
 
-## Phase 5 — Square kitchen order creation and redemption finalization
+## Source-plan Phase 5 — Square kitchen order creation and redemption finalization (after active UI Phase 5)
 
 **Files**
-- Create migration `202608040006_downtown_u_order_outbox.sql` for outbox attempts, Square idempotency key, response IDs, dead-letter/reconciliation state.
+- Do not reserve a migration number for this deferred source-plan phase here. When kitchen-order work becomes active, assign its outbox migration the next sequential number after the migrations actually consumed by the active roadmap; this does not change the active Phase 5/operator-audit `007` contract above.
 - Create `api/downtown-u/reservations/[id]/submit.ts`, `api/downtown-u/jobs/orders.ts`; `server/downtown-u/kitchen-order-service.ts`, `order-outbox.ts`, and Square adapter tests.
 - Add confirmation/status UI and tests.
 
@@ -117,7 +119,7 @@
 ## Phase 6 — Operator dashboard, reconciliation, hardening, and rollout
 
 **Files**
-- Create migration `202608040007_downtown_u_operator_audit.sql` for roles, reconciliation cases, and append-only operator audit.
+- Create `202608040007_downtown_u_operator_audit.sql` for roles, reconciliation cases, and append-only operator audit if active Phase 5 UI consumes no migration. If that UI consumes `007`, operator audit uses `202608040008`; deferred source-plan kitchen-order work does not preempt either assignment.
 - Create `api/downtown-u/operator/{students,purchases,redemptions,reconciliation,adjustments}.ts`, `server/downtown-u/operator/*`.
 - Create `src/pages/DowntownUOperator.tsx`, dashboard components/tests, monitoring/runbook docs, retention/export procedures.
 

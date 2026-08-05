@@ -17,9 +17,9 @@ const databaseName = `downtown_u_refund_test_${suffix}`;
 const runtimeLogin = `downtown_u_refund_login_${suffix}`;
 const unrelatedRole = `downtown_u_refund_unrelated_${suffix}`;
 const password = randomUUID().replaceAll("-", "");
-const migrations = [1, 2, 3, 4, 5].map((number) => readFileSync(resolve(
+const migrations = [1, 2, 3, 4, 5, 6].map((number) => readFileSync(resolve(
   process.cwd(), "db/migrations",
-  `20260804000${number}_downtown_u_${["phase1", "webhook_events", "payment_activation", "refund_activation", "auth"][number - 1]}.sql`,
+  `20260804000${number}_downtown_u_${["phase1", "webhook_events", "payment_activation", "refund_activation", "auth", "student_portal"][number - 1]}.sql`,
 ), "utf8"));
 let admin: Pool;
 let owner: Pool;
@@ -574,7 +574,7 @@ run.sequential("atomic authoritative refund activation on PostgreSQL 16", () => 
     await expect(runtime.query(`INSERT INTO downtown_u_credit_transactions
       (student_id,purchase_id,delta,resulting_balance,transaction_type,reason,idempotency_key,actor_type,actor_id,source_type,source_id)
       VALUES ($1,$2,-1,4,'purchase_refund','attack','attack-refund','square_webhook','attack','square_refund','attack')`,
-    [purchase.student_id, purchase.id])).rejects.toMatchObject({ code: "P0001" });
+    [purchase.student_id, purchase.id])).rejects.toMatchObject({ code: "42501" });
     for (const sql of [
       "UPDATE downtown_u_refund_applications SET status='applied'", "DELETE FROM downtown_u_refund_applications",
       "TRUNCATE downtown_u_refund_applications", "UPDATE downtown_u_refund_reconciliations SET status='open'",

@@ -15,6 +15,10 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       SELECT r.oid, r.rolcanlogin, r.rolsuper, r.rolcreatedb, r.rolcreaterole,
              r.rolreplication, r.rolbypassrls
       FROM pg_catalog.pg_roles AS r WHERE r.rolname = 'downtown_u_runtime'
+    ), jobs_role AS (
+      SELECT r.oid, r.rolcanlogin, r.rolsuper, r.rolcreatedb, r.rolcreaterole,
+             r.rolreplication, r.rolbypassrls
+      FROM pg_catalog.pg_roles AS r WHERE r.rolname = 'downtown_u_jobs'
     ), expected_relations (
       relname, columns, table_select, table_insert, table_update, table_delete,
       table_truncate, table_references, table_trigger, insert_columns, update_columns
@@ -22,16 +26,14 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       ('downtown_u_plans', ARRAY['id','credits','price_cents','active']::text[],
         true,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_students', ARRAY['id','normalized_email','normalized_phone','square_customer_id','eligibility_status','credit_balance','eligibility_reviewed_at','approved_at','rejected_at','suspended_at','created_at','updated_at','deleted_at']::text[],
-        true,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
+        false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_plan_purchases', ARRAY['id','student_id','plan_id','credits_granted','price_cents','currency','square_payment_id','square_order_id','source_event_id','status','refunded_credits','paid_at','refunded_at','created_at','updated_at','authoritative_paid_at','authoritative_normalized_email','authoritative_normalized_phone','authoritative_square_customer_id']::text[],
-        true,false,false,false,false,false,false,
+        false,false,false,false,false,false,false,
         ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_redemptions', ARRAY['id','student_id','credits','idempotency_key','status','square_order_id','reserved_at','redeemed_at','reversed_at','expires_at','created_at','updated_at']::text[],
-        true,true,false,false,false,false,false, ARRAY[]::text[],
-        ARRAY['status','square_order_id','redeemed_at','reversed_at','expires_at','updated_at']::text[]),
+        false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_credit_transactions', ARRAY['id','student_id','purchase_id','redemption_id','delta','resulting_balance','transaction_type','reason','idempotency_key','actor_type','actor_id','source_type','source_id','metadata','created_at','ledger_sequence']::text[],
-        true,false,false,false,false,false,false,
-        ARRAY['id','student_id','purchase_id','redemption_id','delta','resulting_balance','transaction_type','reason','idempotency_key','actor_type','actor_id','source_type','source_id','metadata','created_at']::text[], ARRAY[]::text[]),
+        false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_balance_update_authorizations', ARRAY['backend_pid','transaction_id','student_id','new_balance']::text[],
         false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_webhook_events', ARRAY['square_event_id','event_type','raw_body_sha256','status','attempt_count','received_at','started_at','completed_at','failed_at','failure_code','failure_detail','claim_token','created_at','updated_at']::text[],
@@ -43,6 +45,12 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       ('downtown_u_auth_challenges', ARRAY['challenge_id','contact_type','normalized_contact','student_id','method','verifier_version','verifier_digest','expires_at','max_attempts','attempt_count','consumed_at','revoked_at','status','created_at']::text[],
         false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_auth_sessions', ARRAY['session_id','student_id','verifier_version','token_digest','issued_at','expires_at','revoked_at','last_seen_at']::text[],
+        false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
+      ('downtown_u_meal_rules', ARRAY['id','display_name','square_catalog_object_id','base_credits','active','available_from','available_until','created_at','updated_at']::text[],
+        false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
+      ('downtown_u_meal_modifiers', ARRAY['id','meal_id','display_name','square_catalog_object_id','credit_delta','active','created_at','updated_at']::text[],
+        false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
+      ('downtown_u_reservation_snapshots', ARRAY['redemption_id','meal_rule_id','meal_public_id','meal_display_name','meal_square_catalog_object_id','modifiers','credits','created_at']::text[],
         false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[])
     ), downtown_relations AS (
       SELECT c.oid, c.relname, c.relowner
@@ -165,6 +173,26 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       FROM downtown_relations AS d JOIN pg_catalog.pg_attribute AS a ON a.attrelid=d.oid AND a.attnum>0
       CROSS JOIN LATERAL pg_catalog.aclexplode(a.attacl) AS acl
       WHERE d.relname IN ('downtown_u_auth_challenges','downtown_u_auth_sessions')
+    ), expected_portal_relation_fingerprints (relname, expected_sha256) AS (VALUES
+      ('downtown_u_meal_modifiers','c38c3eb77413cf4b8c7de7484794ac5831ee398b6542f490540557d4d13f9352'),
+      ('downtown_u_meal_rules','a92657c07620bd2652fbe00ea61f9b3bbd4aa9d188c967cd3b10e98bbaa09994'),
+      ('downtown_u_reservation_snapshots','a7b764c571ca95184997a5241036f1be515bed9f51cd2abf5051cbc9c52169c2')
+    ), portal_relation_fingerprints AS (
+      /* PG16-pinned complete descriptors: columns/types/null/default/identity/generated,
+       * relation flags/access method, inheritance/rules, constraints/indexes/predicates,
+       * and normalized relation plus column ACL topology. */
+      SELECT c.relname, pg_catalog.encode(pg_catalog.sha256(pg_catalog.convert_to(pg_catalog.jsonb_build_object(
+        'relation',pg_catalog.jsonb_build_object('relkind',c.relkind,'persistence',c.relpersistence,'rowsecurity',c.relrowsecurity,'forcerowsecurity',c.relforcerowsecurity,'replident',c.relreplident,'options',c.reloptions,'ispartition',c.relispartition,'hasrules',c.relhasrules,'access_method',am.amname),
+        'columns',(SELECT pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object('attnum',a.attnum,'name',a.attname,'type',pg_catalog.format_type(a.atttypid,a.atttypmod),'not_null',a.attnotnull,'default',pg_catalog.pg_get_expr(ad.adbin,ad.adrelid,true),'identity',a.attidentity,'generated',a.attgenerated,'acl',(SELECT COALESCE(pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object('grantee_owner',z.grantee=c.relowner,'grantor_owner',z.grantor=c.relowner,'privilege',z.privilege_type,'grantable',z.is_grantable) ORDER BY z.grantee,z.privilege_type),'[]'::jsonb) FROM pg_catalog.aclexplode(a.attacl) z)) ORDER BY a.attnum) FROM pg_catalog.pg_attribute a LEFT JOIN pg_catalog.pg_attrdef ad ON ad.adrelid=a.attrelid AND ad.adnum=a.attnum WHERE a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped),
+        'constraints',(SELECT COALESCE(pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object('name',x.conname,'type',x.contype,'definition',pg_catalog.pg_get_constraintdef(x.oid,true)) ORDER BY x.conname),'[]'::jsonb) FROM pg_catalog.pg_constraint x WHERE x.conrelid=c.oid),
+        'indexes',(SELECT COALESCE(pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object('name',i.relname,'definition',pg_catalog.pg_get_indexdef(i.oid,0,true),'predicate',pg_catalog.pg_get_expr(x.indpred,x.indrelid,true)) ORDER BY i.relname),'[]'::jsonb) FROM pg_catalog.pg_index x JOIN pg_catalog.pg_class i ON i.oid=x.indexrelid WHERE x.indrelid=c.oid),
+        'relation_acl',(SELECT COALESCE(pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object('grantee_owner',z.grantee=c.relowner,'grantor_owner',z.grantor=c.relowner,'privilege',z.privilege_type,'grantable',z.is_grantable) ORDER BY z.grantee,z.privilege_type),'[]'::jsonb) FROM pg_catalog.aclexplode(COALESCE(c.relacl,pg_catalog.acldefault('r',c.relowner))) z),
+        'inherits',(SELECT COALESCE(pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object('child',h.inhrelid::pg_catalog.regclass::text,'parent',h.inhparent::pg_catalog.regclass::text,'seq',h.inhseqno) ORDER BY h.inhseqno),'[]'::jsonb) FROM pg_catalog.pg_inherits h WHERE h.inhrelid=c.oid OR h.inhparent=c.oid),
+        'rules',(SELECT COALESCE(pg_catalog.jsonb_agg(pg_catalog.pg_get_ruledef(r.oid,true) ORDER BY r.rulename),'[]'::jsonb) FROM pg_catalog.pg_rewrite r WHERE r.ev_class=c.oid)
+      )::text,'UTF8')),'hex') AS descriptor_sha256
+      FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
+      LEFT JOIN pg_catalog.pg_am am ON am.oid=c.relam JOIN expected_portal_relation_fingerprints e ON e.relname=c.relname
+      WHERE n.nspname='public'
     ), expected_functions (
       proname, identity_arguments, expected_oid, allow_execute, security_definer
     ) AS (VALUES
@@ -191,7 +219,17 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       ('downtown_u_create_auth_challenge', 'text, text, text, text, smallint, bytea', pg_catalog.to_regprocedure('public.downtown_u_create_auth_challenge(text,text,text,text,smallint,bytea)')::oid, true, true),
       ('downtown_u_consume_auth_challenge', 'text, smallint, bytea, text, smallint, bytea', pg_catalog.to_regprocedure('public.downtown_u_consume_auth_challenge(text,smallint,bytea,text,smallint,bytea)')::oid, true, true),
       ('downtown_u_validate_auth_session', 'text, smallint, bytea', pg_catalog.to_regprocedure('public.downtown_u_validate_auth_session(text,smallint,bytea)')::oid, true, true),
-      ('downtown_u_revoke_auth_session', 'text, smallint, bytea', pg_catalog.to_regprocedure('public.downtown_u_revoke_auth_session(text,smallint,bytea)')::oid, true, true)
+      ('downtown_u_revoke_auth_session', 'text, smallint, bytea', pg_catalog.to_regprocedure('public.downtown_u_revoke_auth_session(text,smallint,bytea)')::oid, true, true),
+      ('downtown_u_student_principal', 'text, smallint, bytea', pg_catalog.to_regprocedure('public.downtown_u_student_principal(text,smallint,bytea)')::oid, false, true),
+      ('downtown_u_student_me', 'text, smallint, bytea', pg_catalog.to_regprocedure('public.downtown_u_student_me(text,smallint,bytea)')::oid, true, true),
+      ('downtown_u_student_meals', 'text, smallint, bytea', pg_catalog.to_regprocedure('public.downtown_u_student_meals(text,smallint,bytea)')::oid, true, true),
+      ('downtown_u_student_purchases', 'text, smallint, bytea, integer, timestamp with time zone, uuid', pg_catalog.to_regprocedure('public.downtown_u_student_purchases(text,smallint,bytea,integer,timestamp with time zone,uuid)')::oid, true, true),
+      ('downtown_u_student_reservations', 'text, smallint, bytea, integer, timestamp with time zone, uuid', pg_catalog.to_regprocedure('public.downtown_u_student_reservations(text,smallint,bytea,integer,timestamp with time zone,uuid)')::oid, true, true),
+      ('downtown_u_student_reserve', 'text, smallint, bytea, text, text[], text', pg_catalog.to_regprocedure('public.downtown_u_student_reserve(text,smallint,bytea,text,text[],text)')::oid, true, true),
+      ('downtown_u_student_reverse', 'text, smallint, bytea, uuid, text', pg_catalog.to_regprocedure('public.downtown_u_student_reverse(text,smallint,bytea,uuid,text)')::oid, true, true),
+      ('downtown_u_reverse_expired_reservations', 'integer', pg_catalog.to_regprocedure('public.downtown_u_reverse_expired_reservations(integer)')::oid, false, true),
+      ('downtown_u_reject_reservation_snapshot_mutation', '', pg_catalog.to_regprocedure('public.downtown_u_reject_reservation_snapshot_mutation()')::oid, false, false),
+      ('downtown_u_valid_modifier_snapshot', 'jsonb', pg_catalog.to_regprocedure('public.downtown_u_valid_modifier_snapshot(jsonb)')::oid, false, false)
     ), downtown_functions AS (
       SELECT p.oid, p.proname, pg_catalog.oidvectortypes(p.proargtypes) AS identity_arguments,
              p.proowner, p.prosecdef, l.lanname, p.proconfig, p.proacl
@@ -205,7 +243,17 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       (pg_catalog.to_regprocedure('public.downtown_u_consume_auth_challenge(text,smallint,bytea,text,smallint,bytea)')::oid, 'cd7a4bb26a06f1a33afa4a55760af214ec9c8d646e95479d24cfeef900df98bc'),
       (pg_catalog.to_regprocedure('public.downtown_u_create_auth_challenge(text,text,text,text,smallint,bytea)')::oid, '8a50348b98628d29eaea71e9f4cc2a1fdcce5b9e9d6ab0c94dd3a8f2d81850ee'),
       (pg_catalog.to_regprocedure('public.downtown_u_revoke_auth_session(text,smallint,bytea)')::oid, '05b59dd8b9f11ffaac6dbab8c3315954119c969476364bb9ee1da2c8d258cd8c'),
-      (pg_catalog.to_regprocedure('public.downtown_u_validate_auth_session(text,smallint,bytea)')::oid, '0f1fb137a59ae03bee69d09695fcac90ee14712be6ad87a79870accd9864980b')
+      (pg_catalog.to_regprocedure('public.downtown_u_validate_auth_session(text,smallint,bytea)')::oid, '0f1fb137a59ae03bee69d09695fcac90ee14712be6ad87a79870accd9864980b'),
+      (pg_catalog.to_regprocedure('public.downtown_u_student_principal(text,smallint,bytea)')::oid, '899d9c7222dcdbb6ed5b7722ca9532de2412ace6891a8a6517648dc9a0007cf2'),
+      (pg_catalog.to_regprocedure('public.downtown_u_student_me(text,smallint,bytea)')::oid, '057df997c00028f0f04aee75ebfeff12542b80b0e77cf6fbc21931b6155ee8dd'),
+      (pg_catalog.to_regprocedure('public.downtown_u_student_purchases(text,smallint,bytea,integer,timestamp with time zone,uuid)')::oid, 'c5ec332c1aed359e23fc0651af13b752148d03550c372a498b8a8f77ce568b66'),
+      (pg_catalog.to_regprocedure('public.downtown_u_student_reservations(text,smallint,bytea,integer,timestamp with time zone,uuid)')::oid, '9f4c4d1148a46fcc51a11f63151a541b3ca3aebd7364d3f136df6d96628c3f26'),
+      (pg_catalog.to_regprocedure('public.downtown_u_student_meals(text,smallint,bytea)')::oid, '6d6e3fab4749fcc2b22584ee820bcc0bf8133c9e05e711219d2404170059c25b'),
+      (pg_catalog.to_regprocedure('public.downtown_u_student_reserve(text,smallint,bytea,text,text[],text)')::oid, 'b97b0aa746e98e683bedb904673e4b9c78f480aa9367d4dcaa7e90487c26242c'),
+      (pg_catalog.to_regprocedure('public.downtown_u_student_reverse(text,smallint,bytea,uuid,text)')::oid, '6f334c7a8e049a608c622c0deac3a336af9121450902bea44d259a844ddb78e0'),
+      (pg_catalog.to_regprocedure('public.downtown_u_reverse_expired_reservations(integer)')::oid, '8508e828ccc1e5c152072088559306f3a9fb7ac0ff133fbb8bcad9d3fa19936a'),
+      (pg_catalog.to_regprocedure('public.downtown_u_reject_reservation_snapshot_mutation()')::oid, '1f47bc39de65bec0bdfea7fea44886f3bbd679ef7ba1523ef6ffe684b287575b'),
+      (pg_catalog.to_regprocedure('public.downtown_u_valid_modifier_snapshot(jsonb)')::oid, '68794dc2383bf4f0bf7621a22bbb2747a81a18265fd62a7107986676ebb3a4ca')
     ), auth_function_fingerprints AS (
       /*
        * Migration-pinned PG16 descriptor. jsonb's stable key ordering makes a
@@ -285,6 +333,8 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       ('downtown_u_auth_challenges_no_truncate', 'downtown_u_auth_challenges', pg_catalog.to_regprocedure('public.downtown_u_auth_protect_challenge()')::oid, 'O', false,true,false, false,false,false,true, ARRAY[]::text[], NULL::text, 0::smallint, ''),
       ('downtown_u_auth_sessions_immutable', 'downtown_u_auth_sessions', pg_catalog.to_regprocedure('public.downtown_u_auth_protect_session()')::oid, 'O', true,true,false, false,true,true,false, ARRAY[]::text[], NULL::text, 0::smallint, ''),
       ('downtown_u_auth_sessions_no_truncate', 'downtown_u_auth_sessions', pg_catalog.to_regprocedure('public.downtown_u_auth_protect_session()')::oid, 'O', false,true,false, false,false,false,true, ARRAY[]::text[], NULL::text, 0::smallint, '')
+      ,('downtown_u_reservation_snapshots_immutable', 'downtown_u_reservation_snapshots', pg_catalog.to_regprocedure('public.downtown_u_reject_reservation_snapshot_mutation()')::oid, 'O', true,true,false, false,true,true,false, ARRAY[]::text[], NULL::text, 0::smallint, '')
+      ,('downtown_u_reservation_snapshots_no_truncate', 'downtown_u_reservation_snapshots', pg_catalog.to_regprocedure('public.downtown_u_reject_reservation_snapshot_mutation()')::oid, 'O', false,true,false, false,false,false,true, ARRAY[]::text[], NULL::text, 0::smallint, '')
     ), downtown_triggers AS (
       -- pg_trigger.tgtype is a documented bit mask: ROW=1, BEFORE=2,
       -- INSERT=4, DELETE=8, UPDATE=16, TRUNCATE=32, INSTEAD=64.
@@ -320,7 +370,10 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       AND NOT i.rolreplication AND NOT i.rolbypassrls
       AND NOT rr.rolcanlogin AND NOT rr.rolsuper AND NOT rr.rolcreatedb
       AND NOT rr.rolcreaterole AND NOT rr.rolreplication AND NOT rr.rolbypassrls
+      AND NOT jr.rolcanlogin AND NOT jr.rolsuper AND NOT jr.rolcreatedb
+      AND NOT jr.rolcreaterole AND NOT jr.rolreplication AND NOT jr.rolbypassrls
       AND pg_catalog.pg_has_role(CURRENT_USER, 'downtown_u_runtime', 'MEMBER')
+      AND NOT pg_catalog.pg_has_role(CURRENT_USER, 'downtown_u_jobs', 'MEMBER')
       AND NOT pg_catalog.has_schema_privilege(CURRENT_USER, 'public', 'CREATE')
       AND NOT pg_catalog.has_database_privilege(CURRENT_USER, CURRENT_DATABASE(), 'CREATE')
       AND NOT EXISTS (
@@ -397,6 +450,12 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       AND (SELECT count(*) FROM auth_relation_acls) = 14
       AND NOT EXISTS (SELECT 1 FROM auth_column_acls)
       AND NOT EXISTS (
+        SELECT 1 FROM expected_portal_relation_fingerprints e
+        FULL JOIN portal_relation_fingerprints d USING (relname)
+        WHERE e.relname IS NULL OR d.relname IS NULL OR d.descriptor_sha256<>e.expected_sha256
+      )
+      AND (SELECT count(*) FROM portal_relation_fingerprints)=3
+      AND NOT EXISTS (
         SELECT 1 FROM expected_relations AS e JOIN downtown_relations AS d USING (relname)
         WHERE pg_catalog.has_table_privilege(CURRENT_USER, d.oid, 'SELECT') <> e.table_select
            OR pg_catalog.has_table_privilege(CURRENT_USER, d.oid, 'INSERT') <> e.table_insert
@@ -439,18 +498,18 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
         WHERE e.function_oid IS NULL OR d.function_oid IS NULL
           OR d.descriptor_sha256 <> e.expected_sha256
       )
-      AND (SELECT count(*) FROM auth_function_fingerprints) = 6
+      AND (SELECT count(*) FROM auth_function_fingerprints) = 16
       AND NOT EXISTS (
         SELECT 1 FROM expected_functions AS e JOIN downtown_functions AS d
           ON d.oid = e.expected_oid AND d.proname = e.proname
           AND d.identity_arguments = e.identity_arguments
         WHERE (SELECT count(*) FROM function_acls AS a
                WHERE a.function_oid=d.oid AND a.grantee<>d.proowner)
-                <> CASE WHEN e.allow_execute THEN 1 ELSE 0 END
+                <> CASE WHEN e.proname='downtown_u_reverse_expired_reservations' THEN 1 WHEN e.allow_execute THEN 1 ELSE 0 END
            OR EXISTS (
              SELECT 1 FROM function_acls AS a
              WHERE a.function_oid=d.oid AND a.grantee<>d.proowner
-               AND (a.grantee<>rr.oid OR a.grantor<>d.proowner
+               AND (a.grantee<>CASE WHEN e.proname='downtown_u_reverse_expired_reservations' THEN jr.oid ELSE rr.oid END OR a.grantor<>d.proowner
                  OR a.privilege_type<>'EXECUTE' OR a.is_grantable)
            )
       )
@@ -468,7 +527,7 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
           OR d.argument_count <> e.argument_count
           OR d.arguments_hex <> e.arguments_hex
       )
-      FROM identity AS i CROSS JOIN runtime_role AS rr), false) AS safe_runtime_identity
+      FROM identity AS i CROSS JOIN runtime_role AS rr CROSS JOIN jobs_role AS jr), false) AS safe_runtime_identity
   `).then((result) => {
     if (result.rows.length !== 1 || result.rows[0].safe_runtime_identity !== true) {
       throw new Error("Unsafe Downtown U runtime database identity");

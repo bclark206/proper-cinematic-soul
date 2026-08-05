@@ -1,4 +1,7 @@
 {
+  "crons": [
+    { "path": "/api/downtown-u/jobs/expire-reservations", "schedule": "*/5 * * * *" }
+  ],
   "rewrites": [
     { "source": "/api/catalog", "destination": "/api/catalog" },
     { "source": "/api/create-order", "destination": "/api/create-order" },
@@ -7,6 +10,13 @@
     { "source": "/api/downtown-u/request-link", "destination": "/api/downtown-u/request-link" },
     { "source": "/api/downtown-u/send-code", "destination": "/api/downtown-u/send-code" },
     { "source": "/api/downtown-u/verify-code", "destination": "/api/downtown-u/verify-code" },
+    { "source": "/api/downtown-u/me", "destination": "/api/downtown-u/me" },
+    { "source": "/api/downtown-u/meals", "destination": "/api/downtown-u/meals" },
+    { "source": "/api/downtown-u/purchases", "destination": "/api/downtown-u/purchases" },
+    { "source": "/api/downtown-u/reservations", "destination": "/api/downtown-u/reservations" },
+    { "source": "/api/downtown-u/reservations/:id/cancel", "destination": "/api/downtown-u/reservations/:id/cancel" },
+    { "source": "/api/downtown-u/logout", "destination": "/api/downtown-u/logout" },
+    { "source": "/api/downtown-u/jobs/expire-reservations", "destination": "/api/downtown-u/jobs/expire-reservations" },
     { "source": "/downtown-u/auth/verify", "destination": "/downtown-u-auth-verify.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],

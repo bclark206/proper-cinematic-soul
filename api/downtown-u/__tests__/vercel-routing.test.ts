@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 interface VercelConfig {
   rewrites: Array<{ source: string; destination: string }>;
+  crons: Array<{ path: string; schedule: string }>;
 }
 
 describe("Vercel Downtown U API routing", () => {
@@ -15,12 +16,15 @@ describe("Vercel Downtown U API routing", () => {
       (rewrite) => rewrite.source === "/(.*)" && rewrite.destination === "/index.html",
     );
 
-    for (const path of ["square-webhook", "request-link", "send-code", "verify-code"]) {
+    const paths = ["square-webhook", "request-link", "send-code", "verify-code", "me", "meals", "purchases", "reservations", "reservations/:id/cancel", "logout", "jobs/expire-reservations"];
+    for (const path of paths) {
       const route = { source: `/api/downtown-u/${path}`, destination: `/api/downtown-u/${path}` };
       const index = config.rewrites.findIndex((rewrite) => rewrite.source === route.source && rewrite.destination === route.destination);
       expect(index).toBeGreaterThanOrEqual(0);
       expect(catchAllIndex).toBeGreaterThan(index);
       expect(config.rewrites.filter((rewrite) => rewrite.source === route.source)).toEqual([route]);
     }
+    expect(catchAllIndex).toBe(config.rewrites.length - 1);
   });
+  it("schedules the authenticated expiry route every five minutes",()=>{const config=JSON.parse(readFileSync(resolve(process.cwd(),"vercel.json"),"utf8")) as VercelConfig;expect(config.crons).toEqual([{path:"/api/downtown-u/jobs/expire-reservations",schedule:"*/5 * * * *"}])});
 });
