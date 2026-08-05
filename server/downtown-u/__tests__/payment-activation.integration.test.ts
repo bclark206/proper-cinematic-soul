@@ -22,6 +22,7 @@ const migrations = [
   "202608040002_downtown_u_webhook_events.sql",
   "202608040003_downtown_u_payment_activation.sql",
   "202608040004_downtown_u_refund_activation.sql",
+  "202608040005_downtown_u_auth.sql",
 ].map((name) => readFileSync(resolve(process.cwd(), "db/migrations", name), "utf8"));
 let admin: Pool;
 let owner: Pool;

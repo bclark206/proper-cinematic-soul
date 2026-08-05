@@ -12,7 +12,7 @@ const run = baseUrl ? describe : describe.skip;
 const databaseName = `downtown_u_webhook_test_${process.pid}_${Date.now()}`;
 const runtimeLogin = `downtown_u_webhook_login_${process.pid}_${Date.now()}`;
 const runtimePassword = randomUUID().replaceAll("-", "");
-const migrations = ["202608040001_downtown_u_phase1.sql", "202608040002_downtown_u_webhook_events.sql", "202608040003_downtown_u_payment_activation.sql", "202608040004_downtown_u_refund_activation.sql"].map((name) => readFileSync(resolve(process.cwd(), "db/migrations", name), "utf8"));
+const migrations = ["202608040001_downtown_u_phase1.sql", "202608040002_downtown_u_webhook_events.sql", "202608040003_downtown_u_payment_activation.sql", "202608040004_downtown_u_refund_activation.sql", "202608040005_downtown_u_auth.sql"].map((name) => readFileSync(resolve(process.cwd(), "db/migrations", name), "utf8"));
 let admin: Pool;
 let owner: Pool;
 let runtime: Pool;
@@ -48,6 +48,7 @@ run.sequential("durable webhook claims on PostgreSQL 16", () => {
     await owner.query(migrations[1]);
     await owner.query(migrations[2]);
     await owner.query(migrations[3]);
+    await owner.query(migrations[4]);
     await owner.query(`CREATE ROLE ${qi(runtimeLogin)} LOGIN PASSWORD '${runtimePassword}'`);
     await owner.query(`GRANT downtown_u_runtime TO ${qi(runtimeLogin)}`);
     const loginUrl = new URL(parsed);
