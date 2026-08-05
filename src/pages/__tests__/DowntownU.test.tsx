@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import DowntownU from "../DowntownU";
 
@@ -11,8 +11,8 @@ const renderPage = () =>
   );
 
 describe("Downtown U student meal plans", () => {
-  beforeEach(() => vi.restoreAllMocks());
-  afterEach(() => vi.restoreAllMocks());
+  beforeEach(() => { vi.restoreAllMocks(); window.history.replaceState(null, "", "/downtown-u"); });
+  afterEach(() => { vi.restoreAllMocks(); window.history.replaceState(null, "", "/downtown-u"); });
 
   it("presents every plan, marks Scholar recommended, and lists included meals", () => {
     renderPage();
@@ -54,8 +54,24 @@ describe("Downtown U student meal plans", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it("links existing students to the protected portal without calling an API", () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    renderPage();
+    expect(screen.getByRole("link", { name: /student sign in/i })).toHaveAttribute("href", "/downtown-u/portal");
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it("contains no pilot cohort language", () => {
     renderPage();
     expect(document.body).not.toHaveTextContent(/60-day|100 students?/i);
+  });
+
+  it.each(["success", "invalid"])("safely strips the magic-bridge %s marker and redirects to the portal", async (auth) => {
+    window.history.replaceState(null, "", `/downtown-u?auth=${auth}`);
+    renderPage();
+    await waitFor(() => expect(window.location.pathname).toBe("/downtown-u/portal"));
+    expect(window.location.search).toBe("");
+    expect(window.location.hash).toBe("");
+    expect(document.body).not.toHaveTextContent(/challengeId|verifier/i);
   });
 });

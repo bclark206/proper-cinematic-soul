@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { downtownUPaymentLinks, type DowntownUPlanId } from "@/config/downtownUPaymentLinks";
@@ -34,6 +35,13 @@ const DowntownU = () => {
   const [eligibilityConfirmed, setEligibilityConfirmed] = useState(false);
   const plan = plans.find((item) => item.id === selectedPlan)!;
   const checkoutUrl = downtownUPaymentLinks?.get(selectedPlan);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const auth = new URLSearchParams(location.search).get("auth");
+    if (auth === "success" || auth === "invalid") navigate("/downtown-u/portal", { replace: true });
+  }, [location.search, navigate]);
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#090909] text-pure-white">
@@ -55,6 +63,9 @@ const DowntownU = () => {
                 <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/70 sm:text-xl">
                   Flexible meal blocks for eligible Morgan State or Coppin State students living in participating downtown housing.
                 </p>
+                <Link to="/downtown-u/portal" className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl border border-gold/50 px-5 font-bold text-gold transition hover:bg-gold hover:text-jet-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                  Student sign in <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
                 <div className="flex items-start gap-4">

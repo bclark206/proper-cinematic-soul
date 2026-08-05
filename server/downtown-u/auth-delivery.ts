@@ -13,7 +13,7 @@ export class AuthDeliveryError extends Error {
 }
 
 export interface EmailAuthMessage { to: string; magicLink: string; expiresAt: Date }
-export interface SmsAuthMessage { to: string; otp: string; expiresAt: Date }
+export interface SmsAuthMessage { to: string; otp: string; challengeId: string; expiresAt: Date }
 export interface AuthEmailProvider { send(message: EmailAuthMessage): Promise<void> }
 export interface AuthSmsProvider { send(message: SmsAuthMessage): Promise<void> }
 
@@ -58,11 +58,13 @@ export function createEmailAuthDeliverySink(config: {
 export function createSmsAuthDeliverySink(config: { sms: AuthSmsProvider }): AuthDeliverySink {
   return Object.freeze({
     async deliver(delivery: PendingAuthDelivery): Promise<void> {
-      if (delivery.method !== "sms_otp" || !OTP.test(delivery.verifier)
+      if (delivery.method !== "sms_otp" || !OTP.test(delivery.verifier) || !OPAQUE_ID.test(delivery.challengeId)
         || !(delivery.expiresAt instanceof Date) || !Number.isFinite(delivery.expiresAt.getTime())) {
         throw new AuthDeliveryError("provider");
       }
-      await config.sms.send({ to: delivery.normalizedContact, otp: delivery.verifier, expiresAt: delivery.expiresAt });
+      await config.sms.send({
+        to: delivery.normalizedContact, otp: delivery.verifier, challengeId: delivery.challengeId, expiresAt: delivery.expiresAt,
+      });
     },
   });
 }
@@ -82,8 +84,10 @@ export function createAuthDeliverySink(config: {
         });
         return;
       }
-      if (delivery.method === "sms_otp" && OTP.test(delivery.verifier)) {
-        await config.sms.send({ to: delivery.normalizedContact, otp: delivery.verifier, expiresAt: delivery.expiresAt });
+      if (delivery.method === "sms_otp" && OTP.test(delivery.verifier) && OPAQUE_ID.test(delivery.challengeId)) {
+        await config.sms.send({
+          to: delivery.normalizedContact, otp: delivery.verifier, challengeId: delivery.challengeId, expiresAt: delivery.expiresAt,
+        });
         return;
       }
       throw new AuthDeliveryError("provider");
@@ -152,7 +156,7 @@ export function createTwilioSmsProvider(config: {
     async send(message: SmsAuthMessage): Promise<void> {
       const minutes = Math.max(1, Math.ceil((message.expiresAt.getTime() - Date.now()) / 60_000));
       const body = new URLSearchParams({ To: message.to, From: from,
-        Body: `Your Downtown U code is ${message.otp}. It expires in ${minutes} minutes.` });
+        Body: `Your Downtown U code is ${message.otp}. Sign-in reference: ${message.challengeId}. It expires in ${minutes} minutes.` });
       await providerFetch(fetchImpl, `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
         method: "POST", headers: { Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" }, body,

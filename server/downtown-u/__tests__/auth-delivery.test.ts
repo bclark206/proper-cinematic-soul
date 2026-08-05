@@ -28,7 +28,9 @@ describe("authentication delivery boundaries", () => {
     await sink.deliver({ challengeId, method: "sms_otp", normalizedContact: "+12025550100", verifier: "012345", expiresAt: expiry });
     expect(email.send).toHaveBeenCalledOnce(); expect(email.send.mock.calls[0][0]).toEqual({ to: "student@example.test", expiresAt: expiry,
       magicLink: `https://app.example.test/downtown-u/auth/verify#challengeId=${challengeId}&verifier=${verifier}` });
-    expect(sms.send).toHaveBeenCalledOnce(); expect(sms.send).toHaveBeenCalledWith({ to: "+12025550100", otp: "012345", expiresAt: expiry });
+    expect(sms.send).toHaveBeenCalledOnce(); expect(sms.send).toHaveBeenCalledWith({
+      to: "+12025550100", otp: "012345", challengeId, expiresAt: expiry,
+    });
   });
 
   it("uses exact provider endpoints/auth and performs no retry on non-2xx", async () => {
@@ -47,12 +49,13 @@ describe("authentication delivery boundaries", () => {
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 201 }));
     const sid = `AC${"a".repeat(32)}`;
     const sms = createTwilioSmsProvider({ accountSid: sid, authToken: "twilio-secret", from: "+12025550199", fetch: fetchMock });
-    await sms.send({ to: "+12025550100", otp: "012345", expiresAt: expiry });
+    await sms.send({ to: "+12025550100", otp: "012345", challengeId, expiresAt: expiry });
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`);
     const form = new URLSearchParams(String(init?.body));
     expect(form.get("To")).toBe("+12025550100"); expect(form.get("From")).toBe("+12025550199");
-    expect(form.get("Body")).toContain("012345"); expect(form.get("Body")).not.toContain("+12025550100");
+    expect(form.get("Body")).toBe(`Your Downtown U code is 012345. Sign-in reference: ${challengeId}. It expires in 10 minutes.`);
+    expect(form.get("Body")).not.toContain("+12025550100");
     expect((init?.headers as Record<string, string>).Authorization).toBe(`Basic ${Buffer.from(`${sid}:twilio-secret`).toString("base64")}`);
   });
 
