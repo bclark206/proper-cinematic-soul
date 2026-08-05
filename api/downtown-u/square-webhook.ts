@@ -1,8 +1,9 @@
 import { isUint8Array } from "node:util/types";
 import { Pool } from "pg";
 import { createEnrollmentService, readDowntownUSquareConfig, type EnrollmentServiceConfig } from "../../server/downtown-u/enrollment-service";
-import { createPaymentClaimProcessor, type PaymentActivationStore } from "../../server/downtown-u/payment-activation";
+import { createPaymentClaimProcessor, type PaymentActivationStore, type RefundActivationStore } from "../../server/downtown-u/payment-activation";
 import { PostgresPaymentActivationStore } from "../../server/downtown-u/postgres-payment-activation-store";
+import { PostgresRefundActivationStore } from "../../server/downtown-u/postgres-refund-activation-store";
 import { PostgresWebhookEventStore } from "../../server/downtown-u/postgres-webhook-event-store";
 import { createSquareClientFromEnv, type SquareClient } from "../../server/downtown-u/square-client";
 import type { WebhookEventStore } from "../../server/downtown-u/webhook-event-store";
@@ -136,8 +137,11 @@ export function createClaimingProcessor(
             },
           },
         );
-        if (processResult?.claimCompletedAtomically === true) return { outcome: "accepted" };
-        if (processResult?.claimRejected === true) return { outcome: "accepted" };
+        const marker = processResult as {
+          claimCompletedAtomically?: true; claimRejected?: true;
+        } | undefined;
+        if (marker?.claimCompletedAtomically === true) return { outcome: "accepted" };
+        if (marker?.claimRejected === true) return { outcome: "accepted" };
         if ((disposition as string) === "completed") return { outcome: "accepted" };
         if ((disposition as string) === "rejected") return { outcome: "accepted" };
         throw new Error("Webhook claim was not completed");
@@ -179,6 +183,7 @@ export interface ProductionSquareWebhookBoundaries {
   createEnrollment(config: EnrollmentServiceConfig): ReturnType<typeof createEnrollmentService>;
   createWebhookStore(pool: Pool): WebhookEventStore;
   createActivationStore(pool: Pool): PaymentActivationStore;
+  createRefundActivationStore(pool: Pool): RefundActivationStore;
 }
 
 const productionBoundaries: ProductionSquareWebhookBoundaries = {
@@ -187,6 +192,7 @@ const productionBoundaries: ProductionSquareWebhookBoundaries = {
   createEnrollment: createEnrollmentService,
   createWebhookStore: (pool) => new PostgresWebhookEventStore(pool),
   createActivationStore: (pool) => new PostgresPaymentActivationStore(pool),
+  createRefundActivationStore: (pool) => new PostgresRefundActivationStore(pool),
 };
 
 const unavailableHandler = async (_request: NodeWebhookRequest, response: NodeWebhookResponse): Promise<void> => {
@@ -209,7 +215,11 @@ export function createProductionSquareWebhookHandler(
       notificationUrl: env.DOWNTOWN_U_SQUARE_WEBHOOK_URL!,
       processEvent: createClaimingProcessor(
         boundaries.createWebhookStore(pool),
-        createPaymentClaimProcessor({ enrollment, store: boundaries.createActivationStore(pool) }),
+        createPaymentClaimProcessor({
+          enrollment,
+          store: boundaries.createActivationStore(pool),
+          refundStore: boundaries.createRefundActivationStore(pool),
+        }),
       ),
     });
   } catch {

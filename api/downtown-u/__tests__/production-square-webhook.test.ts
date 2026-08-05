@@ -1,8 +1,8 @@
 import { createHmac } from "node:crypto";
 import type { Pool } from "pg";
 import { describe, expect, it, vi } from "vitest";
-import { EnrollmentValidationError, type TrustedEnrollmentCommand } from "../../../server/downtown-u/enrollment-service";
-import type { PaymentActivationStore } from "../../../server/downtown-u/payment-activation";
+import { EnrollmentValidationError, type TrustedEnrollmentCommand, type TrustedRefundCommand } from "../../../server/downtown-u/enrollment-service";
+import type { PaymentActivationStore, RefundActivationStore } from "../../../server/downtown-u/payment-activation";
 import { SquareApiError, type SquareClient } from "../../../server/downtown-u/square-client";
 import type { WebhookEventStore } from "../../../server/downtown-u/webhook-event-store";
 import {
@@ -28,6 +28,11 @@ const command: TrustedEnrollmentCommand = {
   paidAt: "2026-08-04T12:00:00Z", eligibility: "pending",
 };
 const rawBody = Buffer.from('{"event_id":"EVT_1","type":"payment.updated","version":"2026-08-04","data":{"type":"payment","id":"PAY_1","object":{"payment":{"id":"PAY_1"}}}}');
+const refundCommand: TrustedRefundCommand = {
+  refundId: "REFUND_1", paymentId: "PAY_1", orderId: "ORDER_1", amount: 1200,
+  currency: "USD", locationId: "LOC_1", updatedAt: "2026-08-05T12:00:00Z",
+};
+const refundBody = Buffer.from('{"event_id":"EVT_REFUND_1","type":"refund.updated","version":"2026-08-05","data":{"type":"refund","id":"REFUND_1","object":{"refund":{"id":"REFUND_1"}}}}');
 
 function request(bytes = rawBody) {
   const signature = createHmac("sha256", env.SQUARE_WEBHOOK_SIGNATURE_KEY!)
@@ -58,14 +63,19 @@ function boundaries(
     complete: vi.fn(), fail: vi.fn(), reject: vi.fn(),
   };
   const activation: PaymentActivationStore = { activate };
+  const refundActivation: RefundActivationStore = {
+    activate: vi.fn().mockResolvedValue({ outcome: "applied" }),
+  };
+  const validateRefundUpdated = vi.fn().mockResolvedValue(refundCommand);
   const result: ProductionSquareWebhookBoundaries = {
     getPool: vi.fn().mockReturnValue(pool),
     createSquareClient: vi.fn().mockReturnValue({} as SquareClient),
-    createEnrollment: vi.fn().mockReturnValue({ validatePaymentUpdated, validateRefundUpdated: vi.fn() }),
+    createEnrollment: vi.fn().mockReturnValue({ validatePaymentUpdated, validateRefundUpdated }),
     createWebhookStore: vi.fn().mockReturnValue(store),
     createActivationStore: vi.fn().mockReturnValue(activation),
+    createRefundActivationStore: vi.fn().mockReturnValue(refundActivation),
   };
-  return { result, store, activation, pool };
+  return { result, store, activation, refundActivation, validateRefundUpdated, pool };
 }
 
 describe("production Square webhook composition", () => {
@@ -93,7 +103,21 @@ describe("production Square webhook composition", () => {
     expect(b.result.getPool).toHaveBeenCalledWith(env.DATABASE_URL);
     expect(b.result.createWebhookStore).toHaveBeenCalledWith(b.pool);
     expect(b.result.createActivationStore).toHaveBeenCalledWith(b.pool);
+    expect(b.result.createRefundActivationStore).toHaveBeenCalledWith(b.pool);
     expect(b.activation.activate).toHaveBeenCalledWith(expect.objectContaining({ eventId: "EVT_1", resourceId: "PAY_1" }), command);
+    expect(b.store.complete).not.toHaveBeenCalled();
+  });
+
+  it("injects the existing enrollment validator and refund activation boundary", async () => {
+    const b = boundaries();
+    const res = response();
+    await createProductionSquareWebhookHandler(env, b.result)(request(refundBody), res.adapter);
+    expect(res.result).toEqual({ status: 202, body: { ok: true, accepted: true } });
+    expect(b.validateRefundUpdated).toHaveBeenCalledWith("REFUND_1");
+    expect(b.result.createRefundActivationStore).toHaveBeenCalledWith(b.pool);
+    expect(b.refundActivation.activate).toHaveBeenCalledWith(
+      expect.objectContaining({ eventId: "EVT_REFUND_1", resourceId: "REFUND_1" }), refundCommand,
+    );
     expect(b.store.complete).not.toHaveBeenCalled();
   });
 

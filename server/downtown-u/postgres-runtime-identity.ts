@@ -1,15 +1,10 @@
 import type { Pool } from "pg";
 
-const verifiedPools = new WeakMap<Pool, Promise<void>>();
-
 interface IdentityRow { safe_runtime_identity: boolean; }
 
 /** Fail closed unless the pool authenticates directly as the exact bounded runtime identity. */
 export function assertDowntownURuntimeIdentity(pool: Pool): Promise<void> {
-  const existing = verifiedPools.get(pool);
-  if (existing) return existing;
-
-  const verification = pool.query<IdentityRow>(`
+  return pool.query<IdentityRow>(`
     WITH identity AS (
       SELECT r.oid, r.rolcanlogin, r.rolsuper, r.rolcreatedb, r.rolcreaterole,
              r.rolreplication, r.rolbypassrls
@@ -28,16 +23,20 @@ export function assertDowntownURuntimeIdentity(pool: Pool): Promise<void> {
         true,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_plan_purchases', ARRAY['id','student_id','plan_id','credits_granted','price_cents','currency','square_payment_id','square_order_id','source_event_id','status','refunded_credits','paid_at','refunded_at','created_at','updated_at','authoritative_paid_at','authoritative_normalized_email','authoritative_normalized_phone','authoritative_square_customer_id']::text[],
         true,false,false,false,false,false,false,
-        ARRAY[]::text[],
-        ARRAY['status','refunded_credits','refunded_at','updated_at']::text[]),
+        ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_redemptions', ARRAY['id','student_id','credits','idempotency_key','status','square_order_id','reserved_at','redeemed_at','reversed_at','expires_at','created_at','updated_at']::text[],
         true,true,false,false,false,false,false, ARRAY[]::text[],
         ARRAY['status','square_order_id','redeemed_at','reversed_at','expires_at','updated_at']::text[]),
-      ('downtown_u_credit_transactions', ARRAY['id','student_id','purchase_id','redemption_id','delta','resulting_balance','transaction_type','reason','idempotency_key','actor_type','actor_id','source_type','source_id','metadata','created_at']::text[],
-        true,true,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
+      ('downtown_u_credit_transactions', ARRAY['id','student_id','purchase_id','redemption_id','delta','resulting_balance','transaction_type','reason','idempotency_key','actor_type','actor_id','source_type','source_id','metadata','created_at','ledger_sequence']::text[],
+        true,false,false,false,false,false,false,
+        ARRAY['id','student_id','purchase_id','redemption_id','delta','resulting_balance','transaction_type','reason','idempotency_key','actor_type','actor_id','source_type','source_id','metadata','created_at']::text[], ARRAY[]::text[]),
       ('downtown_u_balance_update_authorizations', ARRAY['backend_pid','transaction_id','student_id','new_balance']::text[],
         false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_webhook_events', ARRAY['square_event_id','event_type','raw_body_sha256','status','attempt_count','received_at','started_at','completed_at','failed_at','failure_code','failure_detail','claim_token','created_at','updated_at']::text[],
+        false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
+      ('downtown_u_refund_applications', ARRAY['id','square_refund_id','source_event_id','square_payment_id','square_order_id','purchase_id','student_id','authoritative_amount_cents','authoritative_currency','authoritative_location_id','authoritative_updated_at','refund_sequence','cumulative_refunded_cents','target_refunded_credits','credit_delta','available_credits_before','status','created_at','applied_at']::text[],
+        false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
+      ('downtown_u_refund_reconciliations', ARRAY['id','refund_application_id','purchase_id','student_id','reason_code','required_credits','available_credits','status','created_at']::text[],
         false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[])
     ), downtown_relations AS (
       SELECT c.oid, c.relname, c.relowner
@@ -70,6 +69,7 @@ export function assertDowntownURuntimeIdentity(pool: Pool): Promise<void> {
       ('downtown_u_protect_redemption_fields', '', pg_catalog.to_regprocedure('public.downtown_u_protect_redemption_fields()')::oid, false, false),
       ('downtown_u_reject_credit_transaction_mutation', '', pg_catalog.to_regprocedure('public.downtown_u_reject_credit_transaction_mutation()')::oid, false, false),
       ('downtown_u_require_trusted_purchase_grant', '', pg_catalog.to_regprocedure('public.downtown_u_require_trusted_purchase_grant()')::oid, false, false),
+      ('downtown_u_reject_refund_record_mutation', '', pg_catalog.to_regprocedure('public.downtown_u_reject_refund_record_mutation()')::oid, false, false),
       ('downtown_u_webhook_events_protect', '', pg_catalog.to_regprocedure('public.downtown_u_webhook_events_protect()')::oid, false, false),
       ('downtown_u_claim_webhook_event', 'text, text, text', pg_catalog.to_regprocedure('public.downtown_u_claim_webhook_event(text,text,text)')::oid, true, true),
       ('downtown_u_complete_webhook_event', 'text, uuid', pg_catalog.to_regprocedure('public.downtown_u_complete_webhook_event(text,uuid)')::oid, true, true),
@@ -77,14 +77,23 @@ export function assertDowntownURuntimeIdentity(pool: Pool): Promise<void> {
       ('downtown_u_reject_webhook_event', 'text, uuid, text, text', pg_catalog.to_regprocedure('public.downtown_u_reject_webhook_event(text,uuid,text,text)')::oid, true, true),
       ('downtown_u_upsert_pending_student', 'text, text, text', pg_catalog.to_regprocedure('public.downtown_u_upsert_pending_student(text,text,text)')::oid, true, true),
       ('downtown_u_activate_verified_payment', 'text, uuid, text, text, text, text, integer, integer, text, text, text, text, text, text',
-        pg_catalog.to_regprocedure('public.downtown_u_activate_verified_payment(text,uuid,text,text,text,text,integer,integer,text,text,text,text,text,text)')::oid, true, true)
+        pg_catalog.to_regprocedure('public.downtown_u_activate_verified_payment(text,uuid,text,text,text,text,integer,integer,text,text,text,text,text,text)')::oid, true, true),
+      ('downtown_u_activate_verified_refund', 'text, uuid, text, text, text, text, integer, text, text, text',
+        pg_catalog.to_regprocedure('public.downtown_u_activate_verified_refund(text,uuid,text,text,text,text,integer,text,text,text)')::oid, true, true)
     ), downtown_functions AS (
       SELECT p.oid, p.proname, pg_catalog.oidvectortypes(p.proargtypes) AS identity_arguments,
-             p.proowner, p.prosecdef, l.lanname, p.proconfig
+             p.proowner, p.prosecdef, l.lanname, p.proconfig, p.proacl
       FROM pg_catalog.pg_proc AS p
       JOIN pg_catalog.pg_namespace AS n ON n.oid = p.pronamespace
       JOIN pg_catalog.pg_language AS l ON l.oid = p.prolang
       WHERE n.nspname = 'public' AND p.proname LIKE 'downtown!_u!_%' ESCAPE '!'
+    ), function_acls AS (
+      SELECT d.oid AS function_oid, acl.grantee, acl.grantor,
+             acl.privilege_type, acl.is_grantable
+      FROM downtown_functions AS d
+      CROSS JOIN LATERAL pg_catalog.aclexplode(
+        COALESCE(d.proacl, pg_catalog.acldefault('f', d.proowner))
+      ) AS acl
     ), trusted_owner AS (
       SELECT p.proowner AS oid
       FROM pg_catalog.pg_proc AS p
@@ -111,7 +120,15 @@ export function assertDowntownURuntimeIdentity(pool: Pool): Promise<void> {
       ('downtown_u_webhook_events_protect_trigger', 'downtown_u_webhook_events',
         pg_catalog.to_regprocedure('public.downtown_u_webhook_events_protect()')::oid, 'O', true,true,false, false,false,true,false, ARRAY[]::text[], NULL::text, 0::smallint, ''),
       ('downtown_u_00_purchase_grant_gate', 'downtown_u_credit_transactions',
-        pg_catalog.to_regprocedure('public.downtown_u_require_trusted_purchase_grant()')::oid, 'O', true,true,false, true,false,false,false, ARRAY[]::text[], NULL::text, 0::smallint, '')
+        pg_catalog.to_regprocedure('public.downtown_u_require_trusted_purchase_grant()')::oid, 'O', true,true,false, true,false,false,false, ARRAY[]::text[], NULL::text, 0::smallint, ''),
+      ('downtown_u_refund_applications_immutable', 'downtown_u_refund_applications',
+        pg_catalog.to_regprocedure('public.downtown_u_reject_refund_record_mutation()')::oid, 'O', true,true,false, false,true,true,false, ARRAY[]::text[], NULL::text, 0::smallint, ''),
+      ('downtown_u_refund_applications_no_truncate', 'downtown_u_refund_applications',
+        pg_catalog.to_regprocedure('public.downtown_u_reject_refund_record_mutation()')::oid, 'O', false,true,false, false,false,false,true, ARRAY[]::text[], NULL::text, 0::smallint, ''),
+      ('downtown_u_refund_reconciliations_immutable', 'downtown_u_refund_reconciliations',
+        pg_catalog.to_regprocedure('public.downtown_u_reject_refund_record_mutation()')::oid, 'O', true,true,false, false,true,true,false, ARRAY[]::text[], NULL::text, 0::smallint, ''),
+      ('downtown_u_refund_reconciliations_no_truncate', 'downtown_u_refund_reconciliations',
+        pg_catalog.to_regprocedure('public.downtown_u_reject_refund_record_mutation()')::oid, 'O', false,true,false, false,false,false,true, ARRAY[]::text[], NULL::text, 0::smallint, '')
     ), downtown_triggers AS (
       -- pg_trigger.tgtype is a documented bit mask: ROW=1, BEFORE=2,
       -- INSERT=4, DELETE=8, UPDATE=16, TRUNCATE=32, INSTEAD=64.
@@ -223,6 +240,20 @@ export function assertDowntownURuntimeIdentity(pool: Pool): Promise<void> {
            OR d.proconfig IS DISTINCT FROM ARRAY['search_path=pg_catalog']::text[]
       )
       AND NOT EXISTS (
+        SELECT 1 FROM expected_functions AS e JOIN downtown_functions AS d
+          ON d.oid = e.expected_oid AND d.proname = e.proname
+          AND d.identity_arguments = e.identity_arguments
+        WHERE (SELECT count(*) FROM function_acls AS a
+               WHERE a.function_oid=d.oid AND a.grantee<>d.proowner)
+                <> CASE WHEN e.allow_execute THEN 1 ELSE 0 END
+           OR EXISTS (
+             SELECT 1 FROM function_acls AS a
+             WHERE a.function_oid=d.oid AND a.grantee<>d.proowner
+               AND (a.grantee<>rr.oid OR a.grantor<>d.proowner
+                 OR a.privilege_type<>'EXECUTE' OR a.is_grantable)
+           )
+      )
+      AND NOT EXISTS (
         SELECT 1 FROM expected_triggers AS e
         FULL JOIN downtown_triggers AS d USING (tgname, relname)
         WHERE e.tgname IS NULL OR d.tgname IS NULL
@@ -242,8 +273,4 @@ export function assertDowntownURuntimeIdentity(pool: Pool): Promise<void> {
       throw new Error("Unsafe Downtown U runtime database identity");
     }
   });
-
-  // Cache failures too: a pool that failed validation must remain fail closed.
-  verifiedPools.set(pool, verification);
-  return verification;
 }

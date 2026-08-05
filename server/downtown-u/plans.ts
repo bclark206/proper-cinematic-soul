@@ -8,6 +8,11 @@ export const DOWNTOWN_U_PLANS = {
 export type DowntownUPlanId = keyof typeof DOWNTOWN_U_PLANS;
 export type DowntownUPlan = (typeof DOWNTOWN_U_PLANS)[DowntownUPlanId];
 
+/** Highest amount accepted by authoritative payment/refund persistence. */
+export const MAX_DOWNTOWN_U_PLAN_PRICE_CENTS = Math.max(
+  ...Object.values(DOWNTOWN_U_PLANS).map((plan) => plan.priceCents),
+);
+
 export function getCanonicalPlan(id: unknown): DowntownUPlan {
   if (typeof id !== "string" || !Object.prototype.hasOwnProperty.call(DOWNTOWN_U_PLANS, id)) {
     throw new Error("Unknown Downtown U plan");
