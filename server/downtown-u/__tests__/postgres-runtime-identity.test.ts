@@ -39,7 +39,8 @@ describe("Downtown U runtime database identity preflight", () => {
     expect(sql).toContain("p.proparallel");
     expect(sql).not.toMatch(/\bmd5\s*\(/i);
     expect(sql).toContain("d.proowner <> o.oid");
-    expect(sql).toContain("pg_catalog.pg_get_expr(t.tgqual, t.tgrelid, true)");
+    expect(sql).toContain("pg_catalog.pg_get_triggerdef(t.oid,true)");
+    expect(sql).toContain("'__unexpected_trigger_when__'");
     expect(sql).toContain("t.tgnargs AS argument_count");
     expect(sql).toContain("pg_catalog.encode(t.tgargs, 'hex')");
     expect(sql).toContain("d.when_expression IS DISTINCT FROM e.when_expression");

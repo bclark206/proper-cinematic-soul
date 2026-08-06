@@ -13,8 +13,8 @@ const suffix=`${process.pid}_${Date.now()}`;
 const databaseName=`downtown_u_auth_test_${suffix}`;
 const runtimeLogin=`downtown_u_auth_login_${suffix}`;
 const runtimePassword=randomUUID().replaceAll("-","");
-const migrations=[1,2,3,4,5,6].map((number)=>readFileSync(resolve(process.cwd(),"db/migrations",
-  `20260804000${number}_${["downtown_u_phase1","downtown_u_webhook_events","downtown_u_payment_activation","downtown_u_refund_activation","downtown_u_auth","downtown_u_student_portal"][number-1]}.sql`),"utf8"));
+const migrations=[1,2,3,4,5,6,7].map((number)=>readFileSync(resolve(process.cwd(),"db/migrations",
+  `20260804000${number}_${["downtown_u_phase1","downtown_u_webhook_events","downtown_u_payment_activation","downtown_u_refund_activation","downtown_u_auth","downtown_u_student_portal","downtown_u_checkout"][number-1]}.sql`),"utf8"));
 let admin:Pool; let owner:Pool; let runtime:Pool; let store:PostgresAuthStore;
 const cryptography=createAuthCryptography("cGhhc2UzYS1hdXRoLWludGVncmF0aW9uLWtleS0wMDA");
 const createSignature="(text,text,text,text,smallint,bytea)";

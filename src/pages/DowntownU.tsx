@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { downtownUPaymentLinks, type DowntownUPlanId } from "@/config/downtownUPaymentLinks";
+import type { DowntownUPlanId } from "@/config/downtownUPaymentLinks";
+import DowntownUCheckout from "@/features/downtown-u/DowntownUCheckout";
 import { ArrowRight, Check, Clock3, GraduationCap, Leaf, ShieldCheck, Sparkles, Utensils } from "lucide-react";
 
 type Plan = {
@@ -33,8 +34,9 @@ const meals = [
 const DowntownU = () => {
   const [selectedPlan, setSelectedPlan] = useState<DowntownUPlanId>("scholar-10");
   const [eligibilityConfirmed, setEligibilityConfirmed] = useState(false);
+  const [checkoutLocked, setCheckoutLocked] = useState(false);
   const plan = plans.find((item) => item.id === selectedPlan)!;
-  const checkoutUrl = downtownUPaymentLinks?.get(selectedPlan);
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -104,7 +106,8 @@ const DowntownU = () => {
                       type="button"
                       aria-label={`Choose ${item.name}`}
                       aria-pressed={selected}
-                      onClick={() => { setSelectedPlan(item.id); setEligibilityConfirmed(false); }}
+                      onClick={() => { if (!checkoutLocked) { setSelectedPlan(item.id); setEligibilityConfirmed(false); } }}
+                      disabled={checkoutLocked}
                       className={`mt-7 min-h-12 rounded-xl px-4 font-bold transition focus:outline-none focus:ring-2 focus:ring-gold ${selected ? "bg-gold text-jet-black" : "border border-white/15 text-pure-white hover:border-gold hover:text-gold"}`}
                     >
                       {selected ? "Selected" : `Choose ${item.name}`}
@@ -150,26 +153,14 @@ const DowntownU = () => {
               </div>
               <div className="mt-6 space-y-5">
                 <p className="text-sm leading-relaxed text-cream/70">
-                  Square collects your name, email, and phone number during secure checkout. Proper Cuisine reviews student and participating-housing eligibility before activating a plan.
+                  Enter your student email and card below. Proper Cuisine reviews student and participating-housing eligibility before activating a plan.
                 </p>
                 <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/10 p-4 text-sm leading-relaxed text-cream/70">
-                  <input type="checkbox" className="mt-1 h-4 w-4 accent-[hsl(var(--gold))]" checked={eligibilityConfirmed} onChange={(e) => setEligibilityConfirmed(e.target.checked)} />
+                  <input type="checkbox" disabled={checkoutLocked} className="mt-1 h-4 w-4 accent-[hsl(var(--gold))] disabled:opacity-60" checked={eligibilityConfirmed} onChange={(e) => setEligibilityConfirmed(e.target.checked)} />
                   <span>I confirm I am eligible: a Morgan State or Coppin State student residing in participating downtown housing.</span>
                 </label>
-                {!downtownUPaymentLinks ? (
-                  <p role="alert" className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">
-                    Enrollment checkout is not configured yet. No payment has been taken. Please contact Proper Cuisine for assistance.
-                  </p>
-                ) : checkoutUrl && eligibilityConfirmed ? (
-                  <a href={checkoutUrl} rel="noopener noreferrer" className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-gold px-5 font-bold text-jet-black transition hover:brightness-110">
-                    Continue to Square <ArrowRight className="h-4 w-4" />
-                  </a>
-                ) : (
-                  <button type="button" disabled className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-gold px-5 font-bold text-jet-black opacity-50">
-                    Confirm eligibility to continue <ArrowRight className="h-4 w-4" />
-                  </button>
-                )}
-                <p className="flex items-center justify-center gap-2 text-center text-xs text-cream/40"><ShieldCheck className="h-4 w-4" /> Payment and contact details are collected securely by Square. This page does not collect them.</p>
+                <DowntownUCheckout planId={selectedPlan} eligibilityConfirmed={eligibilityConfirmed} onLockChange={(locked, lockedPlan) => { setCheckoutLocked(locked); if (locked) setSelectedPlan(lockedPlan); }} />
+                <p className="flex items-center justify-center gap-2 text-center text-xs text-cream/40"><ShieldCheck className="h-4 w-4" /> Secure embedded checkout powered by Square.</p>
               </div>
             </div>
           </div>

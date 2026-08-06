@@ -7,6 +7,8 @@
     { "source": "/api/create-order", "destination": "/api/create-order" },
     { "source": "/api/validate-promo", "destination": "/api/validate-promo" },
     { "source": "/api/downtown-u/square-webhook", "destination": "/api/downtown-u/square-webhook" },
+    { "source": "/api/downtown-u/checkout-config", "destination": "/api/downtown-u/checkout-config" },
+    { "source": "/api/downtown-u/checkout", "destination": "/api/downtown-u/checkout" },
     { "source": "/api/downtown-u/request-link", "destination": "/api/downtown-u/request-link" },
     { "source": "/api/downtown-u/send-code", "destination": "/api/downtown-u/send-code" },
     { "source": "/api/downtown-u/verify-code", "destination": "/api/downtown-u/verify-code" },
@@ -21,6 +23,16 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'sha256-XRgsly8MlOiUFyfzlksx7S15DKj5ZwsBK2cIo5KgxV8=' 'sha256-IybXeQrrNW5v7KWZonuD5IwNJI5g69VaO3WKIbHj7pI=' https://web.squarecdn.com; connect-src 'self' https://web.squarecdn.com https://pci-connect.squareup.com; frame-src https://web.squarecdn.com; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(self \"https://web.squarecdn.com\")" }
+      ]
+    },
     {
       "source": "/downtown-u/auth/verify",
       "headers": [

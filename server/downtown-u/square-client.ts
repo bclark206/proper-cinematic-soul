@@ -1,5 +1,6 @@
 export const SQUARE_API_MAX_RESPONSE_BYTES = 1024 * 1024;
 export const SQUARE_API_DEFAULT_TIMEOUT_MS = 8_000;
+export const SQUARE_API_VERSION = "2026-01-22";
 export const SQUARE_RESOURCE_ID_PATTERN = /^[A-Za-z0-9_-]{1,192}$/;
 
 export type SquareApiErrorKind = "configuration" | "permanent" | "transient";
@@ -23,6 +24,11 @@ export interface SquareClient {
   getPayment(id: string): Promise<SquareResource>;
   getOrder(id: string): Promise<SquareResource>;
   getRefund(id: string): Promise<SquareResource>;
+}
+
+export interface SquareCheckoutClient extends SquareClient {
+  createOrder(body: SquareResource): Promise<SquareResource>;
+  createPayment(body: SquareResource): Promise<SquareResource>;
 }
 
 export interface SquareClientConfig {
@@ -151,13 +157,13 @@ async function readBoundedBody(
   }
 }
 
-export function createSquareClient(config: SquareClientConfig): SquareClient {
+export function createSquareClient(config: SquareClientConfig): SquareCheckoutClient {
   const timeoutMs = config.timeoutMs ?? SQUARE_API_DEFAULT_TIMEOUT_MS;
   const maxResponseBytes = config.maxResponseBytes ?? SQUARE_API_MAX_RESPONSE_BYTES;
   const baseUrl = config.baseUrl ?? "https://connect.squareup.com";
   if (
     !validNonempty(config.accessToken) ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(config.apiVersion) ||
+    config.apiVersion !== SQUARE_API_VERSION ||
     !SQUARE_RESOURCE_ID_PATTERN.test(config.locationId) ||
     !Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 60_000 ||
     !Number.isSafeInteger(maxResponseBytes) || maxResponseBytes < 1 || maxResponseBytes > 4 * 1024 * 1024
@@ -175,22 +181,21 @@ export function createSquareClient(config: SquareClientConfig): SquareClient {
   const fetchImpl = config.fetchImpl ?? globalThis.fetch;
   if (typeof fetchImpl !== "function") invalidConfig();
 
-  async function getResource(path: string, wrapper: string, id: string): Promise<SquareResource> {
-    if (!SQUARE_RESOURCE_ID_PATTERN.test(id)) {
-      throw new SquareApiError("permanent", "Invalid Square resource identifier");
-    }
+  async function requestResource(method: "GET" | "POST", path: string, wrapper: string, body?: SquareResource): Promise<SquareResource> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
       let result: Response;
       try {
-        result = await fetchImpl(`${origin}${path}${encodeURIComponent(id)}`, {
-          method: "GET",
+        result = await fetchImpl(`${origin}${path}`, {
+          method,
           headers: {
             Authorization: `Bearer ${config.accessToken}`,
             "Square-Version": config.apiVersion,
             Accept: "application/json",
+            ...(method === "POST" ? { "Content-Type": "application/json" } : {}),
           },
+          ...(body === undefined ? {} : { body: JSON.stringify(body) }),
           signal: controller.signal,
         });
       } catch {
@@ -207,35 +212,24 @@ export function createSquareClient(config: SquareClientConfig): SquareClient {
       }
       const declaredLength = result.headers.get("content-length");
       if (declaredLength !== null && (!/^\d+$/.test(declaredLength) || Number(declaredLength) > maxResponseBytes)) {
-        await rejectUnconsumed(
-          result,
-          controller,
-          new SquareApiError("permanent", "Invalid response from Square API"),
-        );
+        await rejectUnconsumed(result, controller, new SquareApiError("permanent", "Invalid response from Square API"));
       }
-      const contentType = result.headers.get("content-type");
-      if (!validJsonContentType(contentType)) {
-        await rejectUnconsumed(
-          result,
-          controller,
-          new SquareApiError("permanent", "Invalid response from Square API"),
-        );
+      if (!validJsonContentType(result.headers.get("content-type"))) {
+        await rejectUnconsumed(result, controller, new SquareApiError("permanent", "Invalid response from Square API"));
       }
-
       const text = await readBoundedBody(result, maxResponseBytes, controller);
       let parsed: unknown;
-      try {
-        parsed = JSON.parse(text) as unknown;
-      } catch {
-        throw new SquareApiError("permanent", "Invalid response from Square API");
-      }
+      try { parsed = JSON.parse(text) as unknown; } catch { throw new SquareApiError("permanent", "Invalid response from Square API"); }
       if (!plainObject(parsed)) throw new SquareApiError("permanent", "Invalid response from Square API");
       const resource = ownData(parsed, wrapper);
       if (!plainObject(resource)) throw new SquareApiError("permanent", "Invalid response from Square API");
       return resource;
-    } finally {
-      clearTimeout(timer);
-    }
+    } finally { clearTimeout(timer); }
+  }
+
+  function getResource(path: string, wrapper: string, id: string): Promise<SquareResource> {
+    if (!SQUARE_RESOURCE_ID_PATTERN.test(id)) return Promise.reject(new SquareApiError("permanent", "Invalid Square resource identifier"));
+    return requestResource("GET", `${path}${encodeURIComponent(id)}`, wrapper);
   }
 
   return {
@@ -243,13 +237,15 @@ export function createSquareClient(config: SquareClientConfig): SquareClient {
     getPayment: (id) => getResource("/v2/payments/", "payment", id),
     getOrder: (id) => getResource("/v2/orders/", "order", id),
     getRefund: (id) => getResource("/v2/refunds/", "refund", id),
+    createOrder: (body) => requestResource("POST", "/v2/orders", "order", body),
+    createPayment: (body) => requestResource("POST", "/v2/payments", "payment", body),
   };
 }
 
 export function createSquareClientFromEnv(
   env: NodeJS.ProcessEnv,
   fetchImpl?: typeof fetch,
-): SquareClient {
+): SquareCheckoutClient {
   return createSquareClient({
     accessToken: env.SQUARE_ACCESS_TOKEN ?? "",
     apiVersion: env.SQUARE_API_VERSION ?? "",

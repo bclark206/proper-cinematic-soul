@@ -51,6 +51,8 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       ('downtown_u_meal_modifiers', ARRAY['id','meal_id','display_name','square_catalog_object_id','credit_delta','active','created_at','updated_at']::text[],
         false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
       ('downtown_u_reservation_snapshots', ARRAY['redemption_id','meal_rule_id','meal_public_id','meal_display_name','meal_square_catalog_object_id','modifiers','credits','created_at']::text[],
+        false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[]),
+      ('downtown_u_checkout_attempts', ARRAY['id','idempotency_key','plan_id','normalized_email','request_actor','state','square_order_id','square_payment_id','purchase_id','created_at','updated_at','redacted_at']::text[],
         false,false,false,false,false,false,false, ARRAY[]::text[], ARRAY[]::text[])
     ), downtown_relations AS (
       SELECT c.oid, c.relname, c.relowner
@@ -177,6 +179,7 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       ('downtown_u_meal_modifiers','c38c3eb77413cf4b8c7de7484794ac5831ee398b6542f490540557d4d13f9352'),
       ('downtown_u_meal_rules','a92657c07620bd2652fbe00ea61f9b3bbd4aa9d188c967cd3b10e98bbaa09994'),
       ('downtown_u_reservation_snapshots','a7b764c571ca95184997a5241036f1be515bed9f51cd2abf5051cbc9c52169c2')
+      ,('downtown_u_checkout_attempts','691bd91691fe5058a8908a342d13a629423750a386307a6825adf31b7b86ae3d')
     ), portal_relation_fingerprints AS (
       /* PG16-pinned complete descriptors: columns/types/null/default/identity/generated,
        * relation flags/access method, inheritance/rules, constraints/indexes/predicates,
@@ -230,6 +233,13 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       ('downtown_u_reverse_expired_reservations', 'integer', pg_catalog.to_regprocedure('public.downtown_u_reverse_expired_reservations(integer)')::oid, false, true),
       ('downtown_u_reject_reservation_snapshot_mutation', '', pg_catalog.to_regprocedure('public.downtown_u_reject_reservation_snapshot_mutation()')::oid, false, false),
       ('downtown_u_valid_modifier_snapshot', 'jsonb', pg_catalog.to_regprocedure('public.downtown_u_valid_modifier_snapshot(jsonb)')::oid, false, false)
+      ,('downtown_u_checkout_guard', '', pg_catalog.to_regprocedure('public.downtown_u_checkout_guard()')::oid, false, false)
+      ,('downtown_u_checkout_anonymize', 'integer', pg_catalog.to_regprocedure('public.downtown_u_checkout_anonymize(integer)')::oid, false, true)
+      ,('downtown_u_checkout_activate', '', pg_catalog.to_regprocedure('public.downtown_u_checkout_activate()')::oid, false, true)
+      ,('downtown_u_checkout_begin', 'text, text, text, bytea', pg_catalog.to_regprocedure('public.downtown_u_checkout_begin(text,text,text,bytea)')::oid, true, true)
+      ,('downtown_u_checkout_record', 'uuid, text, text', pg_catalog.to_regprocedure('public.downtown_u_checkout_record(uuid,text,text)')::oid, true, true)
+      ,('downtown_u_checkout_transition', 'uuid, text', pg_catalog.to_regprocedure('public.downtown_u_checkout_transition(uuid,text)')::oid, true, true)
+      ,('downtown_u_checkout_status', 'uuid', pg_catalog.to_regprocedure('public.downtown_u_checkout_status(uuid)')::oid, true, true)
     ), downtown_functions AS (
       SELECT p.oid, p.proname, pg_catalog.oidvectortypes(p.proargtypes) AS identity_arguments,
              p.proowner, p.prosecdef, l.lanname, p.proconfig, p.proacl
@@ -254,6 +264,13 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       (pg_catalog.to_regprocedure('public.downtown_u_reverse_expired_reservations(integer)')::oid, '8508e828ccc1e5c152072088559306f3a9fb7ac0ff133fbb8bcad9d3fa19936a'),
       (pg_catalog.to_regprocedure('public.downtown_u_reject_reservation_snapshot_mutation()')::oid, '1f47bc39de65bec0bdfea7fea44886f3bbd679ef7ba1523ef6ffe684b287575b'),
       (pg_catalog.to_regprocedure('public.downtown_u_valid_modifier_snapshot(jsonb)')::oid, '68794dc2383bf4f0bf7621a22bbb2747a81a18265fd62a7107986676ebb3a4ca')
+      ,(pg_catalog.to_regprocedure('public.downtown_u_checkout_activate()')::oid, '6dfc863808716980c27c5a2c345a6fb9cc15efb2c9b983c9491af5aee43e303c')
+      ,(pg_catalog.to_regprocedure('public.downtown_u_checkout_anonymize(integer)')::oid, '090eb86a90a1876092bf3203840b78fc78017f416efd993346b5550537ab87f0')
+      ,(pg_catalog.to_regprocedure('public.downtown_u_checkout_begin(text,text,text,bytea)')::oid, '10fc6fc3d72e1c788d3f14877efbf92acab97ae94cd8f8bfe72935f0c472900a')
+      ,(pg_catalog.to_regprocedure('public.downtown_u_checkout_guard()')::oid, '6b8ac2f38da2b9e671a8b8281312219fbfd9e12a23e8d3a0cde9e1881818b8b8')
+      ,(pg_catalog.to_regprocedure('public.downtown_u_checkout_record(uuid,text,text)')::oid, '87a6e911026d189bb546952300d4b6451092ce6182bbb268624404a782a4c8ad')
+      ,(pg_catalog.to_regprocedure('public.downtown_u_checkout_status(uuid)')::oid, '39d0c6394f84bdcdd9e457a024f9f0030951385504b2621c9be4a7517c9239ea')
+      ,(pg_catalog.to_regprocedure('public.downtown_u_checkout_transition(uuid,text)')::oid, '1792928c805b722353ac7cc13777ea85058e22f049c024bf92d174fd5456ec4c')
     ), auth_function_fingerprints AS (
       /*
        * Migration-pinned PG16 descriptor. jsonb's stable key ordering makes a
@@ -335,6 +352,9 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       ('downtown_u_auth_sessions_no_truncate', 'downtown_u_auth_sessions', pg_catalog.to_regprocedure('public.downtown_u_auth_protect_session()')::oid, 'O', false,true,false, false,false,false,true, ARRAY[]::text[], NULL::text, 0::smallint, '')
       ,('downtown_u_reservation_snapshots_immutable', 'downtown_u_reservation_snapshots', pg_catalog.to_regprocedure('public.downtown_u_reject_reservation_snapshot_mutation()')::oid, 'O', true,true,false, false,true,true,false, ARRAY[]::text[], NULL::text, 0::smallint, '')
       ,('downtown_u_reservation_snapshots_no_truncate', 'downtown_u_reservation_snapshots', pg_catalog.to_regprocedure('public.downtown_u_reject_reservation_snapshot_mutation()')::oid, 'O', false,true,false, false,false,false,true, ARRAY[]::text[], NULL::text, 0::smallint, '')
+      ,('downtown_u_checkout_immutable', 'downtown_u_checkout_attempts', pg_catalog.to_regprocedure('public.downtown_u_checkout_guard()')::oid, 'O', true,true,false, false,true,true,false, ARRAY[]::text[], NULL::text, 0::smallint, '')
+      ,('downtown_u_checkout_no_truncate', 'downtown_u_checkout_attempts', pg_catalog.to_regprocedure('public.downtown_u_checkout_guard()')::oid, 'O', false,true,false, false,false,false,true, ARRAY[]::text[], NULL::text, 0::smallint, '')
+      ,('downtown_u_checkout_purchase_link', 'downtown_u_plan_purchases', pg_catalog.to_regprocedure('public.downtown_u_checkout_activate()')::oid, 'O', true,false,false, true,false,true,false, ARRAY[]::text[], NULL::text, 0::smallint, '')
     ), downtown_triggers AS (
       -- pg_trigger.tgtype is a documented bit mask: ROW=1, BEFORE=2,
       -- INSERT=4, DELETE=8, UPDATE=16, TRUNCATE=32, INSTEAD=64.
@@ -348,16 +368,15 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
           JOIN pg_catalog.pg_attribute AS a ON a.attrelid=t.tgrelid AND a.attnum=x.attnum
           ORDER BY a.attname
         ), ARRAY[]::text[]) AS update_columns,
-        -- pg_get_expr(tgqual,tgrelid,true) is the normalized representation
-        -- except for the one expected predicate: PG16 cannot deparse an OLD/NEW
-        -- expression as one relation, so use its canonical trigger deparser.
+        -- The PG16 canonical trigger definition is owner-independent. Compare it
+        -- exactly instead of extracting a WHEN clause with a fragile regex.
         CASE
           WHEN t.tgqual IS NULL THEN NULL
-          WHEN t.tgname = 'downtown_u_students_ledger_balance_only' THEN pg_catalog.substring(
-            pg_catalog.pg_get_triggerdef(t.oid, true),
-            ' WHEN \\((.*)\\) EXECUTE FUNCTION '
-          )
-          ELSE pg_catalog.pg_get_expr(t.tgqual, t.tgrelid, true)
+          WHEN t.tgname = 'downtown_u_students_ledger_balance_only'
+            AND pg_catalog.pg_get_triggerdef(t.oid,true) =
+              'CREATE TRIGGER downtown_u_students_ledger_balance_only BEFORE UPDATE OF credit_balance ON downtown_u_students FOR EACH ROW WHEN (old.credit_balance IS DISTINCT FROM new.credit_balance) EXECUTE FUNCTION downtown_u_reject_direct_balance_update()'
+            THEN 'old.credit_balance IS DISTINCT FROM new.credit_balance'
+          ELSE '__unexpected_trigger_when__'
         END AS when_expression,
         t.tgnargs AS argument_count, pg_catalog.encode(t.tgargs, 'hex') AS arguments_hex
       FROM pg_catalog.pg_trigger AS t
@@ -454,7 +473,7 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
         FULL JOIN portal_relation_fingerprints d USING (relname)
         WHERE e.relname IS NULL OR d.relname IS NULL OR d.descriptor_sha256<>e.expected_sha256
       )
-      AND (SELECT count(*) FROM portal_relation_fingerprints)=3
+      AND (SELECT count(*) FROM portal_relation_fingerprints)=4
       AND NOT EXISTS (
         SELECT 1 FROM expected_relations AS e JOIN downtown_relations AS d USING (relname)
         WHERE pg_catalog.has_table_privilege(CURRENT_USER, d.oid, 'SELECT') <> e.table_select
@@ -498,7 +517,7 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
         WHERE e.function_oid IS NULL OR d.function_oid IS NULL
           OR d.descriptor_sha256 <> e.expected_sha256
       )
-      AND (SELECT count(*) FROM auth_function_fingerprints) = 16
+      AND (SELECT count(*) FROM auth_function_fingerprints) = 23
       AND NOT EXISTS (
         SELECT 1 FROM expected_functions AS e JOIN downtown_functions AS d
           ON d.oid = e.expected_oid AND d.proname = e.proname

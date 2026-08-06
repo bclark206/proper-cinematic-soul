@@ -46,10 +46,10 @@ describe("Downtown U student meal plans", () => {
     expect(screen.getByText(/cross-contact/i)).toBeInTheDocument();
   });
 
-  it("fails closed without the complete reusable Square-link configuration", () => {
+  it("fails closed when secure embedded Square checkout is unavailable", () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     renderPage();
-    expect(screen.getByRole("alert")).toHaveTextContent(/enrollment checkout is not configured/i);
+    expect(screen.getByRole("alert")).toHaveTextContent(/embedded checkout is unavailable/i);
     expect(screen.queryByRole("link", { name: /continue to square/i })).not.toBeInTheDocument();
     expect(fetchSpy).not.toHaveBeenCalled();
   });

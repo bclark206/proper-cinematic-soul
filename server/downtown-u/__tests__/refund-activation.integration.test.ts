@@ -17,9 +17,9 @@ const databaseName = `downtown_u_refund_test_${suffix}`;
 const runtimeLogin = `downtown_u_refund_login_${suffix}`;
 const unrelatedRole = `downtown_u_refund_unrelated_${suffix}`;
 const password = randomUUID().replaceAll("-", "");
-const migrations = [1, 2, 3, 4, 5, 6].map((number) => readFileSync(resolve(
+const migrations = [1, 2, 3, 4, 5, 6, 7].map((number) => readFileSync(resolve(
   process.cwd(), "db/migrations",
-  `20260804000${number}_downtown_u_${["phase1", "webhook_events", "payment_activation", "refund_activation", "auth", "student_portal"][number - 1]}.sql`,
+  `20260804000${number}_downtown_u_${["phase1", "webhook_events", "payment_activation", "refund_activation", "auth", "student_portal", "checkout"][number - 1]}.sql`,
 ), "utf8"));
 let admin: Pool;
 let owner: Pool;

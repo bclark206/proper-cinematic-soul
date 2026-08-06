@@ -43,6 +43,21 @@ function streamingResponse(
 
 describe("Square API client", () => {
   it.each([
+    ["createOrder", "/v2/orders", "order"],
+    ["createPayment", "/v2/payments", "payment"],
+  ] as const)("%s sends an exact JSON POST and unwraps its resource", async (method, path, wrapper) => {
+    const body = { idempotency_key: "stable-key", trusted: { amount: 6000 } };
+    const fetchImpl = vi.fn().mockResolvedValue(response({ [wrapper]: { id: "resource_1" } }));
+    const client = createSquareClient({ ...config, fetchImpl });
+    await expect(client[method](body)).resolves.toEqual({ id: "resource_1" });
+    expect(fetchImpl).toHaveBeenCalledWith(`https://connect.squareup.com${path}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${config.accessToken}`, "Square-Version": config.apiVersion,
+        Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(body), signal: expect.any(AbortSignal),
+    });
+  });
+  it.each([
     ["getPayment", "pay_1", "/v2/payments/pay_1", "payment"],
     ["getOrder", "order-1", "/v2/orders/order-1", "order"],
     ["getRefund", "refund_1", "/v2/refunds/refund_1", "refund"],
@@ -232,6 +247,12 @@ describe("Square API client", () => {
     ["apiVersion", "not-a-version"],
   ] as const)("fails closed for invalid %s", (field, value) => {
     expect(() => createSquareClient({ ...config, [field]: value, fetchImpl: vi.fn() })).toThrow(
+      "Square API configuration is invalid",
+    );
+  });
+
+  it.each(["2025-01-23", "2026-01-21", "2026-01-23"])("rejects Square-Version drift: %s", (apiVersion) => {
+    expect(() => createSquareClient({ ...config, apiVersion, fetchImpl: vi.fn() })).toThrow(
       "Square API configuration is invalid",
     );
   });

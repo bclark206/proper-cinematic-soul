@@ -90,7 +90,7 @@
 
 ## Phase 4 — Server-authoritative meal selection and atomic reservation
 
-> **Active decomposition note (2026-08-05):** Migration `202608040005` was already consumed by Phase 3B authentication work. Phase 4 is backend-only and therefore uses `202608040006`; the meal-selection UI from this source plan is tracked separately as active Phase 5 and is intentionally not part of Phase 4. Active Phase 5 reserves `202608040007` only if its UI needs a schema migration. If it needs no schema change, the UI consumes no migration number and operator audit is the next migration, `202608040007`.
+> **Active decomposition note (2026-08-05):** Migration `202608040005` was already consumed by Phase 3B authentication work. Phase 4 is backend-only and uses `202608040006`; the meal-selection UI was delivered separately as active Phase 5 without a migration. The subsequently authorized embedded Square checkout consumes `202608040007`. Kitchen-order outbox work therefore uses `202608040008`, and operator audit uses `202608040009`.
 
 **Files**
 - Create migration `202608040006_downtown_u_student_portal.sql` for eligible menu snapshots/rules and reservation expiry.
@@ -103,10 +103,10 @@
 
 **Verification:** Tampered payloads fail; two concurrent last-credit requests produce one success; retries return the same reservation; expiry/cancel restores credits once.
 
-## Source-plan Phase 5 — Square kitchen order creation and redemption finalization (after active UI Phase 5)
+## Active next step — Square kitchen order creation and redemption finalization
 
 **Files**
-- Do not reserve a migration number for this deferred source-plan phase here. When kitchen-order work becomes active, assign its outbox migration the next sequential number after the migrations actually consumed by the active roadmap; this does not change the active Phase 5/operator-audit `007` contract above.
+- Create `202608040008_downtown_u_order_outbox.sql`. Embedded checkout already owns `202608040007`; this outbox assignment is explicit and must not be renumbered by operator work.
 - Create `api/downtown-u/reservations/[id]/submit.ts`, `api/downtown-u/jobs/orders.ts`; `server/downtown-u/kitchen-order-service.ts`, `order-outbox.ts`, and Square adapter tests.
 - Add confirmation/status UI and tests.
 
@@ -116,10 +116,10 @@
 
 **Verification:** Retried worker creates one kitchen order, success never double-debits, failure restores once, and an operator can correlate reservation, ledger, outbox, and Square IDs.
 
-## Phase 6 — Operator dashboard, reconciliation, hardening, and rollout
+## Following step — Operator dashboard, reconciliation, hardening, and rollout
 
 **Files**
-- Create `202608040007_downtown_u_operator_audit.sql` for roles, reconciliation cases, and append-only operator audit if active Phase 5 UI consumes no migration. If that UI consumes `007`, operator audit uses `202608040008`; deferred source-plan kitchen-order work does not preempt either assignment.
+- Create `202608040009_downtown_u_operator_audit.sql` for roles, reconciliation cases, and append-only operator audit. Embedded checkout owns `007` and the kitchen-order outbox owns `008`.
 - Create `api/downtown-u/operator/{students,purchases,redemptions,reconciliation,adjustments}.ts`, `server/downtown-u/operator/*`.
 - Create `src/pages/DowntownUOperator.tsx`, dashboard components/tests, monitoring/runbook docs, retention/export procedures.
 

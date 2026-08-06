@@ -265,6 +265,50 @@ function contacts(payment: SquareResource, order: SquareResource) {
   return { email, phone, squareCustomerId };
 }
 
+/** Shared strict settlement invariant for checkout readback and webhook enrollment. */
+export function validateSquarePaymentOrderInvariant(input: {
+  payment: SquareResource; order: SquareResource; locationId: string;
+  expectedPaymentId?: string; expectedOrderId?: string; expectedVariationId?: string;
+  expectedAmount?: number; expectedEmail?: string; expectedReferenceId?: string;
+}) {
+  const { payment, order } = input;
+  if (!plainObject(payment) || !plainObject(order)) reject("malformed_resource");
+  const paymentId = resourceId(payment, "id");
+  const orderId = resourceId(payment, "order_id");
+  if (paymentId === orderId || (input.expectedPaymentId && paymentId !== input.expectedPaymentId)
+    || (input.expectedOrderId && orderId !== input.expectedOrderId)) reject("identity_mismatch");
+  if (requiredString(payment, "status") !== "COMPLETED") reject("payment_not_completed");
+  if (requiredString(payment, "location_id") !== input.locationId) reject("location_mismatch");
+  const paid = money(own(payment, "amount_money"));
+  if (paid.amount <= 0 || paid.currency !== "USD") reject("invalid_economics");
+  validateOptionalZeroMoney(payment, "tip_money");
+  if (resourceId(order, "id") !== orderId) reject("identity_mismatch");
+  if (requiredString(order, "location_id") !== input.locationId) reject("location_mismatch");
+  const state = requiredString(order, "state");
+  if (state !== "OPEN" && state !== "COMPLETED") reject("invalid_order_state");
+  const lines = ownArray(order, "line_items");
+  if (lines.length !== 1 || !plainObject(lines[0])) reject("invalid_line_items");
+  const line = lines[0];
+  rejectStructuralAdjustments(line, ["modifiers", "applied_taxes", "applied_discounts", "applied_service_charges"]);
+  rejectStructuralAdjustments(order, ["taxes", "discounts", "service_charges", "rewards"]);
+  for (const key of ["total_tax_money", "total_discount_money", "total_service_charge_money", "total_tip_money"] as const) {
+    validateOptionalZeroMoney(line, key); validateOptionalZeroMoney(order, key);
+  }
+  const rounding = strictOptionalOwnData(order, "rounding_adjustment");
+  if (rounding.present) { if (!plainObject(rounding.value)) reject("malformed_resource"); reject("unsupported_adjustment"); }
+  const variationId = resourceId(line, "catalog_object_id");
+  if (input.expectedVariationId && variationId !== input.expectedVariationId) reject("unknown_plan");
+  if (requiredString(line, "quantity") !== "1") reject("invalid_line_items");
+  const candidates = [paid, money(own(line, "base_price_money")), money(own(line, "total_money")), money(own(order, "total_money"))];
+  const expectedAmount = input.expectedAmount ?? paid.amount;
+  for (const candidate of candidates) if (candidate.amount !== expectedAmount || candidate.currency !== "USD") reject("invalid_economics");
+  if (input.expectedReferenceId && (requiredString(payment, "reference_id") !== input.expectedReferenceId
+    || requiredString(order, "reference_id") !== input.expectedReferenceId)) reject("identity_mismatch");
+  const contact = contacts(payment, order);
+  if (input.expectedEmail && contact.email !== input.expectedEmail) reject("contact_conflict");
+  return { paymentId, orderId, variationId, amount: paid.amount, contact };
+}
+
 export function createEnrollmentService(config: EnrollmentServiceConfig) {
   validateConfiguration(config);
   const variationToPlan = new Map<string, DowntownUPlanId>(
@@ -275,54 +319,20 @@ export function createEnrollmentService(config: EnrollmentServiceConfig) {
     if (!SQUARE_RESOURCE_ID_PATTERN.test(resourceIdValue)) reject("invalid_resource_id");
     const payment = await config.client.getPayment(resourceIdValue);
     if (!plainObject(payment)) reject("malformed_resource");
-    const paymentId = resourceId(payment, "id");
     const orderId = resourceId(payment, "order_id");
-    if (paymentId !== resourceIdValue || paymentId === orderId) reject("identity_mismatch");
-    if (requiredString(payment, "status") !== "COMPLETED") reject("payment_not_completed");
-    if (requiredString(payment, "location_id") !== config.locationId) reject("location_mismatch");
-    const paid = money(own(payment, "amount_money"));
-    if (paid.amount <= 0 || paid.currency !== "USD") reject("invalid_economics");
-    validateOptionalZeroMoney(payment, "tip_money");
-
     const order = await config.client.getOrder(orderId);
-    if (!plainObject(order)) reject("malformed_resource");
-    if (resourceId(order, "id") !== orderId) reject("identity_mismatch");
-    if (requiredString(order, "location_id") !== config.locationId) reject("location_mismatch");
-    // Payment Links may leave a paid order OPEN pending fulfillment. A COMPLETED
-    // payment is authoritative settlement, so OPEN and COMPLETED are accepted.
-    const state = requiredString(order, "state");
-    if (state !== "OPEN" && state !== "COMPLETED") reject("invalid_order_state");
-    const lines = ownArray(order, "line_items");
-    if (lines.length !== 1 || !plainObject(lines[0])) reject("invalid_line_items");
-    const line = lines[0];
-    rejectStructuralAdjustments(line, ["modifiers", "applied_taxes", "applied_discounts", "applied_service_charges"]);
-    rejectStructuralAdjustments(order, ["taxes", "discounts", "service_charges", "rewards"]);
-    for (const key of ["total_tax_money", "total_discount_money", "total_service_charge_money", "total_tip_money"] as const) {
-      validateOptionalZeroMoney(line, key);
-      validateOptionalZeroMoney(order, key);
-    }
-    const roundingAdjustment = strictOptionalOwnData(order, "rounding_adjustment");
-    if (roundingAdjustment.present) {
-      if (!plainObject(roundingAdjustment.value)) reject("malformed_resource");
-      reject("unsupported_adjustment");
-    }
-    const variationId = resourceId(line, "catalog_object_id");
+    const invariant = validateSquarePaymentOrderInvariant({ payment, order, locationId: config.locationId, expectedPaymentId: resourceIdValue });
+    const { paymentId, variationId, amount } = invariant;
     const planId = variationToPlan.get(variationId);
     if (!planId) reject("unknown_plan");
     const plan = getCanonicalPlan(planId);
-    if (requiredString(line, "quantity") !== "1") reject("invalid_line_items");
-    const base = money(own(line, "base_price_money"));
-    const lineTotal = money(own(line, "total_money"));
-    const orderTotal = money(own(order, "total_money"));
-    for (const candidate of [paid, base, lineTotal, orderTotal]) {
-      if (candidate.amount !== plan.priceCents || candidate.currency !== "USD") reject("invalid_economics");
-    }
-    const contact = contacts(payment, order);
+    if (amount !== plan.priceCents) reject("invalid_economics");
+    const contact = invariant.contact;
     return {
       paymentId,
       orderId,
       planId,
-      amount: paid.amount,
+      amount,
       currency: "USD",
       locationId: config.locationId,
       ...contact,
