@@ -35,6 +35,8 @@ const migrationNames = [
   "202608040008_downtown_u_kitchen_outbox.sql",
   "202608040009_downtown_u_operator_audit.sql",
   "202608040010_downtown_u_operator_auth_capabilities.sql",
+  "202608040011_downtown_u_operator_dashboard_reads.sql",
+  "202608040012_downtown_u_operator_eligibility_mutations.sql",
 ];
 const migrations = migrationNames.map((name) => readFileSync(resolve(process.cwd(), "db/migrations", name), "utf8"));
 

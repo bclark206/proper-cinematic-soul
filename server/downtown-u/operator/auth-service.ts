@@ -11,6 +11,7 @@ import {
   type OperatorVerifierCredential,
 } from "./auth-crypto";
 import type { SendOperatorMagicLinkInput, SendOperatorSmsOtpInput } from "./auth-delivery";
+import { exactDateTime, exactOwnData, isCanonicalLowercaseUuid } from "./trusted-result";
 
 export type OperatorAuthHeaders = Record<string, string | string[] | undefined>;
 export interface OperatorSessionCredential { readonly sessionId: string; readonly bearer: string }
@@ -162,7 +163,10 @@ export type OperatorSessionResponse =
   | Readonly<{ authenticated: true; displayName: string; roles: readonly string[]; smsReauthFresh: boolean }>
   | typeof UNAUTHENTICATED | OperatorUnavailableResponse;
 export type OperatorLogoutResponse = typeof LOGOUT_SUCCESS | OperatorUnavailableResponse;
-export type OperatorRequestReauthResponse = typeof OPERATOR_AUTH_REQUEST_ACCEPTED | typeof UNAUTHENTICATED | OperatorUnavailableResponse;
+export type OperatorRequestReauthResponse =
+  | Readonly<{ accepted: true; challengeId: string }>
+  | typeof UNAUTHENTICATED
+  | OperatorUnavailableResponse;
 export type OperatorVerifyReauthResponse =
   | Readonly<{ reauthenticated: true; validForSeconds: 300 }>
   | typeof NOT_REAUTHENTICATED | OperatorUnavailableResponse;
@@ -355,16 +359,20 @@ export class OperatorAuthService {
     try {
       const challenge = this.credentials.challenge();
       const otp = this.credentials.otp();
+      if (!isCanonicalLowercaseUuid(challenge.id)) throw new Error("Operator reauthentication challenge generation failed");
       const result = await this.dependencies.store.beginReauth({
         ...this.sessionInput(credential), challengeId: challenge.id,
         challengeVersion: OPERATOR_AUTH_VERIFIER_VERSION,
         challengeDigest: this.dependencies.cryptography.digestChallenge(challenge.id, "reauth", "sms_otp", otp),
       });
-      if (result.outcome !== "started" || result.challengeId !== challenge.id
-          || !E164.test(result.normalizedPhone) || !validDate(result.expiresAt)) return UNAUTHENTICATED;
-      const sms = Object.freeze({ normalizedPhone: result.normalizedPhone, otp, purpose: "reauth" as const });
+      const started = exactOwnData(result, ["outcome", "challengeId", "normalizedPhone", "expiresAt"]);
+      if (!started || started.outcome !== "started" || started.challengeId !== challenge.id
+          || !isCanonicalLowercaseUuid(started.challengeId)
+          || typeof started.normalizedPhone !== "string" || !E164.test(started.normalizedPhone)
+          || exactDateTime(started.expiresAt) === undefined) return UNAUTHENTICATED;
+      const sms = Object.freeze({ normalizedPhone: started.normalizedPhone, otp, purpose: "reauth" as const });
       this.track(() => this.dependencies.delivery.sendSmsOtp(sms));
-      return OPERATOR_AUTH_REQUEST_ACCEPTED;
+      return Object.freeze({ accepted: true as const, challengeId: started.challengeId });
     } catch { return UNAVAILABLE; }
   }
 

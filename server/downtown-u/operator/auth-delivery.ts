@@ -124,16 +124,16 @@ function validateEmailInput(input: SendOperatorMagicLinkInput): URL {
 }
 
 function operatorMagicLink(origin: URL, input: SendOperatorMagicLinkInput): string {
-  const link = new URL("/", origin.origin);
+  const link = new URL("/downtown-u/operator/auth", origin.origin);
   const credentials = new URLSearchParams({
     flowId: input.flowId,
     flowVerifier: input.flowVerifier,
     challengeId: input.challengeId,
     verifier: input.challengeVerifier,
   });
-  // The HTTP request target is always "/". The SPA route and all credentials
-  // remain after "#", so browsers do not transmit them to an HTTP server.
-  link.hash = `/downtown-u/operator/auth?${credentials.toString()}`;
+  // The HTTP request reaches the BrowserRouter auth path, while all one-time
+  // credentials remain after "#" so browsers do not transmit them to a server.
+  link.hash = credentials.toString();
   return link.toString();
 }
 

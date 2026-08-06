@@ -11,9 +11,9 @@ const suffix=`${process.pid}_${Date.now()}`;
 const databaseName=`du_operator_identity_${suffix}`;
 const login=`du_operator_identity_login_${suffix}`;
 const extra=`du_operator_identity_extra_${suffix}`;
-const migrations=[1,2,3,4,5,6,7,8,9,10].map(n=>readFileSync(resolve(process.cwd(),"db/migrations",`2026080400${String(n).padStart(2,"0")}_${[
+const migrations=[1,2,3,4,5,6,7,8,9,10,11,12].map(n=>readFileSync(resolve(process.cwd(),"db/migrations",`2026080400${String(n).padStart(2,"0")}_${[
   "downtown_u_phase1","downtown_u_webhook_events","downtown_u_payment_activation","downtown_u_refund_activation","downtown_u_auth",
-  "downtown_u_student_portal","downtown_u_checkout","downtown_u_kitchen_outbox","downtown_u_operator_audit","downtown_u_operator_auth_capabilities",
+  "downtown_u_student_portal","downtown_u_checkout","downtown_u_kitchen_outbox","downtown_u_operator_audit","downtown_u_operator_auth_capabilities","downtown_u_operator_dashboard_reads","downtown_u_operator_eligibility_mutations",
 ][n-1]}.sql`),"utf8"));
 let admin:Pool; let database:Pool; let operator:Pool;
 function qi(x:string){return `"${x.replaceAll('"','""')}"`;}
@@ -41,7 +41,7 @@ run.sequential("operator PostgreSQL identity attestation on stock PostgreSQL 16"
     }
   },30_000);
 
-  it("accepts a dedicated LOGIN and exposes exactly the seven pinned signatures",async()=>{
+  it("accepts a dedicated LOGIN and exposes exactly the twelve pinned signatures",async()=>{
     const client=await operator.connect();
     try { await client.query("BEGIN"); await expect(assertDowntownUOperatorRuntimeIdentity(client)).resolves.toBeUndefined(); await client.query("ROLLBACK"); }
     finally{client.release();}
@@ -55,6 +55,11 @@ run.sequential("operator PostgreSQL identity attestation on stock PostgreSQL 16"
       "downtown_u_operator_auth_revoke_session(uuid,smallint,bytea,text)",
       "downtown_u_operator_auth_validate_session(uuid,smallint,bytea,text,text,text)",
       "downtown_u_operator_auth_verify_email(uuid,smallint,bytea,uuid,smallint,bytea,uuid,smallint,bytea,text)",
+      "downtown_u_operator_read_purchases(uuid,smallint,bytea,text,integer,timestamp with time zone,uuid,text,uuid,uuid)",
+      "downtown_u_operator_read_reconciliation(uuid,smallint,bytea,text,integer,timestamp with time zone,uuid,text,text,uuid,uuid)",
+      "downtown_u_operator_read_redemptions(uuid,smallint,bytea,text,integer,timestamp with time zone,uuid,text,uuid,uuid)",
+      "downtown_u_operator_read_students(uuid,smallint,bytea,text,integer,timestamp with time zone,uuid,text,uuid)",
+      "downtown_u_operator_set_eligibility(uuid,smallint,bytea,text,text,uuid,uuid,uuid,text,timestamp with time zone,text,text,text)",
     ]);
   });
 
@@ -104,15 +109,42 @@ run.sequential("operator PostgreSQL identity attestation on stock PostgreSQL 16"
     expect(altered).not.toBe(def); await rejectsMutation(altered);
   });
 
+  it("pins every dashboard function descriptor and every dashboard source index",async()=>{
+    const readDef=(await database.query<{definition:string}>("SELECT pg_get_functiondef('downtown_u_operator_read_students(uuid,smallint,bytea,text,integer,timestamptz,uuid,text,uuid)'::regprocedure) definition")).rows[0].definition;
+    const alteredRead=readDef.replace("BEGIN\n", "BEGIN\n  PERFORM 1;\n");
+    expect(alteredRead).not.toBe(readDef); await rejectsMutation(alteredRead);
+
+    const principalDef=(await database.query<{definition:string}>("SELECT pg_get_functiondef('downtown_u_operator_read_principal(uuid,smallint,bytea,text,text)'::regprocedure) definition")).rows[0].definition;
+    const alteredPrincipal=principalDef.replace("BEGIN\n", "BEGIN\n  PERFORM 1;\n");
+    expect(alteredPrincipal).not.toBe(principalDef); await rejectsMutation(alteredPrincipal);
+    await rejectsMutation("ALTER FUNCTION downtown_u_operator_read_principal(uuid,smallint,bytea,text,text) SET search_path=public");
+    await rejectsMutation(`ALTER FUNCTION downtown_u_operator_read_principal(uuid,smallint,bytea,text,text) OWNER TO ${qi(extra)}`);
+    await rejectsMutation("GRANT EXECUTE ON FUNCTION downtown_u_operator_read_students(uuid,smallint,bytea,text,integer,timestamptz,uuid,text,uuid) TO PUBLIC");
+
+    await rejectsMutation("DROP INDEX downtown_u_students_operator_created_idx");
+    await rejectsMutation("DROP INDEX downtown_u_plan_purchases_operator_created_idx");
+    await rejectsMutation("DROP INDEX downtown_u_redemptions_operator_created_idx");
+    await rejectsMutation("DROP INDEX downtown_u_operator_cases_created_idx");
+    await rejectsMutation("ALTER INDEX downtown_u_operator_cases_student_created_idx RENAME TO downtown_u_operator_cases_student_created_hostile_idx");
+
+    await rejectsMutation(`CREATE FUNCTION downtown_u_operator_read_students(text) RETURNS text
+      LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS 'BEGIN RETURN $1; END'`);
+    await rejectsMutation(`CREATE FUNCTION downtown_u_operator_dashboard_hostile_helper() RETURNS void
+      LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS 'BEGIN END'`);
+  });
+
   it("pins the exact owner-only executable dependency set and every helper descriptor",async()=>{
     const helper=(await database.query<{signature:string}>(`SELECT p.oid::regprocedure::text signature FROM pg_proc p
       JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public'
         AND p.proname LIKE 'downtown_u_operator_%' AND p.proname NOT LIKE 'downtown_u_operator_auth_%'
+        AND (p.proname NOT LIKE 'downtown_u_operator_read_%' OR p.proname='downtown_u_operator_read_principal')
+        AND p.proname<>'downtown_u_operator_set_eligibility'
       ORDER BY p.oid::regprocedure::text COLLATE "C"`)).rows.map(row=>row.signature);
     expect(helper).toEqual([
       "downtown_u_operator_accounts_immutable_identity_guard()",
       "downtown_u_operator_append_only_guard()",
       "downtown_u_operator_config_guard()",
+      "downtown_u_operator_read_principal(uuid,smallint,bytea,text,text)",
       "downtown_u_operator_sync_kitchen_case()",
       "downtown_u_operator_sync_refund_case()",
     ]);

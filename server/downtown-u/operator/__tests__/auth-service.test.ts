@@ -208,7 +208,10 @@ describe("operator sessions, logout, and reauthentication", () => {
     let generated = "";
     const s = store({ beginReauth: vi.fn(async (input) => { generated = input.challengeId; return { outcome: "started", challengeId: input.challengeId, normalizedPhone: phone, expiresAt: later }; }) });
     const x = setup(s); const response = await x.service.requestReauth(credential, headers);
-    expect(response).toEqual({ accepted: true }); expect(x.guard.admitReauthIssuance).toHaveBeenCalledWith(headers, sessionId); expect(x.tracked).toHaveLength(1);
+    expect(response).toEqual({ accepted: true, challengeId: generated });
+    expect(Object.keys(response)).toEqual(["accepted", "challengeId"]);
+    expect(Object.isFrozen(response)).toBe(true);
+    expect(x.guard.admitReauthIssuance).toHaveBeenCalledWith(headers, sessionId); expect(x.tracked).toHaveLength(1);
     await Promise.all(x.tracked); const sent = (x.delivery.sendSmsOtp as ReturnType<typeof vi.fn>).mock.calls[0][0]; expect(sent.purpose).toBe("reauth");
     const input = arg(s.beginReauth, "beginReauth") as OperatorAuthStoreInputs["beginReauth"];
     expect(input.challengeDigest).toEqual(crypto.digestChallenge(generated, "reauth", "sms_otp", sent.otp)); expect(JSON.stringify(response)).not.toContain(phone);
@@ -216,8 +219,64 @@ describe("operator sessions, logout, and reauthentication", () => {
     const rejectingStore = store({ beginReauth: vi.fn(async (item) => ({ outcome: "started", challengeId: item.challengeId, normalizedPhone: phone, expiresAt: later })) });
     const rejecting = setup(rejectingStore);
     (rejecting.delivery.sendSmsOtp as ReturnType<typeof vi.fn>).mockRejectedValue(new Error(`${phone} ${otp}`));
-    expect(await rejecting.service.requestReauth(credential, headers)).toEqual({ accepted: true });
+    const rejectingResponse = await rejecting.service.requestReauth(credential, headers);
+    const rejectingInput = arg(rejectingStore.beginReauth, "beginReauth") as OperatorAuthStoreInputs["beginReauth"];
+    expect(rejectingResponse).toEqual({ accepted: true, challengeId: rejectingInput.challengeId });
     await expect(Promise.all(rejecting.tracked)).resolves.toEqual([undefined]);
+  });
+
+  it("returns request-link's exact frozen accepted-only contract unchanged", async () => {
+    const s = store({ begin: vi.fn(async (input) => ({ outcome: "accepted", emailChallengeId: input.emailChallengeId, expiresAt: later })) });
+    const result = await setup(s).service.requestLink(email, headers);
+    expect(result).toBe(OPERATOR_AUTH_REQUEST_ACCEPTED);
+    expect(Object.keys(result)).toEqual(["accepted"]);
+    expect(JSON.stringify(result)).toBe('{"accepted":true}');
+    expect(Object.isFrozen(result)).toBe(true);
+  });
+
+  it("fails closed on mismatched, non-canonical, extra, accessor, and proxy reauth store successes", async () => {
+    let getterCalls = 0;
+    const proxyTraps = { getPrototypeOf: 0, ownKeys: 0, getOwnPropertyDescriptor: 0 };
+    let dateGetCalls = 0;
+    const traps: ProxyHandler<object> = {
+      getPrototypeOf: () => { proxyTraps.getPrototypeOf += 1; throw new Error("hostile getPrototypeOf"); },
+      ownKeys: () => { proxyTraps.ownKeys += 1; throw new Error("hostile ownKeys"); },
+      getOwnPropertyDescriptor: () => {
+        proxyTraps.getOwnPropertyDescriptor += 1;
+        throw new Error("hostile getOwnPropertyDescriptor");
+      },
+    };
+    const cases: OperatorAuthStore[] = [
+      store({ beginReauth: vi.fn(async () => ({ outcome: "started", challengeId: flowId, normalizedPhone: phone, expiresAt: later })) }),
+      store({ beginReauth: vi.fn(async (input) => ({ outcome: "started", challengeId: input.challengeId.toUpperCase(), normalizedPhone: phone, expiresAt: later })) }),
+      store({ beginReauth: vi.fn(async (input) => ({ outcome: "started", challengeId: input.challengeId, normalizedPhone: phone, expiresAt: later, operatorId: flowId })) }),
+      store({ beginReauth: vi.fn(async (input) => {
+        const result = { outcome: "started", challengeId: input.challengeId, normalizedPhone: phone, expiresAt: later } as Record<string, unknown>;
+        Object.defineProperty(result, "challengeId", { enumerable: true, get: () => { getterCalls += 1; return input.challengeId; } });
+        return result;
+      }) }),
+      store({ beginReauth: vi.fn(async (input) => new Proxy(
+        { outcome: "started", challengeId: input.challengeId, normalizedPhone: phone, expiresAt: later }, traps,
+      )) }),
+      store({ beginReauth: vi.fn(async (input) => ({
+        outcome: "started", challengeId: input.challengeId, normalizedPhone: phone,
+        expiresAt: new Proxy(new Date(later), {
+          ...traps,
+          get: () => { dateGetCalls += 1; throw new Error("hostile Date get"); },
+        }),
+      })) }),
+    ];
+    for (const item of cases) {
+      const x = setup(item);
+      const response = await x.service.requestReauth(credential, headers);
+      expect(response).toEqual({ authenticated: false });
+      expect(JSON.stringify(response)).not.toMatch(/phone|otp|operatorId|expiresAt/);
+      expect(x.delivery.sendSmsOtp).not.toHaveBeenCalled();
+      expect(x.tracked).toHaveLength(0);
+    }
+    expect(getterCalls).toBe(0);
+    expect(proxyTraps).toEqual({ getPrototypeOf: 0, ownKeys: 0, getOwnPropertyDescriptor: 0 });
+    expect(dateGetCalls).toBe(0);
   });
 
   it("maps invalid issuance generically and store outage distinctly", async () => {

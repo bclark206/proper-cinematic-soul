@@ -67,11 +67,14 @@ describe("operator authentication cryptography", () => {
       crypto.digestChallenge(ids[0], "reauth", "sms_otp", "123456"),
       crypto.digestSession(ids[0], rawA), crypto.digestAdmissionActor("203.0.113.7"),
       crypto.digestAdmissionContact("operator@example.test"), crypto.digestAdmissionSession(ids[0]),
+      crypto.digestReadCursor("operator@example.test"),
     ].map((value) => value.toString("hex"));
     expect(new Set(values).size).toBe(values.length);
     expect(Object.keys(crypto)).not.toContain("digest");
     expect(crypto.digestFlow(ids[0], rawA)).not.toEqual(createHash("sha256").update(rawA).digest());
     expect(crypto.digestFlow(ids[0], rawA)).toHaveLength(32);
+    expect(crypto.digestReadCursor("operator@example.test"))
+      .not.toEqual(crypto.digestAdmissionContact("operator@example.test"));
   });
 
   it("rejects malformed UUID, purpose, factor, verifier, OTP, and admission identifiers", () => {
@@ -89,6 +92,8 @@ describe("operator authentication cryptography", () => {
       () => crypto.digestAdmissionActor("203.0.113.999"),
       () => crypto.digestAdmissionContact(" Operator@Example.test "),
       () => crypto.digestAdmissionSession("not-a-uuid"),
+      () => crypto.digestReadCursor("é"),
+      () => crypto.digestReadCursor("x"),
     ];
     for (const failure of failures) expect(failure).toThrow(TypeError);
   });

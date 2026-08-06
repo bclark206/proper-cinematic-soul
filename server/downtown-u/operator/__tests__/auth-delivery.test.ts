@@ -81,16 +81,16 @@ describe("operator authentication delivery", () => {
     expect(link).toBeDefined();
     const parsed = new URL(link!);
     expect(parsed.origin).toBe("https://operators.example.test");
-    expect(parsed.pathname).toBe("/");
+    expect(parsed.pathname).toBe("/downtown-u/operator/auth");
     expect(parsed.search).toBe("");
-    expect(parsed.hash.startsWith("#/downtown-u/operator/auth?")).toBe(true);
-    const fragmentParams = new URLSearchParams(parsed.hash.split("?", 2)[1]);
-    expect(Object.fromEntries(fragmentParams)).toEqual({
-      flowId: FLOW_ID,
-      flowVerifier: FLOW_VERIFIER,
-      challengeId: CHALLENGE_ID,
-      verifier: CHALLENGE_VERIFIER,
-    });
+    const fragmentParams = new URLSearchParams(parsed.hash.slice(1));
+    expect([...fragmentParams.entries()]).toEqual([
+      ["flowId", FLOW_ID],
+      ["flowVerifier", FLOW_VERIFIER],
+      ["challengeId", CHALLENGE_ID],
+      ["verifier", CHALLENGE_VERIFIER],
+    ]);
+    expect(fragmentParams.size).toBe(4);
     const serverRequestTarget = `${parsed.pathname}${parsed.search}`;
     for (const credential of [FLOW_ID, FLOW_VERIFIER, CHALLENGE_ID, CHALLENGE_VERIFIER]) {
       expect(serverRequestTarget).not.toContain(credential);

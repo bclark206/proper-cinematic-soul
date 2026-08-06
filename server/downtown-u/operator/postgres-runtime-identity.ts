@@ -2,10 +2,10 @@ import type { PoolClient } from "pg";
 
 export type OperatorQueryable = Pick<PoolClient, "query">;
 
-/** PG16 descriptors generated from pristine migrations 001-010; never learned at runtime. */
-export const OPERATOR_RELATION_TOPOLOGY_SHA256 = "efdd8914954a65c8d68c2fbe5012039f74321cfc4b4640e4b5d44488c00dba94";
-export const OPERATOR_CAPABILITY_TOPOLOGY_SHA256 = "1c79596947b0fe0fb19dc430f9104aed7283ee3108172a77aa465ab0d60b2777";
-export const OPERATOR_DEPENDENCY_TOPOLOGY_SHA256 = "0f5c5b5c538342fdc983999b7e22d0dfc55ea81f33fc46e95b2e847b87042dbc";
+/** PG16 descriptors generated from pristine migrations 001-012; never learned at runtime. */
+export const OPERATOR_RELATION_TOPOLOGY_SHA256 = "52a6fd0bde365e37b0d909810757f588c14154230362b61171a15d65f8a6f0f9";
+export const OPERATOR_CAPABILITY_TOPOLOGY_SHA256 = "ed5c067164a119585023e412c665f1087fa326a42691153fb800f3ba9172fba1";
+export const OPERATOR_DEPENDENCY_TOPOLOGY_SHA256 = "27e8b48b66ce6ef394a6c1fddd13a18a18300a4bd143db743a23097915381d71";
 
 interface IdentityRow { safe_operator_identity: boolean }
 
@@ -35,7 +35,9 @@ export async function assertDowntownUOperatorRuntimeIdentity(queryable: Operator
         AND c.relkind IN ('r','p','v','m','f','S')
     ), operator_relations AS (
       SELECT c.* FROM downtown_relations c
-      WHERE c.relname LIKE 'downtown!_u!_operator!_%' ESCAPE '!' OR c.relname='downtown_u_eligibility_events'
+      WHERE c.relname LIKE 'downtown!_u!_operator!_%' ESCAPE '!'
+        OR c.relname IN ('downtown_u_eligibility_events','downtown_u_students','downtown_u_plan_purchases',
+          'downtown_u_redemptions','downtown_u_reservation_snapshots')
     ), downtown_functions AS (
       SELECT p.*,l.lanname FROM pg_catalog.pg_proc p JOIN pg_catalog.pg_namespace n ON n.oid=p.pronamespace
       JOIN pg_catalog.pg_language l ON l.oid=p.prolang
@@ -47,7 +49,12 @@ export async function assertDowntownUOperatorRuntimeIdentity(queryable: Operator
       ('downtown_u_operator_auth_validate_session(uuid,smallint,bytea,text,text,text)'),
       ('downtown_u_operator_auth_begin_reauth(uuid,smallint,bytea,uuid,smallint,bytea,text)'),
       ('downtown_u_operator_auth_finish_reauth(uuid,smallint,bytea,uuid,smallint,bytea,text)'),
-      ('downtown_u_operator_auth_revoke_session(uuid,smallint,bytea,text)')
+      ('downtown_u_operator_auth_revoke_session(uuid,smallint,bytea,text)'),
+      ('downtown_u_operator_read_students(uuid,smallint,bytea,text,integer,timestamp with time zone,uuid,text,uuid)'),
+      ('downtown_u_operator_read_purchases(uuid,smallint,bytea,text,integer,timestamp with time zone,uuid,text,uuid,uuid)'),
+      ('downtown_u_operator_read_redemptions(uuid,smallint,bytea,text,integer,timestamp with time zone,uuid,text,uuid,uuid)'),
+      ('downtown_u_operator_read_reconciliation(uuid,smallint,bytea,text,integer,timestamp with time zone,uuid,text,text,uuid,uuid)'),
+      ('downtown_u_operator_set_eligibility(uuid,smallint,bytea,text,text,uuid,uuid,uuid,text,timestamp with time zone,text,text,text)')
     ), capabilities AS (
       SELECT p.* FROM downtown_functions p JOIN expected_capabilities e
         ON p.oid=pg_catalog.to_regprocedure('public.'||e.signature)::oid
@@ -157,8 +164,8 @@ export async function assertDowntownUOperatorRuntimeIdentity(queryable: Operator
         WHERE d.relkind<>'S' AND pg_catalog.has_column_privilege(i.oid,d.oid,a.attname,'SELECT,INSERT,UPDATE,REFERENCES'))
       AND NOT EXISTS (SELECT 1 FROM downtown_functions p WHERE p.proowner=i.oid OR pg_catalog.pg_has_role(i.oid,p.proowner,'MEMBER')
         OR pg_catalog.has_function_privilege(i.oid,p.oid,'EXECUTE') <> EXISTS(SELECT 1 FROM capabilities a WHERE a.oid=p.oid))
-      AND (SELECT count(*) FROM capabilities)=7
-      AND (SELECT count(*) FROM executable_dependencies)=5
+      AND (SELECT count(*) FROM capabilities)=12
+      AND (SELECT count(*) FROM executable_dependencies)=6
       AND NOT EXISTS (SELECT 1 FROM capabilities p WHERE p.proowner<>(SELECT oid FROM trusted_owner) OR p.lanname<>'plpgsql'
         OR NOT p.prosecdef OR p.proisstrict OR p.proconfig IS DISTINCT FROM ARRAY['search_path=pg_catalog']::text[] OR p.pronargdefaults<>0)
       AND NOT EXISTS (SELECT 1 FROM capabilities p CROSS JOIN LATERAL pg_catalog.aclexplode(COALESCE(p.proacl,pg_catalog.acldefault('f',p.proowner))) a

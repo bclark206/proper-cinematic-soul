@@ -17,6 +17,7 @@ import {
   type OperatorSessionCredential,
 } from "../../../server/downtown-u/operator/auth-http";
 import { OperatorAuthService, type OperatorAuthStore } from "../../../server/downtown-u/operator/auth-service";
+import { exactOwnData, isCanonicalLowercaseUuid } from "../../../server/downtown-u/operator/trusted-result";
 import {
   PostgresOperatorAuthStore,
   getDowntownUOperatorPool,
@@ -164,8 +165,10 @@ export function createOperatorAuthHandler(
         else send(response, 204, undefined, clearOperatorSessionCookie());
       } else if (endpoint === "reauth-request") {
         const result = await composition.service.requestReauth(sessionCredential!, headers);
-        if ("accepted" in result && result.accepted === true) send(response, 202, ACCEPTED);
-        else if ("unavailable" in result) unavailable(endpoint, response);
+        const accepted = exactOwnData(result, ["accepted", "challengeId"]);
+        if (accepted?.accepted === true && isCanonicalLowercaseUuid(accepted.challengeId)) {
+          send(response, 202, { accepted: true, challengeId: accepted.challengeId });
+        } else if (exactOwnData(result, ["unavailable"])?.unavailable === true) unavailable(endpoint, response);
         else send(response, 401, AUTHENTICATION_FAILED);
       } else {
         const result = await composition.service.verifyReauth(sessionCredential!, body as { challengeId: string; otp: string }, headers);

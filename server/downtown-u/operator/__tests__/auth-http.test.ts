@@ -54,6 +54,24 @@ describe("operator auth POST raw boundary", () => {
     }
   });
 
+  it("keeps reauth verification at the exact challengeId plus six-digit OTP schema", async () => {
+    const valid = rawRequest("POST", JSON.stringify({ challengeId: uuid, otp: "123456" }), {
+      origin, "content-type": "application/json",
+    });
+    await expect(parseOperatorPostRequest(valid, "reauth-verify", origin)).resolves.toEqual({ challengeId: uuid, otp: "123456" });
+    for (const body of [
+      { challengeId: uuid },
+      { challengeId: uuid, otp: "12345" },
+      { challengeId: uuid, otp: "1234567" },
+      { challengeId: uuid, otp: "12345a" },
+      { challengeId: uuid, otp: "123456", extra: true },
+    ]) {
+      await rejected(parseOperatorPostRequest(rawRequest("POST", JSON.stringify(body), {
+        origin, "content-type": "application/json",
+      }), "reauth-verify", origin));
+    }
+  });
+
   it("rejects method, origin, fetch metadata, and non-exact media type generically", async () => {
     const body = JSON.stringify({ email: "student@example.test" });
     const variants = [
@@ -141,6 +159,8 @@ describe("operator auth security response headers", () => {
   it("defines immutable no-store headers for success and error responses", () => {
     expect(OPERATOR_AUTH_RESPONSE_HEADERS).toEqual({
       "Cache-Control": "private, no-store, max-age=0",
+      "CDN-Cache-Control": "no-store",
+      "Vercel-CDN-Cache-Control": "no-store",
       "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
       "Referrer-Policy": "no-referrer",
       "X-Content-Type-Options": "nosniff",

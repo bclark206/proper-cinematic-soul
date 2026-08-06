@@ -70,6 +70,7 @@ export interface OperatorAuthCryptography {
   digestAdmissionActor(canonicalActorIp: string): Buffer;
   digestAdmissionContact(normalizedEmail: string): Buffer;
   digestAdmissionSession(sessionId: string): Buffer;
+  digestReadCursor(canonicalPayload: string): Buffer;
 }
 
 export function createOperatorAuthCryptography(secret: string | undefined): OperatorAuthCryptography {
@@ -112,6 +113,11 @@ export function createOperatorAuthCryptography(secret: string | undefined): Oper
     digestAdmissionSession(sessionId: string): Buffer {
       requireUuid(sessionId);
       return hmac("operator-admission:v1:session", sessionId);
+    },
+    digestReadCursor(canonicalPayload: string): Buffer {
+      if (typeof canonicalPayload !== "string" || canonicalPayload.length < 2 || canonicalPayload.length > 1_024
+        || !/^[\x20-\x7e]+$/.test(canonicalPayload)) throw new TypeError("Invalid operator dashboard cursor payload");
+      return hmac("operator-dashboard-cursor:v1", canonicalPayload);
     },
   });
 }

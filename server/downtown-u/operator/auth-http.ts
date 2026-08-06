@@ -7,6 +7,8 @@ export const OPERATOR_SESSION_COOKIE_NAME = "__Host-downtown_u_operator_session"
 
 export const OPERATOR_AUTH_RESPONSE_HEADERS: Readonly<Record<string, string>> = Object.freeze({
   "Cache-Control": "private, no-store, max-age=0",
+  "CDN-Cache-Control": "no-store",
+  "Vercel-CDN-Cache-Control": "no-store",
   "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
   "Referrer-Policy": "no-referrer",
   "X-Content-Type-Options": "nosniff",
@@ -37,8 +39,10 @@ export interface OperatorSessionCredential { sessionId: string; bearer: string }
 
 /** A deliberately value-free error suitable for mapping to a generic 4xx response. */
 export class OperatorAuthBoundaryError extends Error {
-  readonly code = "invalid_request";
-  constructor() { super("Invalid operator auth request"); this.name = "OperatorAuthBoundaryError"; }
+  constructor(readonly code: "invalid_request" | "forbidden" = "invalid_request") {
+    super("Invalid operator auth request");
+    this.name = "OperatorAuthBoundaryError";
+  }
 }
 
 function invalid(): never { throw new OperatorAuthBoundaryError(); }
@@ -107,9 +111,10 @@ function safeMethod(request: object): string {
 
 function assertOrigin(headers: Map<string, string>, configuredOrigin: string, required: boolean): void {
   const origin = headers.get("origin");
-  if ((required && origin === undefined) || (origin !== undefined && origin !== configuredOrigin)) invalid();
+  if (required && origin === undefined) invalid();
+  if (origin !== undefined && origin !== configuredOrigin) throw new OperatorAuthBoundaryError("forbidden");
   const fetchSite = headers.get("sec-fetch-site");
-  if (fetchSite !== undefined && fetchSite !== "same-origin") invalid();
+  if (fetchSite !== undefined && fetchSite !== "same-origin") throw new OperatorAuthBoundaryError("forbidden");
 }
 
 function asyncIterator(request: object): (() => AsyncIterator<Uint8Array | string>) | undefined {

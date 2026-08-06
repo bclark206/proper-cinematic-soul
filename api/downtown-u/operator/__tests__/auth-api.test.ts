@@ -146,13 +146,69 @@ describe("operator auth API adapter", () => {
   });
 
   it("maps reauth request and verify with mandatory credentials and exact bodies", async () => {
-    const started = service({ requestReauth: vi.fn().mockResolvedValue({ accepted: true }) });
-    expect((await invoke("reauth-request", started, request("POST", {}, { cookie }))).result).toMatchObject({ status: 202, body: { accepted: true } });
+    const started = service({ requestReauth: vi.fn().mockResolvedValue(Object.freeze({ accepted: true, challengeId: uuid2 })) });
+    const issued = (await invoke("reauth-request", started, request("POST", {}, { cookie }))).result;
+    expect(issued.status).toBe(202);
+    expect(issued.body).toEqual({ accepted: true, challengeId: uuid2 });
+    expect(Object.keys(issued.body as object)).toEqual(["accepted", "challengeId"]);
+    expect(JSON.stringify(issued.body)).toBe(`{"accepted":true,"challengeId":"${uuid2}"}`);
+    expect(issued.headers["Set-Cookie"]).toBeUndefined();
+    expect(JSON.stringify(issued.headers)).not.toContain(uuid2);
     const verified = service({ verifyReauth: vi.fn().mockResolvedValue({ reauthenticated: true, validForSeconds: 300 }) });
-    expect((await invoke("reauth-verify", verified, request("POST", { challengeId: uuid2, otp: "123456" }, { cookie }))).result)
+    const verifyRequest = request("POST", { challengeId: uuid2, otp: "123456" }, { cookie });
+    expect((await invoke("reauth-verify", verified, verifyRequest)).result)
       .toMatchObject({ status: 200, body: { reauthenticated: true, validForSeconds: 300 } });
+    expect(verified.verifyReauth).toHaveBeenCalledWith({ sessionId: uuid, bearer }, { challengeId: uuid2, otp: "123456" }, expect.objectContaining({ cookie }));
     const noCookie = await invoke("reauth-request", started, request("POST", {}));
     expect(noCookie.result).toMatchObject({ status: 401, body: { authenticated: false } });
+  });
+
+  it("maps every malformed trusted reauth issuance result to exact generic unauthorized without traps or leaks", async () => {
+    const invalid = (await invoke("reauth-request", service({
+      requestReauth: vi.fn().mockResolvedValue({ authenticated: false }),
+    }), request("POST", {}, { cookie }))).result;
+    expect(invalid.status).toBe(401);
+    expect(invalid.body).toEqual({ authenticated: false });
+    expect(Object.keys(invalid.body as object)).toEqual(["authenticated"]);
+
+    let getterCalls = 0;
+    const proxyTraps = { getPrototypeOf: 0, ownKeys: 0, getOwnPropertyDescriptor: 0 };
+    const accessor = { accepted: true, challengeId: uuid2 } as Record<string, unknown>;
+    Object.defineProperty(accessor, "challengeId", { enumerable: true, get: () => { getterCalls += 1; return uuid2; } });
+    const hostile = new Proxy({ accepted: true, challengeId: uuid2 }, {
+      getPrototypeOf: () => { proxyTraps.getPrototypeOf += 1; throw new Error("hostile getPrototypeOf"); },
+      ownKeys: () => { proxyTraps.ownKeys += 1; throw new Error("hostile ownKeys"); },
+      getOwnPropertyDescriptor: () => {
+        proxyTraps.getOwnPropertyDescriptor += 1;
+        throw new Error("hostile getOwnPropertyDescriptor");
+      },
+    });
+    for (const result of [
+      { accepted: true },
+      { accepted: true, challengeId: uuid2, phone: "+14155550123" },
+      accessor,
+      hostile,
+    ]) {
+      const auth = service({ requestReauth: vi.fn().mockResolvedValue(result) });
+      const out = await invoke("reauth-request", auth, request("POST", {}, { cookie }));
+      expect(out.result).toEqual(invalid);
+      expect(JSON.stringify(out.result)).not.toMatch(/223e4567|opaque-id-must-not-leak|14155550123|phone|challenge/i);
+      expect(out.result.headers["Set-Cookie"]).toBeUndefined();
+    }
+    expect(getterCalls).toBe(0);
+    expect(proxyTraps).toEqual({ getPrototypeOf: 0, ownKeys: 0, getOwnPropertyDescriptor: 0 });
+  });
+
+  it("keeps explicit and thrown reauth issuance unavailability distinct from malformed results", async () => {
+    for (const requestReauth of [
+      vi.fn().mockResolvedValue({ unavailable: true }),
+      vi.fn().mockRejectedValue(new Error("store unavailable")),
+    ]) {
+      const out = await invoke("reauth-request", service({ requestReauth }), request("POST", {}, { cookie }));
+      expect(out.result.status).toBe(503);
+      expect(out.result.body).toEqual({ error: "unavailable" });
+      expect(out.result.headers["Set-Cookie"]).toBeUndefined();
+    }
   });
 
   it("returns the exact Allow method and security headers for every injected and production 405 without composing", async () => {
