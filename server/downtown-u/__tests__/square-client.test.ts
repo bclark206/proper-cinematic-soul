@@ -57,6 +57,17 @@ describe("Square API client", () => {
       body: JSON.stringify(body), signal: expect.any(AbortSignal),
     });
   });
+  it("sends exact versioned Square order cancellation updates", async () => {
+    const body = { idempotency_key: "stable-cancel", order: { location_id: "LOC_1", version: 7, state: "CANCELED" } };
+    const fetchImpl = vi.fn().mockResolvedValue(response({ order: { id: "order-1", version: 8, state: "CANCELED" } }));
+    await expect(createSquareClient({ ...config, fetchImpl }).updateOrder("order-1", body)).resolves.toMatchObject({ id: "order-1", version: 8 });
+    expect(fetchImpl).toHaveBeenCalledWith("https://connect.squareup.com/v2/orders/order-1", {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${config.accessToken}`, "Square-Version": config.apiVersion,
+        Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(body), signal: expect.any(AbortSignal),
+    });
+  });
   it.each([
     ["getPayment", "pay_1", "/v2/payments/pay_1", "payment"],
     ["getOrder", "order-1", "/v2/orders/order-1", "order"],

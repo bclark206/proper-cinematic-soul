@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:postgres": "vitest run --no-file-parallelism server/downtown-u/__tests__/migration.integration.test.ts server/downtown-u/__tests__/webhook-event-store.integration.test.ts",
+    "test:postgres": "vitest run --no-file-parallelism server/downtown-u/__tests__/migration.integration.test.ts server/downtown-u/__tests__/webhook-event-store.integration.test.ts server/downtown-u/__tests__/kitchen-outbox.integration.test.ts",
     "typecheck": "tsc -b --pretty false",
     "typecheck:server": "tsc -p tsconfig.server.json --pretty false"
   },

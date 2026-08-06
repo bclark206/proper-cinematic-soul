@@ -16,7 +16,7 @@ describe("Vercel Downtown U API routing", () => {
       (rewrite) => rewrite.source === "/(.*)" && rewrite.destination === "/index.html",
     );
 
-    const paths = ["square-webhook", "request-link", "send-code", "verify-code", "me", "meals", "purchases", "reservations", "reservations/:id/cancel", "logout", "jobs/expire-reservations"];
+    const paths = ["square-webhook", "request-link", "send-code", "verify-code", "me", "meals", "purchases", "reservations", "reservations/:id/cancel", "logout", "jobs/expire-reservations", "jobs/process-kitchen-orders"];
     for (const path of paths) {
       const route = { source: `/api/downtown-u/${path}`, destination: `/api/downtown-u/${path}` };
       const index = config.rewrites.findIndex((rewrite) => rewrite.source === route.source && rewrite.destination === route.destination);
@@ -26,5 +26,5 @@ describe("Vercel Downtown U API routing", () => {
     }
     expect(catchAllIndex).toBe(config.rewrites.length - 1);
   });
-  it("schedules the authenticated expiry route every five minutes",()=>{const config=JSON.parse(readFileSync(resolve(process.cwd(),"vercel.json"),"utf8")) as VercelConfig;expect(config.crons).toEqual([{path:"/api/downtown-u/jobs/expire-reservations",schedule:"*/5 * * * *"}])});
+  it("schedules both authenticated bounded jobs",()=>{const config=JSON.parse(readFileSync(resolve(process.cwd(),"vercel.json"),"utf8")) as VercelConfig;expect(config.crons).toEqual([{path:"/api/downtown-u/jobs/expire-reservations",schedule:"*/5 * * * *"},{path:"/api/downtown-u/jobs/process-kitchen-orders",schedule:"* * * * *"}])});
 });

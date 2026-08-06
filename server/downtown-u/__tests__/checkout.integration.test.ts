@@ -29,6 +29,7 @@ const migrations = [
   "202608040005_downtown_u_auth.sql",
   "202608040006_downtown_u_student_portal.sql",
   "202608040007_downtown_u_checkout.sql",
+  "202608040008_downtown_u_kitchen_outbox.sql",
 ].map((name) => readFileSync(resolve(process.cwd(), "db/migrations", name), "utf8"));
 let admin: Pool;
 let owner: Pool;

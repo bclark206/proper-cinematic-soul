@@ -19,6 +19,13 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       SELECT r.oid, r.rolcanlogin, r.rolsuper, r.rolcreatedb, r.rolcreaterole,
              r.rolreplication, r.rolbypassrls
       FROM pg_catalog.pg_roles AS r WHERE r.rolname = 'downtown_u_jobs'
+    ), kitchen_role AS (
+      SELECT r.oid,r.rolcanlogin,r.rolsuper,r.rolcreatedb,r.rolcreaterole,r.rolreplication,r.rolbypassrls
+      FROM pg_catalog.pg_roles r WHERE r.rolname='downtown_u_kitchen_jobs'
+      UNION ALL
+      SELECT NULL::oid,false,false,false,false,false,false
+      WHERE pg_catalog.to_regclass('public.downtown_u_kitchen_order_outbox') IS NULL
+        AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles r WHERE r.rolname='downtown_u_kitchen_jobs')
     ), expected_relations (
       relname, columns, table_select, table_insert, table_update, table_delete,
       table_truncate, table_references, table_trigger, insert_columns, update_columns
@@ -59,12 +66,14 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       FROM pg_catalog.pg_class AS c
       JOIN pg_catalog.pg_namespace AS n ON n.oid = c.relnamespace
       WHERE n.nspname = 'public' AND c.relname LIKE 'downtown!_u!_%' ESCAPE '!'
+        AND c.relname NOT LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!'
         AND c.relkind IN ('r', 'p', 'v', 'm', 'f')
     ), downtown_sequences AS (
       SELECT c.oid
       FROM pg_catalog.pg_class AS c
       JOIN pg_catalog.pg_namespace AS n ON n.oid = c.relnamespace
       WHERE n.nspname = 'public' AND c.relname LIKE 'downtown!_u!_%' ESCAPE '!'
+        AND c.relname NOT LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!'
         AND c.relkind = 'S'
     ), expected_columns AS (
       SELECT e.relname, expanded.attname
@@ -247,6 +256,7 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       JOIN pg_catalog.pg_namespace AS n ON n.oid = p.pronamespace
       JOIN pg_catalog.pg_language AS l ON l.oid = p.prolang
       WHERE n.nspname = 'public' AND p.proname LIKE 'downtown!_u!_%' ESCAPE '!'
+        AND p.proname NOT LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!'
     ), expected_auth_function_fingerprints (function_oid, expected_sha256) AS (VALUES
       (pg_catalog.to_regprocedure('public.downtown_u_auth_protect_challenge()')::oid, '8e044f7c953a183c1d8489df99d3e9592bd14045add0066e164fbe86077f904e'),
       (pg_catalog.to_regprocedure('public.downtown_u_auth_protect_session()')::oid, '30d1854c0d7c4ecaa987f340cf22d519455aaa8f4b0d809b3d4d947338723ad6'),
@@ -381,7 +391,7 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
         t.tgnargs AS argument_count, pg_catalog.encode(t.tgargs, 'hex') AS arguments_hex
       FROM pg_catalog.pg_trigger AS t
       JOIN downtown_relations AS c ON c.oid=t.tgrelid
-      WHERE NOT t.tgisinternal
+      WHERE NOT t.tgisinternal AND t.tgname NOT LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!'
     )
     SELECT COALESCE((SELECT i.rolcanlogin
       AND SESSION_USER = CURRENT_USER
@@ -391,8 +401,16 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
       AND NOT rr.rolcreaterole AND NOT rr.rolreplication AND NOT rr.rolbypassrls
       AND NOT jr.rolcanlogin AND NOT jr.rolsuper AND NOT jr.rolcreatedb
       AND NOT jr.rolcreaterole AND NOT jr.rolreplication AND NOT jr.rolbypassrls
+      AND (kr.oid IS NULL OR (NOT kr.rolcanlogin AND NOT kr.rolsuper AND NOT kr.rolcreatedb AND NOT kr.rolcreaterole AND NOT kr.rolreplication AND NOT kr.rolbypassrls))
       AND pg_catalog.pg_has_role(CURRENT_USER, 'downtown_u_runtime', 'MEMBER')
       AND NOT pg_catalog.pg_has_role(CURRENT_USER, 'downtown_u_jobs', 'MEMBER')
+      AND NOT COALESCE(pg_catalog.pg_has_role(CURRENT_USER, kr.oid, 'MEMBER'),false)
+      AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
+        WHERE n.nspname='public' AND c.relname LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!'
+          AND pg_catalog.has_table_privilege(CURRENT_USER,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'))
+      AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_proc p JOIN pg_catalog.pg_namespace n ON n.oid=p.pronamespace
+        WHERE n.nspname='public' AND p.proname LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!'
+          AND pg_catalog.has_function_privilege(CURRENT_USER,p.oid,'EXECUTE'))
       AND NOT pg_catalog.has_schema_privilege(CURRENT_USER, 'public', 'CREATE')
       AND NOT pg_catalog.has_database_privilege(CURRENT_USER, CURRENT_DATABASE(), 'CREATE')
       AND NOT EXISTS (
@@ -546,7 +564,7 @@ export function assertDowntownURuntimeIdentity(queryable: Queryable): Promise<vo
           OR d.argument_count <> e.argument_count
           OR d.arguments_hex <> e.arguments_hex
       )
-      FROM identity AS i CROSS JOIN runtime_role AS rr CROSS JOIN jobs_role AS jr), false) AS safe_runtime_identity
+      FROM identity AS i CROSS JOIN runtime_role AS rr CROSS JOIN jobs_role AS jr CROSS JOIN kitchen_role AS kr), false) AS safe_runtime_identity
   `).then((result) => {
     if (result.rows.length !== 1 || result.rows[0].safe_runtime_identity !== true) {
       throw new Error("Unsafe Downtown U runtime database identity");

@@ -10,14 +10,23 @@ export function assertDowntownUJobRuntimeIdentity(queryable: Queryable): Promise
     ), job_role AS (
       SELECT oid,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls FROM pg_catalog.pg_roles WHERE rolname='downtown_u_jobs'
     ), runtime_role AS (SELECT oid FROM pg_catalog.pg_roles WHERE rolname='downtown_u_runtime'),
+    kitchen_role AS (
+      SELECT oid,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls FROM pg_catalog.pg_roles WHERE rolname='downtown_u_kitchen_jobs'
+      UNION ALL
+      SELECT NULL::oid,false,false,false,false,false,false
+      WHERE pg_catalog.to_regclass('public.downtown_u_kitchen_order_outbox') IS NULL
+        AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname='downtown_u_kitchen_jobs')
+    ),
     trusted_owner AS (SELECT proowner AS oid FROM pg_catalog.pg_proc WHERE oid=pg_catalog.to_regprocedure('public.downtown_u_require_trusted_purchase_grant()')),
     downtown_relations AS (
       SELECT c.* FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname='public' AND c.relname LIKE 'downtown!_u!_%' ESCAPE '!' AND c.relkind IN('r','p','v','m','f','S')
+        AND c.relname NOT LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!'
     ), downtown_functions AS (
       SELECT p.*,l.lanname FROM pg_catalog.pg_proc p JOIN pg_catalog.pg_namespace n ON n.oid=p.pronamespace
       JOIN pg_catalog.pg_language l ON l.oid=p.prolang
       WHERE n.nspname='public' AND p.proname LIKE 'downtown!_u!_%' ESCAPE '!'
+        AND p.proname NOT LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!'
     ), relation_topology AS (
       /* PG16-pinned, owner-portable descriptors for every Downtown relation.
        * ACL identities are semantic labels rather than cluster-local OIDs or the
@@ -81,7 +90,8 @@ export function assertDowntownUJobRuntimeIdentity(queryable: Queryable): Promise
           FROM pg_catalog.pg_policy p WHERE p.polrelid=c.oid),
         'triggers',(SELECT COALESCE(pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object(
           'name',t.tgname,'enabled',t.tgenabled,'definition',pg_catalog.pg_get_triggerdef(t.oid,true)) ORDER BY t.tgname COLLATE "C"),'[]'::jsonb)
-          FROM pg_catalog.pg_trigger t WHERE t.tgrelid=c.oid AND NOT t.tgisinternal)
+          FROM pg_catalog.pg_trigger t WHERE t.tgrelid=c.oid AND NOT t.tgisinternal
+            AND t.tgname NOT LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!')
       ) ORDER BY c.relname COLLATE "C"),'[]'::jsonb)::text,'UTF8')),'hex') hash
       FROM downtown_relations c LEFT JOIN pg_catalog.pg_am am ON am.oid=c.relam
     ), function_topology AS (
@@ -120,7 +130,13 @@ export function assertDowntownUJobRuntimeIdentity(queryable: Queryable): Promise
     SELECT COALESCE((SELECT i.rolcanlogin AND SESSION_USER=CURRENT_USER
       AND NOT i.rolsuper AND NOT i.rolcreatedb AND NOT i.rolcreaterole AND NOT i.rolreplication AND NOT i.rolbypassrls
       AND NOT j.rolcanlogin AND NOT j.rolsuper AND NOT j.rolcreatedb AND NOT j.rolcreaterole AND NOT j.rolreplication AND NOT j.rolbypassrls
+      AND (k.oid IS NULL OR (NOT k.rolcanlogin AND NOT k.rolsuper AND NOT k.rolcreatedb AND NOT k.rolcreaterole AND NOT k.rolreplication AND NOT k.rolbypassrls))
       AND pg_catalog.pg_has_role(CURRENT_USER,j.oid,'MEMBER') AND NOT pg_catalog.pg_has_role(CURRENT_USER,r.oid,'MEMBER')
+      AND NOT COALESCE(pg_catalog.pg_has_role(CURRENT_USER,k.oid,'MEMBER'),false)
+      AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public'
+        AND c.relname LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!' AND pg_catalog.has_table_privilege(CURRENT_USER,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'))
+      AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_proc p JOIN pg_catalog.pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public'
+        AND p.proname LIKE 'downtown!_u!_kitchen!_%' ESCAPE '!' AND pg_catalog.has_function_privilege(CURRENT_USER,p.oid,'EXECUTE'))
       AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles x WHERE x.oid NOT IN(i.oid,j.oid) AND pg_catalog.pg_has_role(CURRENT_USER,x.oid,'MEMBER'))
       AND NOT pg_catalog.has_schema_privilege(CURRENT_USER,'public','CREATE') AND NOT pg_catalog.has_database_privilege(CURRENT_USER,CURRENT_DATABASE(),'CREATE')
       AND (SELECT count(*) FROM trusted_owner)=1
@@ -140,7 +156,7 @@ export function assertDowntownUJobRuntimeIdentity(queryable: Queryable): Promise
         WHERE a.grantor<>p.proowner OR a.privilege_type<>'EXECUTE' OR a.is_grantable
           OR (p.proname='downtown_u_reverse_expired_reservations' AND a.grantee<>j.oid)
           OR (p.proname<>'downtown_u_reverse_expired_reservations' AND a.grantee<>r.oid))
-      FROM identity i CROSS JOIN job_role j CROSS JOIN runtime_role r),false) safe_runtime_identity
+      FROM identity i CROSS JOIN job_role j CROSS JOIN runtime_role r CROSS JOIN kitchen_role k),false) safe_runtime_identity
   `).then(result => {
     if (result.rows.length !== 1 || result.rows[0].safe_runtime_identity !== true) throw new Error("Unsafe Downtown U job database identity");
   });

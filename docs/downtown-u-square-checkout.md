@@ -47,8 +47,47 @@ Install `scripts/downtown-u-checkout-retention.sh` in an owner-controlled schedu
 
 Run additional bounded invocations when a backlog exists, stopping when `anonymized_attempts` is zero. Alert on a nonzero script exit and on records older than 97 days whose `redacted_at` remains null. Checkout must remain disabled if this owner-controlled schedule is not installed and tested.
 
+## Kitchen-order outbox operations
+
+Migration `202608040008_downtown_u_kitchen_outbox.sql` atomically creates one immutable, PII-free kitchen outbox row with each reservation snapshot. Historical rows are backfilled as `pending` only while the reservation remains unexpired; stale or reversed reservations are recorded as `cancelled` and never submitted.
+
+The Vercel cron calls `/api/downtown-u/jobs/process-kitchen-orders` every minute. It requires all of:
+
+- `DOWNTOWN_U_PORTAL_ENABLED=1`
+- `DOWNTOWN_U_KITCHEN_ORDERS_ENABLED=1`
+- valid `CRON_SECRET` authorization
+- `DOWNTOWN_U_KITCHEN_DATABASE_URL` authenticating as a dedicated LOGIN whose only membership is `downtown_u_kitchen_jobs`
+- owner-controlled `downtown_u_kitchen_config.enabled=true`
+- Square location `LPPWSSV03BHK8` and API version `2026-01-22`
+
+Claims use 45-second leases, `SKIP LOCKED`, at most 12 provider attempts, and stable create/cancel idempotency keys. No database transaction spans Square HTTP. Tickets contain trusted variation/modifier IDs, quantity one, zero-dollar USD pricing, the reservation UUID reference, and the generic pickup name `Downtown U`; no student email or phone is sent.
+
+### Enable, disable, and monitor
+
+Keep both kitchen gates disabled during migration and credential setup. After the sandbox kitchen ticket, cancellation, cron authentication, database preflight, and alerts pass, the migration owner may enable claims:
+
+```sql
+BEGIN;
+UPDATE public.downtown_u_kitchen_config
+SET enabled = true, updated_at = pg_catalog.clock_timestamp()
+WHERE singleton;
+COMMIT;
+```
+
+Then set the deployment gate to `DOWNTOWN_U_KITCHEN_ORDERS_ENABLED=1`. To stop submissions, reverse the order: set the deployment gate to `0` first, then set the owner-controlled database flag to `false`. Disabling claims never deletes queued work.
+
+The endpoint returns only generic `202`/`503` responses and logs `downtown_u_kitchen_job` with bounded aggregate `claimed`, `completed`, and `deferred` counts. A provider or verification failure returns `202` only after its retry/review state is durably recorded; any failure to persist the Square outcome returns `503`. Alert on any `503`, repeated zero-claim runs while eligible backlog exists, sustained deferred counts, expired leases, `operator_review`, or an oldest eligible age above two minutes.
+
+- `pending`/`leased`: retry with the same create key.
+- `cancel_pending`: recover/create with the original key if needed, then cancel with the stable cancel key.
+- `created`: the reservation was atomically redeemed and linked to the exact Square order.
+- `cancelled`: no provider order existed or its exact cancellation was verified.
+- `operator_review`: never create a replacement order. Reconcile the persisted Square order ID or reservation reference in Square first. Mismatched success responses preserve valid observed order ID/version data.
+
+Never edit outbox rows directly or grant table access to the kitchen login. Audited recovery/requeue belongs to the operator capabilities in migration `009`, not ad hoc SQL.
+
 ## Migration roadmap numbering
 
-- `202608040007`: embedded checkout attempts, capabilities, rate limits, purchase-link trigger (this step)
-- `202608040008`: kitchen order workflow (reserved)
-- `202608040009`: operator audit workflow (reserved)
+- `202608040007`: embedded checkout attempts, capabilities, rate limits, purchase-link trigger
+- `202608040008`: durable Square kitchen-order outbox and isolated worker
+- `202608040009`: operator audit and reconciliation workflow (reserved)

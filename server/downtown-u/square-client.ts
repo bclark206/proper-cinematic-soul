@@ -28,6 +28,7 @@ export interface SquareClient {
 
 export interface SquareCheckoutClient extends SquareClient {
   createOrder(body: SquareResource): Promise<SquareResource>;
+  updateOrder(id: string, body: SquareResource): Promise<SquareResource>;
   createPayment(body: SquareResource): Promise<SquareResource>;
 }
 
@@ -181,7 +182,7 @@ export function createSquareClient(config: SquareClientConfig): SquareCheckoutCl
   const fetchImpl = config.fetchImpl ?? globalThis.fetch;
   if (typeof fetchImpl !== "function") invalidConfig();
 
-  async function requestResource(method: "GET" | "POST", path: string, wrapper: string, body?: SquareResource): Promise<SquareResource> {
+  async function requestResource(method: "GET" | "POST" | "PUT", path: string, wrapper: string, body?: SquareResource): Promise<SquareResource> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -193,7 +194,7 @@ export function createSquareClient(config: SquareClientConfig): SquareCheckoutCl
             Authorization: `Bearer ${config.accessToken}`,
             "Square-Version": config.apiVersion,
             Accept: "application/json",
-            ...(method === "POST" ? { "Content-Type": "application/json" } : {}),
+            ...(method !== "GET" ? { "Content-Type": "application/json" } : {}),
           },
           ...(body === undefined ? {} : { body: JSON.stringify(body) }),
           signal: controller.signal,
@@ -238,6 +239,10 @@ export function createSquareClient(config: SquareClientConfig): SquareCheckoutCl
     getOrder: (id) => getResource("/v2/orders/", "order", id),
     getRefund: (id) => getResource("/v2/refunds/", "refund", id),
     createOrder: (body) => requestResource("POST", "/v2/orders", "order", body),
+    updateOrder: (id, body) => {
+      if (!SQUARE_RESOURCE_ID_PATTERN.test(id)) return Promise.reject(new SquareApiError("permanent", "Invalid Square resource identifier"));
+      return requestResource("PUT", `/v2/orders/${encodeURIComponent(id)}`, "order", body);
+    },
     createPayment: (body) => requestResource("POST", "/v2/payments", "payment", body),
   };
 }
