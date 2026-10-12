@@ -58,10 +58,19 @@ export function useMenu() {
       setLoading(true);
       setError(null);
 
+      // Static snapshot shipped with the site — always available, even if the
+      // live catalog feed is down or the restaurant is closed.
+      const loadStaticSnapshot = async (): Promise<CatalogResponse> => {
+        const res = await fetch("/catalog.json", { cache: "no-store" });
+        if (!res.ok) throw new Error(`Snapshot HTTP ${res.status}`);
+        return (await res.json()) as CatalogResponse;
+      };
+
       try {
         const res = await fetch("/api/catalog", { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: CatalogResponse = await res.json();
+        if (!Array.isArray(data.menuItems)) throw new Error("Invalid catalog response");
 
         if (!cancelled) {
           applyData(data);
@@ -69,6 +78,18 @@ export function useMenu() {
           setLoading(false);
         }
       } catch (err) {
+        // Live feed failed — try the static snapshot, then the local cache.
+        try {
+          const snapshot = await loadStaticSnapshot();
+          if (!cancelled) {
+            applyData(snapshot);
+            setLoading(false);
+            return;
+          }
+        } catch {
+          // fall through to cache
+        }
+
         const cached = getCached();
         if (!cancelled && cached) {
           applyData(cached);
